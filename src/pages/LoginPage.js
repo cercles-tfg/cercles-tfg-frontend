@@ -5,7 +5,7 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <div className="login-box">
-        <h2>Inicia sessió</h2>
+        <h2>Inici de sessió</h2>
         <form>
           <label htmlFor="usuari">Usuari:</label>
           <input
