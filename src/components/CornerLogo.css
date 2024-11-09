@@ -1,0 +1,11 @@
+.corner-logo {
+  position: fixed;
+  top: 20px; /* Ajusta según la posición que desees */
+  right: 20px; /* Ajusta según la posición que desees */
+  z-index: 1000; /* Asegura que el logo siempre esté encima del contenido */
+}
+
+.upc-logo {
+  height: 80px; /* Ajusta el tamaño según necesites */
+  cursor: pointer; /* Hace que parezca clicable, opcional */
+}
