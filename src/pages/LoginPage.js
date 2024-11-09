@@ -19,28 +19,8 @@ const LoginPage = () => {
     <GoogleOAuthProvider clientId="556635874733-kcqieabaqpplmsbp1lnm15qjg9c78bp0.apps.googleusercontent.com">
       <div className="login-page">
         <div className="login-box">
-          <h2>Inici de sessió</h2>
-          <form>
-            <label htmlFor="usuari">Usuari:</label>
-            <input
-              type="text"
-              id="usuari"
-              name="usuari"
-              placeholder="Insereix el teu usuari"
-            />
-
-            <label htmlFor="contrasenya">Contrasenya:</label>
-            <input
-              type="password"
-              id="contrasenya"
-              name="contrasenya"
-              placeholder="Insereix la teva contrasenya"
-            />
-
-            <button type="submit" className="login-button">
-              Inicia sessió
-            </button>
-          </form>
+          <h1>Benvingut a FIB Puntua</h1>
+          <p>Inicia sessió per continuar</p>
 
           <div className="google-login">
             <GoogleLogin

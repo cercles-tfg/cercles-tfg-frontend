@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
-import {
-  FaBars,
-  FaHome,
-  FaUser,
-  FaProjectDiagram,
-  FaSignOutAlt,
-} from 'react-icons/fa';
+import { FaBars, FaHome, FaUser, FaProjectDiagram } from 'react-icons/fa';
 import './Sidebar.css';
+import Logout from '../components/Logout';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -33,8 +28,8 @@ const Sidebar = () => {
           <FaProjectDiagram />
           <span className="link-text">Projectes</span>
         </a>
-        <a href="/sortir">
-          <FaSignOutAlt />
+        <a href="/">
+          <Logout />
           <span className="link-text">Sortir</span>
         </a>
       </div>
