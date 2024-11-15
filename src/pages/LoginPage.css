@@ -90,3 +90,9 @@ input:focus {
 .google-button:hover {
   background: #357ae8;
 }
+
+.error-message {
+  color: red;
+  margin-top: 1rem;
+  font-weight: bold;
+}
