@@ -19,7 +19,12 @@ const LoginPage = () => {
     <GoogleOAuthProvider clientId="556635874733-kcqieabaqpplmsbp1lnm15qjg9c78bp0.apps.googleusercontent.com">
       <div className="login-page">
         <div className="login-box">
-          <h1>Benvingut a UPC Puntua</h1>
+          <h1>CERCLES</h1>
+          <p>
+            {' '}
+            Creació d&apos;Equips i seguiment del Rendiment i CoL·laboracio en
+            projectes d&apos;Enginyeria del Software{' '}
+          </p>
           <p>Inicia sessió amb el teu compte de la UPC per continuar</p>
 
           <div className="google-login">
