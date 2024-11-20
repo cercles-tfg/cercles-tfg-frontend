@@ -4,22 +4,23 @@ const GitHubCallbackHandler = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const code = queryParams.get('code');
+    const jwtToken = localStorage.getItem('jwtToken');
 
-    if (code) {
-      fetch('/github/callback', {
+    if (code && jwtToken) {
+      fetch('http://localhost:8080/api/github/callback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`,
         },
         body: JSON.stringify({ code }),
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.access_token) {
-            console.log('Access Token:', data.access_token);
-            // Aquí puedes almacenar el token o usarlo según sea necesario
+          if (data.message) {
+            console.log('GitHub connected:', data.message);
           } else {
-            console.error('Error al obtener el token:', data.error);
+            console.error('Error connecting GitHub:', data);
           }
         })
         .catch((error) => console.error('Error:', error));
