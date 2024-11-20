@@ -28,10 +28,9 @@ const Sidebar = () => {
           <FaProjectDiagram />
           <span className="link-text">Projectes</span>
         </a>
-        <a href="/">
+        <div>
           <Logout />
-          <span className="link-text">Sortir</span>
-        </a>
+        </div>
       </div>
     </div>
   );
