@@ -8,39 +8,35 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLoginSuccess = (credentialResponse) => {
-    // Decodificar token para obtener el correo del usuario
-    const jwtToken = credentialResponse.credential;
-    const payload = JSON.parse(atob(jwtToken.split('.')[1]));
+    const googleToken = credentialResponse.credential;
+    const payload = JSON.parse(atob(googleToken.split('.')[1]));
     const email = payload.email;
+    console.log('token: ', googleToken);
 
-    // Llamada al backend para verificar si el usuario existe
-    fetch('http://localhost:8080/api/usuarios/verificar', {
+    // Llamada al backend para verificar si el usuario existe y obtener el JWT
+    fetch('http://localhost:8080/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ correo: email }),
+      body: googleToken,
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        return response.json();
+        return response.text();
       })
-      .then((data) => {
-        console.log('Respuesta del backend:', data);
-        if (data.existe) {
-          navigate('/home');
-        } else {
-          setErrorMessage(
-            'El correu introduit no pertany a cap usuari registrat a CERCLES',
-          );
-        }
+      .then((jwt) => {
+        console.log('JWT recibido:', jwt);
+        localStorage.setItem('jwtToken', jwt);
+        localStorage.setItem('userEmail', email);
+        navigate('/home');
       })
       .catch((error) => {
         console.error('Error:', error);
         setErrorMessage(
-          "S'ha produït un error inesperat. Torna-ho a intentar.",
+          'El correu introduit no pertany a cap usuari registrat a CERCLES.',
         );
       });
   };
