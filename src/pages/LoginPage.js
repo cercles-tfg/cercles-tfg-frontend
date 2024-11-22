@@ -19,7 +19,7 @@ const LoginPage = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ googleToken }),
+      body: googleToken,
     })
       .then((response) => {
         if (!response.ok) {
