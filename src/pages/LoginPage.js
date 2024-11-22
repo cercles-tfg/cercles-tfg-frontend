@@ -19,13 +19,13 @@ const LoginPage = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: googleToken,
+      body: JSON.stringify({ googleToken }),
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        return response.text();
+        return response.json();
       })
       .then((jwt) => {
         console.log('JWT recibido:', jwt);
