@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
 import GitHubCallbackHandler from '../components/GitHubCallbackHandler';
 import './PerfilPage.css';
@@ -8,7 +8,7 @@ const PerfilPage = () => {
   const [loading, setLoading] = useState(true);
   const [nombre, setNombre] = useState(null);
 
-  useEffect(() => {
+  const fetchUserData = useCallback(() => {
     // Obtener el JWT del localStorage
     const jwtToken = localStorage.getItem('jwtToken');
 
@@ -46,6 +46,10 @@ const PerfilPage = () => {
       });
   }, []);
 
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
   const handleGitHubConnect = () => {
     const clientId = 'Ov23liXUUdsk0qec5bBU';
     const redirectUri = 'http://localhost:3000/perfil';
@@ -54,14 +58,17 @@ const PerfilPage = () => {
     window.location.href = githubAuthUrl;
   };
 
+  const onGitHubConnected = () => {
+    window.location.reload();
+  };
+
   if (loading) {
     return <p>Cargando...</p>;
   }
 
   return (
     <div className="perfil-page">
-      <GitHubCallbackHandler />{' '}
-      {/* Maneja la redirección después de conectar GitHub */}
+      <GitHubCallbackHandler onGitHubConnected={onGitHubConnected} />
       <Sidebar />
       <div className="content">
         <h1>PERFIL</h1>
@@ -71,7 +78,7 @@ const PerfilPage = () => {
           {gitUsername ? (
             <>
               <p className="github-message">
-                El teu compte de GitHub és: {gitUsername}
+                La cuenta de GitHub asociada a tu perfil es: {gitUsername}
               </p>
             </>
           ) : (
