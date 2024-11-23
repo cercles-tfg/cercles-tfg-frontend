@@ -9,37 +9,41 @@ const PerfilPage = () => {
   const [nombre, setNombre] = useState(null);
 
   useEffect(() => {
+    // Obtener el JWT del localStorage
     const jwtToken = localStorage.getItem('jwtToken');
-    const userEmail = localStorage.getItem('userEmail');
 
-    if (jwtToken && userEmail) {
-      // Llamada para obtener los datos del usuario, incluido el GitHub username
-      fetch(
-        `http://localhost:8080/api/usuarios/email/datos?email=${userEmail}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${jwtToken}`, // Enviamos el token para autenticación
-          },
-        },
-      )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setNombre(data.nombre);
-          setGitUsername(data.gitUsername);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error al obtener los datos del usuario:', error);
-          setLoading(false);
-        });
+    // Si no hay token, no seguimos
+    if (!jwtToken) {
+      console.error(
+        'No se encontró el JWT en el localStorage o el formato es incorrecto',
+      );
+      setLoading(false);
+      return;
     }
+
+    // Llamada para obtener los datos del usuario
+    fetch('http://localhost:8080/api/usuarios/datos', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwtToken}`, // Enviamos el token para autenticación
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setNombre(data.nombre);
+        setGitUsername(data.gitUsername);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error al obtener los datos del usuario:', error);
+        setLoading(false);
+      });
   }, []);
 
   const handleGitHubConnect = () => {

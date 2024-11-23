@@ -11,6 +11,7 @@ const LoginPage = () => {
     const googleToken = credentialResponse.credential;
     const payload = JSON.parse(atob(googleToken.split('.')[1]));
     const email = payload.email;
+    console.log('email es', email);
     console.log('token: ', googleToken);
 
     // Llamada al backend para verificar si el usuario existe y obtener el JWT
@@ -19,7 +20,7 @@ const LoginPage = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: googleToken,
+      body: JSON.stringify({ googleToken }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -29,12 +30,12 @@ const LoginPage = () => {
       })
       .then((jwt) => {
         console.log('JWT recibido:', jwt);
-        localStorage.setItem('jwtToken', jwt);
+        localStorage.setItem('jwtToken', jwt.token);
         localStorage.setItem('userEmail', email);
         navigate('/home');
       })
       .catch((error) => {
-        console.error('Error:', error);
+        console.log = ('Error:', error);
         setErrorMessage(
           'El correu introduit no pertany a cap usuari registrat a CERCLES.',
         );
@@ -42,7 +43,7 @@ const LoginPage = () => {
   };
 
   const handleLoginFailure = (error) => {
-    console.error('Login failed', error);
+    console.error = ('Login failed', error);
     setErrorMessage("S'ha produït un error durant l'inici de sessió.");
   };
 
