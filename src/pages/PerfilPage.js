@@ -61,8 +61,12 @@ const PerfilPage = () => {
   };
 
   const handleTaigaConnect = () => {
-    // Lógica para conectar con Taiga se implementará más adelante
-    console.log('Conectar a Taiga (Por implementar)');
+    const clientId = 'YOUR_TAIGA_CLIENT_ID';
+    const redirectUri = 'http://localhost:3000/perfil';
+    const taigaAuthUrl = `https://api.taiga.io/api/v1/auth/github?client_id=${clientId}&redirect_uri=${redirectUri}`;
+
+    // Redirigir al usuario para que autorice la aplicación en Taiga
+    window.location.href = taigaAuthUrl;
   };
 
   const onGitHubConnected = () => {
