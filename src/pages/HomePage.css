@@ -1,24 +1,86 @@
 .home-page {
   display: flex;
-  flex-direction: column;
-}
-
-.top-bar-container {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 10;
+  flex-direction: row;
+  background-color: #f5f5f5; /* Color de fondo suave */
 }
 
 .content {
   margin-left: 250px;
-  margin-top: 60px;
   padding: 2rem;
   width: calc(100% - 250px);
   transition: margin-left 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Cambiar de center a flex-start para alinear hacia arriba */
+  height: 90vh; /* Reducir la altura total para dar más espacio al contenedor */
+  padding-top: 18rem; /* Añadir más margen superior */
 }
 
 .sidebar.closed + .content {
   margin-left: 80px;
   width: calc(100% - 80px);
+}
+
+.welcome-section {
+  max-width: 90%; /* Limitar el ancho de la sección para que no se desborde */
+  margin: 0 auto; /* Centrar la sección */
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.home-image {
+  max-width: 40%; /* Limitar el ancho de la imagen para que se vea bien proporcionada */
+  height: auto;
+  border-radius: 15px;
+}
+
+.welcome-text {
+  max-width: 50%; /* Limitar el ancho del texto */
+}
+
+.welcome-text h1 {
+  color: #0058a3; /* Azul oscuro */
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-text p {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.button-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.navigate-button {
+  background-color: #0058a3; /* Azul principal */
+  color: white;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.navigate-button:hover {
+  background-color: #003e70; /* Azul más oscuro al hacer hover */
+  transform: scale(1.05); /* Aumentar un poco el tamaño */
 }
