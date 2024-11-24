@@ -35,7 +35,7 @@ const LoginPage = () => {
         navigate('/home');
       })
       .catch((error) => {
-        console.log = ('Error:', error);
+        console.log('Error:', error);
         setErrorMessage(
           'El correu introduit no pertany a cap usuari registrat a CERCLES.',
         );
@@ -43,7 +43,7 @@ const LoginPage = () => {
   };
 
   const handleLoginFailure = (error) => {
-    console.error = ('Login failed', error);
+    console.error('Login failed', error);
     setErrorMessage("S'ha produït un error durant l'inici de sessió.");
   };
 

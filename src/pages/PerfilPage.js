@@ -5,6 +5,7 @@ import './PerfilPage.css';
 
 const PerfilPage = () => {
   const [gitUsername, setGitUsername] = useState(null);
+  const [taigaUsername, setTaigaUsername] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nombre, setNombre] = useState(null);
 
@@ -38,6 +39,7 @@ const PerfilPage = () => {
       .then((data) => {
         setNombre(data.nombre);
         setGitUsername(data.gitUsername);
+        setTaigaUsername(data.taigaUsername);
         setLoading(false);
       })
       .catch((error) => {
@@ -58,6 +60,11 @@ const PerfilPage = () => {
     window.location.href = githubAuthUrl;
   };
 
+  const handleTaigaConnect = () => {
+    // Lógica para conectar con Taiga se implementará más adelante
+    console.log('Conectar a Taiga (Por implementar)');
+  };
+
   const onGitHubConnected = () => {
     window.location.reload();
   };
@@ -72,28 +79,81 @@ const PerfilPage = () => {
       <Sidebar />
       <div className="content">
         <h1>PERFIL</h1>
-        <p>Aquesta és la pàgina principal del perfil de {nombre}</p>
+        <p>
+          Aquesta és la pàgina principal del perfil de <strong>{nombre}</strong>
+        </p>
 
-        <div className="github-connection-box">
-          {gitUsername ? (
-            <>
-              <p className="github-message">
-                La cuenta de GitHub asociada a tu perfil es: {gitUsername}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="github-message">
-                Encara no has configurat el teu compte de GitHub.
-              </p>
-              <button
-                className="github-connect-button"
-                onClick={handleGitHubConnect}
-              >
-                Connecta amb GitHub
-              </button>
-            </>
-          )}
+        <div className="connections-container">
+          {/* Caja de conexión de GitHub */}
+          <div className="github-connection-box">
+            {gitUsername ? (
+              <div className="github-info">
+                <h2>Compte de GitHub associat</h2>
+                <p className="github-message">
+                  El compte de GitHub associat al teu perfil és:{' '}
+                  <a
+                    href={`https://github.com/${gitUsername}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="github-link"
+                  >
+                    {gitUsername}
+                  </a>
+                </p>
+                <p className="github-description">
+                  Ara tens accés a les funcionalitats relacionades amb GitHub.
+                  Pots veure els teus repositoris i altres activitats.
+                </p>
+              </div>
+            ) : (
+              <div className="github-prompt">
+                <p className="github-message">
+                  Encara no has configurat el teu compte de GitHub.
+                </p>
+                <button
+                  className="github-connect-button"
+                  onClick={handleGitHubConnect}
+                >
+                  Connecta amb GitHub
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Caja de conexión de Taiga */}
+          <div className="taiga-connection-box">
+            {taigaUsername ? (
+              <div className="taiga-info">
+                <h2>Compte de Taiga associat</h2>
+                <p className="taiga-message">
+                  El compte de Taiga associat al teu perfil és:{' '}
+                  <a
+                    href={`https://taiga.io/${taigaUsername}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="taiga-link"
+                  >
+                    {taigaUsername}
+                  </a>
+                </p>
+                <p className="taiga-description">
+                  Ara tens accés a les funcionalitats relacionades amb Taiga.
+                </p>
+              </div>
+            ) : (
+              <div className="taiga-prompt">
+                <p className="taiga-message">
+                  Encara no has configurat el teu compte de Taiga.
+                </p>
+                <button
+                  className="taiga-connect-button"
+                  onClick={handleTaigaConnect}
+                >
+                  Connecta amb Taiga
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
