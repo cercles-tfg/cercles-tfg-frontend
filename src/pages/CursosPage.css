@@ -1,0 +1,91 @@
+/* Asegurarse de que toda la página esté bien contenida y no cause scroll horizontal */
+body,
+html {
+  overflow-x: hidden; /* Evitar scrolling horizontal */
+}
+
+.cursos-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cursos-page .content {
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px; /* Limitar el ancho máximo para mejorar la legibilidad */
+  box-sizing: border-box;
+}
+
+.cursos-page h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Estilo del botón para crear un nuevo curso */
+.create-course-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 20px; /* Añade separación entre el botón y la tabla */
+  border-radius: 4px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
+  align-self: flex-start; /* Hace que el botón esté alineado al principio */
+}
+
+.create-course-button:hover {
+  background-color: #45a049;
+  transform: scale(1.05); /* Añadir un pequeño zoom al pasar el ratón */
+}
+
+.cursos-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añadir sombra a la tabla */
+}
+
+.cursos-table th,
+.cursos-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+  word-wrap: break-word; /* Asegurarse de que el texto se ajuste sin desbordar */
+}
+
+.cursos-table th {
+  background-color: #f8f9fa; /* Color de fondo para los encabezados */
+  color: #333;
+}
+
+.clicable-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clicable-row:hover {
+  background-color: #f1f1f1; /* Cambiar el color de la fila al pasar el ratón */
+}
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+  .cursos-page .content {
+    padding: 10px;
+  }
+
+  .cursos-table th,
+  .cursos-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .create-course-button {
+    font-size: 13px; /* Reducir tamaño de fuente en pantallas más pequeñas */
+    padding: 6px 12px; /* Reducir el padding para mejorar en pantallas pequeñas */
+  }
+}

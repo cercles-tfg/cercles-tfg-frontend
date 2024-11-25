@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import PerfilPage from './pages/PerfilPage';
 import PrivateRoute from './utils/PrivateRoute';
+import CursosPage from './pages/CursosPage';
+import ProjectesPage from './pages/ProjectesPage';
 
 function App() {
   return (
@@ -23,6 +25,22 @@ function App() {
           element={
             <PrivateRoute>
               <PerfilPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cursos"
+          element={
+            <PrivateRoute requiredRole="PROFESOR">
+              <CursosPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/projectes"
+          element={
+            <PrivateRoute requiredRole="ESTUDIANTE">
+              <ProjectesPage />
             </PrivateRoute>
           }
         />

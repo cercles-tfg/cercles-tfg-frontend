@@ -16,6 +16,10 @@ const HomePage = () => {
     window.location.href = '/perfil';
   };
 
+  const handleNavigateToCourses = () => {
+    window.location.href = '/cursos';
+  };
+
   const handleNavigateToProjects = () => {
     window.location.href = '/projectes';
   };
@@ -37,7 +41,7 @@ const HomePage = () => {
                 <p>
                   Aquesta és la pàgina principal després d&apos;iniciar sessió.
                   Pots accedir al teu perfil per veure la teva informació o
-                  explorar els teus cursos.
+                  explorar els teus projectes.
                 </p>
               )}
               {rol === 'Profesor' && (
@@ -55,12 +59,21 @@ const HomePage = () => {
                 >
                   Accedir al Perfil
                 </button>
-                <button
-                  className="navigate-button"
-                  onClick={handleNavigateToProjects}
-                >
-                  Veure Projectes
-                </button>
+                {rol === 'Estudiante' ? (
+                  <button
+                    className="navigate-button"
+                    onClick={handleNavigateToProjects}
+                  >
+                    Veure Projectes
+                  </button>
+                ) : (
+                  <button
+                    className="navigate-button"
+                    onClick={handleNavigateToCourses}
+                  >
+                    Veure Cursos
+                  </button>
+                )}
               </div>
             </div>
           </div>

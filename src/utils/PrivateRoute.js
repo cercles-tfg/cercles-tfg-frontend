@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, redirectToHome = false }) => {
   const token = localStorage.getItem('jwtToken');
   const rol = localStorage.getItem('rol');
 
@@ -10,8 +10,8 @@ const PrivateRoute = ({ children }) => {
     return <Navigate to="/" />;
   }
 
-  // Si hay token y el usuario intenta acceder a "/", redirigir a "/home"
-  if (window.location.pathname === '/') {
+  // Si el usuario intenta acceder a '/', redirigir a '/home' si está loggeado
+  if (redirectToHome) {
     return <Navigate to="/home" />;
   }
 
