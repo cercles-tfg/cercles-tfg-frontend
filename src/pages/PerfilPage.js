@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
-import GitHubCallbackHandler from '../components/GitHubCallbackHandler';
+import TaigaCallbackHandler from '../components/TaigaCallbackHandler';
 import './PerfilPage.css';
 
 const PerfilPage = () => {
@@ -8,26 +8,23 @@ const PerfilPage = () => {
   const [taigaUsername, setTaigaUsername] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nombre, setNombre] = useState(null);
+  const [authType, setAuthType] = useState('normal'); // Tipo de autenticación: normal o GitHub
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const fetchUserData = useCallback(() => {
-    // Obtener el JWT del localStorage
     const jwtToken = localStorage.getItem('jwtToken');
-
-    // Si no hay token, no seguimos
     if (!jwtToken) {
-      console.error(
-        'No se encontró el JWT en el localStorage o el formato es incorrecto',
-      );
+      console.error('No se encontró el JWT en el localStorage.');
       setLoading(false);
       return;
     }
 
-    // Llamada para obtener los datos del usuario
     fetch('http://localhost:8080/api/usuarios/datos', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwtToken}`, // Enviamos el token para autenticación
+        Authorization: `Bearer ${jwtToken}`,
       },
     })
       .then((response) => {
@@ -52,34 +49,17 @@ const PerfilPage = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  const handleGitHubConnect = () => {
-    const clientId = 'Ov23liXUUdsk0qec5bBU';
-    const redirectUri = 'http://localhost:3000/perfil';
-    const scope = 'repo user';
-    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-    window.location.href = githubAuthUrl;
-  };
-
-  const handleTaigaConnect = () => {
-    const clientId = 'YOUR_TAIGA_CLIENT_ID';
-    const redirectUri = 'http://localhost:3000/perfil';
-    const taigaAuthUrl = `https://api.taiga.io/api/v1/auth/github?client_id=${clientId}&redirect_uri=${redirectUri}`;
-
-    // Redirigir al usuario para que autorice la aplicación en Taiga
-    window.location.href = taigaAuthUrl;
-  };
-
-  const onGitHubConnected = () => {
-    window.location.reload();
-  };
-
   if (loading) {
     return <p>Cargando...</p>;
   }
 
   return (
     <div className="perfil-page">
-      <GitHubCallbackHandler onGitHubConnected={onGitHubConnected} />
+      <TaigaCallbackHandler
+        authType={authType}
+        username={username}
+        password={password}
+      />
       <Sidebar />
       <div className="content">
         <h1>PERFIL</h1>
@@ -104,10 +84,6 @@ const PerfilPage = () => {
                     {gitUsername}
                   </a>
                 </p>
-                <p className="github-description">
-                  Ara tens accés a les funcionalitats relacionades amb GitHub.
-                  Pots veure els teus repositoris i altres activitats.
-                </p>
               </div>
             ) : (
               <div className="github-prompt">
@@ -116,7 +92,10 @@ const PerfilPage = () => {
                 </p>
                 <button
                   className="github-connect-button"
-                  onClick={handleGitHubConnect}
+                  onClick={() =>
+                    (window.location.href =
+                      'https://github.com/login/oauth/authorize?...')
+                  }
                 >
                   Connecta amb GitHub
                 </button>
@@ -131,30 +110,69 @@ const PerfilPage = () => {
                 <h2>Compte de Taiga associat</h2>
                 <p className="taiga-message">
                   El compte de Taiga associat al teu perfil és:{' '}
-                  <a
-                    href={`https://taiga.io/${taigaUsername}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="taiga-link"
-                  >
-                    {taigaUsername}
-                  </a>
-                </p>
-                <p className="taiga-description">
-                  Ara tens accés a les funcionalitats relacionades amb Taiga.
+                  <strong>{taigaUsername}</strong>
                 </p>
               </div>
             ) : (
               <div className="taiga-prompt">
-                <p className="taiga-message">
-                  Encara no has configurat el teu compte de Taiga.
-                </p>
-                <button
-                  className="taiga-connect-button"
-                  onClick={handleTaigaConnect}
-                >
-                  Connecta amb Taiga
-                </button>
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      value="normal"
+                      checked={authType === 'normal'}
+                      onChange={() => setAuthType('normal')}
+                    />
+                    Autenticació normal
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      value="github"
+                      checked={authType === 'github'}
+                      onChange={() => setAuthType('github')}
+                    />
+                    Autenticació amb GitHub
+                  </label>
+                </div>
+
+                {authType === 'normal' && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Usuario"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <input
+                      type="password"
+                      placeholder="Contraseña"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      className="taiga-connect-button"
+                      onClick={() =>
+                        (window.location.href =
+                          window.location.href + '?type=normal')
+                      }
+                    >
+                      Connecta amb Taiga
+                    </button>
+                  </div>
+                )}
+
+                {authType === 'github' && (
+                  <button
+                    className="taiga-connect-button"
+                    onClick={() =>
+                      (window.location.href =
+                        'https://api.taiga.io/api/v1/auth')
+                    }
+                  >
+                    Connecta amb GitHub
+                  </button>
+                )}
               </div>
             )}
           </div>
