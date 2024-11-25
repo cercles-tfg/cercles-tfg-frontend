@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './CrearCurso.css';
 
 const CrearCurso = ({ onCancel }) => {
@@ -8,14 +8,32 @@ const CrearCurso = ({ onCancel }) => {
   const [cuatrimestre, setCuatrimestre] = useState('1');
   const [actiu, setActiu] = useState('true');
   const [selectedProfesores, setSelectedProfesores] = useState([]);
+  const [profesoresDisponibles, setProfesoresDisponibles] = useState([]);
   const [estudiantesFile, setEstudiantesFile] = useState(null);
 
-  // Lista de profesores hardcodeada (esto luego se obtendrá del backend)
-  const profesoresDisponibles = [
-    { id: 1, nombre: 'Professor 1' },
-    { id: 2, nombre: 'Professor 2' },
-    { id: 3, nombre: 'Professor 3' },
-  ];
+  useEffect(() => {
+    // Obtener la lista de profesores del backend
+    const token = localStorage.getItem('jwtToken');
+    fetch('http://localhost:8080/api/usuarios/profesores', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setProfesoresDisponibles(data);
+      })
+      .catch((error) => {
+        console.error('Error al obtener los profesores:', error);
+      });
+  }, []);
 
   const handleProfesorClick = (id) => {
     setSelectedProfesores((prevSelected) =>
@@ -118,7 +136,7 @@ const CrearCurso = ({ onCancel }) => {
         </div>
         <div className="form-group">
           <label htmlFor="estudiantesFile">
-            Subir document d&apos;estudiants
+            Pujar document excel amb els estudiants
           </label>
           <input
             type="file"
