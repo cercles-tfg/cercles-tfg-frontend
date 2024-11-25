@@ -28,10 +28,11 @@ const LoginPage = () => {
         }
         return response.json();
       })
-      .then((jwt) => {
-        console.log('JWT recibido:', jwt);
-        localStorage.setItem('jwtToken', jwt.token);
+      .then((data) => {
+        console.log('Respuesta del backend:', data);
+        localStorage.setItem('jwtToken', data.token);
         localStorage.setItem('userEmail', email);
+        localStorage.setItem('rol', data.rol);
         navigate('/home');
       })
       .catch((error) => {
