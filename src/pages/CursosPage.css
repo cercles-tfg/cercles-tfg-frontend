@@ -1,7 +1,6 @@
-/* Asegurarse de que toda la página esté bien contenida y no cause scroll horizontal */
 body,
 html {
-  overflow-x: hidden; /* Evitar scrolling horizontal */
+  overflow-x: hidden;
 }
 
 .cursos-page {
@@ -13,7 +12,7 @@ html {
 .cursos-page .content {
   padding: 20px;
   width: 100%;
-  max-width: 1200px; /* Limitar el ancho máximo para mejorar la legibilidad */
+  max-width: 1200px;
   box-sizing: border-box;
 }
 
@@ -22,25 +21,33 @@ html {
   margin-bottom: 20px;
 }
 
-/* Estilo del botón para crear un nuevo curso */
-.create-course-button {
+.success-message {
   background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.create-course-button {
+  background-color: #0056a4;
   color: white;
   border: none;
   padding: 8px 10px;
   font-size: 14px;
   cursor: pointer;
-  margin-bottom: 20px; /* Añade separación entre el botón y la tabla */
+  margin-bottom: 20px;
   border-radius: 4px;
   transition:
     background-color 0.3s ease,
     transform 0.2s;
-  align-self: flex-start; /* Hace que el botón esté alineado al principio */
+  align-self: flex-start;
 }
 
 .create-course-button:hover {
-  background-color: #45a049;
-  transform: scale(1.05); /* Añadir un pequeño zoom al pasar el ratón */
+  background-color: #2a5298;
+  transform: scale(1.05);
 }
 
 .cursos-table {
