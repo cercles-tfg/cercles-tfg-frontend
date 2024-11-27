@@ -13,17 +13,15 @@ const VerificarCurso = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleConfirmCurso = () => {
+    // Primero, verificar si ya existe un curso similar activo
     const cursoData = {
       nombreAsignatura,
       añoInicio,
       cuatrimestre,
-      activo: true,
-      profesores: profesores.map((prof) => prof.id),
-      estudiantes,
     };
 
     const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos/crear', {
+    fetch('http://localhost:8080/api/cursos/verificarCursoExistente', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,12 +31,46 @@ const VerificarCurso = () => {
     })
       .then((response) => {
         if (response.status === 409) {
+          // Si ya existe un curso activo, mostramos el popup de confirmación
           setShowConfirmPopup(true);
+          return null;
         } else if (!response.ok) {
-          throw new Error('Error al crear el curso');
+          throw new Error('Error al verificar el curso existente.');
         } else {
-          return response.json().catch(() => ({}));
+          // Si no hay conflicto, proceder a crear el curso
+          return createCurso();
         }
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+        console.error('Error al verificar el curso existente:', error);
+      });
+  };
+
+  const createCurso = () => {
+    const newCursoData = {
+      nombreAsignatura,
+      añoInicio,
+      cuatrimestre,
+      activo: true,
+      profesores: profesores.map((prof) => prof.id),
+      estudiantes,
+    };
+
+    const token = localStorage.getItem('jwtToken');
+    return fetch('http://localhost:8080/api/cursos/crear', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newCursoData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al crear el curso.');
+        }
+        return response.text(); // Usar .text() para manejar respuestas que no son JSON
       })
       .then(() => {
         navigate('/cursos', { state: { cursoCreado: true } });
@@ -49,7 +81,7 @@ const VerificarCurso = () => {
       });
   };
 
-  const handleDesactivarCurso = () => {
+  const handleCambiarEstadoCurso = () => {
     const cursoData = {
       nombreAsignatura,
       añoInicio,
@@ -57,7 +89,7 @@ const VerificarCurso = () => {
     };
 
     const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos/desactivar', {
+    fetch('http://localhost:8080/api/cursos/cambiarEstado', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,14 +97,25 @@ const VerificarCurso = () => {
       },
       body: JSON.stringify(cursoData),
     })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al cambiar el estado del curso existente.');
+        }
+        return response.text(); // Usar .text() para manejar respuestas que no son JSON
+      })
       .then(() => {
         setShowConfirmPopup(false);
-        handleConfirmCurso();
+        // Después de desactivar el curso existente, confirmar la creación del nuevo curso
+        createCurso();
       })
       .catch((error) => {
         setErrorMessage(error.message);
-        console.error('Error al desactivar el curso:', error);
+        console.error('Error al cambiar el estado del curso existente:', error);
       });
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmPopup(false);
   };
 
   return (
@@ -161,15 +204,15 @@ const VerificarCurso = () => {
               <div className="popup-buttons">
                 <button
                   type="button"
-                  className="cancel-verfication-button"
-                  onClick={() => setShowConfirmPopup(false)}
+                  className="cancel-verification-button"
+                  onClick={handleCancelConfirm}
                 >
                   No
                 </button>
                 <button
                   type="button"
-                  className="confirm-verficiation-button"
-                  onClick={handleDesactivarCurso}
+                  className="confirm-verification-button"
+                  onClick={handleCambiarEstadoCurso}
                 >
                   Sí
                 </button>

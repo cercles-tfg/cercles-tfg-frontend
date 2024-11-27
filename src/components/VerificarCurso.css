@@ -96,6 +96,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-right: 10px;
   transition: background-color 0.3s ease;
 }
 
@@ -113,6 +114,7 @@
 .confirm-verification-button {
   background-color: #4caf50;
   color: #fff;
+  margin-right: 0;
 }
 
 .confirm-verification-button:hover {
