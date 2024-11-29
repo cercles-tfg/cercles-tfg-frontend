@@ -7,6 +7,7 @@ import {
   cambiarEstadoCurso,
   verificarCursoExistente,
   obtenerProfesoresDisponibles,
+  modificarCurso,
 } from '../../services/Cursos_Api.js';
 
 const CursoPage = () => {
@@ -18,7 +19,7 @@ const CursoPage = () => {
   const [showConflictPopup, setShowConflictPopup] = useState(false);
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isEditingProfessores, setIsEditingProfessores] = useState(false);
+  const [editedCurso, setEditedCurso] = useState(null);
   const [newEstudiante, setNewEstudiante] = useState({
     nombre: '',
     correo: '',
@@ -30,6 +31,7 @@ const CursoPage = () => {
     obtenerDetallesCurso(id)
       .then((data) => {
         setCurso(data);
+        setEditedCurso(data);
         setNombresProfesores(data.nombresProfesores || []);
       })
       .catch((error) => {
@@ -46,7 +48,6 @@ const CursoPage = () => {
     if (curso.activo) {
       setShowConfirmPopup(true);
     } else {
-      // Verificamos si existe otro curso activo con los mismos datos
       verificarCursoExistente(curso)
         .then((response) => {
           if (response.status === 409) {
@@ -54,7 +55,6 @@ const CursoPage = () => {
           } else if (!response.ok) {
             throw new Error('Error al verificar el curso existente.');
           } else {
-            // Si no hay conflicto, procedemos directamente a cambiar el estado
             handleConfirmEstado();
           }
         })
@@ -73,7 +73,6 @@ const CursoPage = () => {
       cuatrimestre: curso.cuatrimestre,
     })
       .then(() => {
-        // Actualizar el estado localmente
         setCurso((prevCurso) => ({
           ...prevCurso,
           activo: !prevCurso.activo,
@@ -91,7 +90,6 @@ const CursoPage = () => {
   };
 
   const handleResolveConflict = () => {
-    // Llamar al backend para desactivar el curso existente
     cambiarEstadoCurso({
       nombreAsignatura: curso.nombreAsignatura,
       añoInicio: curso.añoInicio,
@@ -99,7 +97,6 @@ const CursoPage = () => {
     })
       .then(() => {
         setShowConflictPopup(false);
-        // Intentar activar el curso actual después de desactivar el otro curso
         handleConfirmEstado();
       })
       .catch((error) => {
@@ -113,44 +110,49 @@ const CursoPage = () => {
   };
 
   const handleEditToggle = () => {
-    setIsEditing((prevEditing) => !prevEditing);
+    if (isEditing) {
+      setEditedCurso(curso);
+    } else {
+      obtenerProfesoresDisponibles()
+        .then((data) => setProfesoresDisponibles(data))
+        .catch((error) => {
+          console.error('Error al obtener los profesores:', error);
+        });
+    }
+    setIsEditing(!isEditing);
   };
 
-  const handleEditProfessoresToggle = () => {
-    setIsEditingProfessores((prevEditing) => {
-      if (!prevEditing) {
-        obtenerProfesoresDisponibles()
-          .then((data) => setProfesoresDisponibles(data))
-          .catch((error) => {
-            console.error('Error al obtener los profesores:', error);
-          });
-      }
-      return !prevEditing;
-    });
-  };
+  const handleSaveChanges = () => {
+    const cursoData = {
+      nombreAsignatura: editedCurso.nombreAsignatura,
+      añoInicio: editedCurso.añoInicio,
+      cuatrimestre: editedCurso.cuatrimestre,
+      estudiantesAñadir: newEstudiante.nombre
+        ? [{ nombre: newEstudiante.nombre, correo: newEstudiante.correo }]
+        : [],
+      estudiantesBorrar: [],
+      profesoresAñadir: nombresProfesores.map((nombre) => {
+        const profesor = profesoresDisponibles.find(
+          (prof) => prof.nombre === nombre,
+        );
+        return { nombre: profesor.nombre, correo: profesor.correo };
+      }),
+      profesoresBorrar: [],
+    };
+    console.log('data: ', cursoData);
 
-  const handleAddStudent = () => {
-    setShowAddConfirmPopup(true);
-  };
-
-  const handleConfirmAddStudent = () => {
-    setCurso((prevCurso) => ({
-      ...prevCurso,
-      nombresEstudiantes: [
-        ...prevCurso.nombresEstudiantes,
-        newEstudiante.nombre,
-      ],
-      correosEstudiantes: [
-        ...prevCurso.correosEstudiantes,
-        newEstudiante.correo,
-      ],
-    }));
-    setNewEstudiante({ nombre: '', correo: '' });
-    setShowAddConfirmPopup(false);
-  };
-
-  const handleCancelAddStudent = () => {
-    setShowAddConfirmPopup(false);
+    modificarCurso(id, cursoData)
+      .then(() => {
+        // Si no hubo ningún error, asumimos que la operación fue exitosa
+        setCurso(editedCurso);
+        setIsEditing(false);
+        setNewEstudiante({ nombre: '', correo: '' }); // Limpiar el campo después de guardar
+        console.log('Curso modificado con éxito');
+      })
+      .catch((error) => {
+        setError(error.message);
+        console.error('Error al modificar el curso:', error);
+      });
   };
 
   const handleInputChange = (e) => {
@@ -178,16 +180,79 @@ const CursoPage = () => {
         {error && <div className="error-message">{error}</div>}
         {curso ? (
           <>
+            <div className="edit-controls">
+              {isEditing ? (
+                <>
+                  <button className="save-button" onClick={handleSaveChanges}>
+                    Guardar canvis
+                  </button>
+                  <button className="cancel-button" onClick={handleEditToggle}>
+                    Cancel·lar
+                  </button>
+                </>
+              ) : (
+                <button className="edit-button" onClick={handleEditToggle}>
+                  ✏️ Editar
+                </button>
+              )}
+            </div>
+
             <div className="curso-details">
-              <h1 className="curso-title">{curso.nombreAsignatura}</h1>
+              <h1 className="curso-title">
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={editedCurso.nombreAsignatura}
+                    onChange={(e) =>
+                      setEditedCurso({
+                        ...editedCurso,
+                        nombreAsignatura: e.target.value,
+                      })
+                    }
+                  />
+                ) : (
+                  curso.nombreAsignatura
+                )}
+              </h1>
               <div className="curso-info">
                 <div className="curso-info-content">
                   <p>
-                    <strong>Any d&apos;inici:</strong> {curso.añoInicio}
+                    <strong>Any d&apos;inici:</strong>{' '}
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        value={editedCurso.añoInicio}
+                        onChange={(e) =>
+                          setEditedCurso({
+                            ...editedCurso,
+                            añoInicio: parseInt(e.target.value, 10),
+                          })
+                        }
+                      />
+                    ) : (
+                      curso.añoInicio
+                    )}
                   </p>
                   <p>
                     <strong>Cuatrimestre:</strong>{' '}
-                    {curso.cuatrimestre === 1 ? 'Tardor' : 'Primavera'}
+                    {isEditing ? (
+                      <select
+                        value={editedCurso.cuatrimestre}
+                        onChange={(e) =>
+                          setEditedCurso({
+                            ...editedCurso,
+                            cuatrimestre: parseInt(e.target.value, 10),
+                          })
+                        }
+                      >
+                        <option value={1}>Tardor</option>
+                        <option value={2}>Primavera</option>
+                      </select>
+                    ) : curso.cuatrimestre === 1 ? (
+                      'Tardor'
+                    ) : (
+                      'Primavera'
+                    )}
                   </p>
                   <p>
                     <strong>Actiu:</strong> {curso.activo ? 'Sí' : 'No'}
@@ -215,14 +280,10 @@ const CursoPage = () => {
                 </div>
               </div>
             </div>
+
             <div className="curso-lists">
               <div className="curso-section">
-                <div className="curso-section-header">
-                  <h2>Estudiants</h2>
-                  <button className="edit-button" onClick={handleEditToggle}>
-                    {isEditing ? "Deixar d'editar" : '✏️ Editar'}
-                  </button>
-                </div>
+                <h2>Estudiants</h2>
                 <table className="curso-table">
                   <thead>
                     <tr>
@@ -267,7 +328,7 @@ const CursoPage = () => {
                         <td>
                           <button
                             className="add-button"
-                            onClick={handleAddStudent}
+                            onClick={() => setShowAddConfirmPopup(true)}
                           >
                             Afegir
                           </button>
@@ -278,16 +339,8 @@ const CursoPage = () => {
                 </table>
               </div>
               <div className="curso-section">
-                <div className="curso-section-header">
-                  <h2>Professors</h2>
-                  <button
-                    className="edit-button"
-                    onClick={handleEditProfessoresToggle}
-                  >
-                    {isEditingProfessores ? "Deixar d'editar" : '✏️ Editar'}
-                  </button>
-                </div>
-                {isEditingProfessores ? (
+                <h2>Professors</h2>
+                {isEditing ? (
                   <div className="profesores-list">
                     {profesoresDisponibles.map((profesor, index) => (
                       <div key={index} className="professor-item">
@@ -388,14 +441,14 @@ const CursoPage = () => {
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={handleCancelAddStudent}
+                  onClick={() => setShowAddConfirmPopup(false)}
                 >
                   No
                 </button>
                 <button
                   type="button"
                   className="confirm-button"
-                  onClick={handleConfirmAddStudent}
+                  onClick={handleSaveChanges}
                 >
                   Sí
                 </button>

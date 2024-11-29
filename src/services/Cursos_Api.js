@@ -189,3 +189,37 @@ export const subirArchivoEstudiantes = async (estudiantesFile) => {
     throw error;
   }
 };
+
+// Función para modificar un curso
+export const modificarCurso = async (id, cursoData) => {
+  const token = obtenerToken();
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/cursos/${id}/modificar_curso`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(cursoData),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al modificar el curso: ${errorText}`);
+    }
+
+    // Intentar parsear la respuesta a JSON si existe, si no, devolver vacío
+    try {
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      return {}; // Devolver un objeto vacío si no hay un JSON en la respuesta
+    }
+  } catch (error) {
+    console.error('Error al modificar el curso:', error);
+    throw error;
+  }
+};
