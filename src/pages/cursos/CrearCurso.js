@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/common/Sidebar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './CrearCurso.css';
+import {
+  obtenerProfesoresDisponibles,
+  subirArchivoEstudiantes,
+} from '../../services/Cursos_Api.js';
 
 const CrearCurso = () => {
   const currentYear = new Date().getFullYear();
@@ -17,22 +21,12 @@ const CrearCurso = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Obtener la lista de profesores del backend
-    const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/usuarios/profesores', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => setProfesoresDisponibles(data))
+    obtenerProfesoresDisponibles()
+      .then(setProfesoresDisponibles)
       .catch((error) => {
         console.error('Error al obtener los profesores:', error);
       });
 
-    // Cargar el estado si viene de la página de verificación
     if (location.state) {
       const { nombreAsignatura, añoInicio, cuatrimestre, selectedProfesores } =
         location.state;
@@ -51,43 +45,30 @@ const CrearCurso = () => {
     );
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-    if (selectedProfesores.length === 0) {
+    if (selectedProfesores.length === 0 || !estudiantesFile) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', estudiantesFile);
-
-    const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos/uploadEstudiantes', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setEstudiantesData(data);
-        navigate('/cursos/crear/verificar', {
-          state: {
-            nombreAsignatura,
-            añoInicio,
-            cuatrimestre,
-            profesores: selectedProfesores.map((id) => {
-              const prof = profesoresDisponibles.find((prof) => prof.id === id);
-              return { id: prof.id, nombre: prof.nombre };
-            }),
-            estudiantes: data,
-          },
-        });
-      })
-      .catch((error) => {
-        console.error('Error al procesar el archivo:', error);
+    try {
+      const data = await subirArchivoEstudiantes(estudiantesFile);
+      setEstudiantesData(data);
+      navigate('/cursos/crear/verificar', {
+        state: {
+          nombreAsignatura,
+          añoInicio,
+          cuatrimestre,
+          profesores: selectedProfesores.map((id) => {
+            const prof = profesoresDisponibles.find((prof) => prof.id === id);
+            return { id: prof.id, nombre: prof.nombre, correo: prof.correo };
+          }),
+          estudiantes: data,
+        },
       });
+    } catch (error) {
+      console.error('Error al procesar el archivo:', error);
+    }
   };
 
   return (

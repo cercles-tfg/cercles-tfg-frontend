@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import './VerificarCurso.css';
+import {
+  cambiarEstadoCurso,
+  crearCurso,
+  verificarCursoExistente,
+} from '../../services/Cursos_Api';
 
 const VerificarCurso = () => {
   const navigate = useNavigate();
@@ -20,15 +25,7 @@ const VerificarCurso = () => {
       cuatrimestre,
     };
 
-    const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos/verificarCursoExistente', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(cursoData),
-    })
+    verificarCursoExistente(cursoData)
       .then((response) => {
         if (response.status === 409) {
           // Si ya existe un curso activo, mostramos el popup de confirmación
@@ -53,25 +50,17 @@ const VerificarCurso = () => {
       añoInicio,
       cuatrimestre,
       activo: true,
-      profesores: profesores.map((prof) => prof.id),
-      estudiantes,
+      profesores: profesores.map((prof) => ({
+        nombre: prof.nombre,
+        correo: prof.correo,
+      })),
+      estudiantes: estudiantes.map((estudiante) => ({
+        nombre: estudiante.nombre,
+        correo: estudiante.correo,
+      })),
     };
 
-    const token = localStorage.getItem('jwtToken');
-    return fetch('http://localhost:8080/api/cursos/crear', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(newCursoData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al crear el curso.');
-        }
-        return response.text(); // Usar .text() para manejar respuestas que no son JSON
-      })
+    crearCurso(newCursoData)
       .then(() => {
         navigate('/cursos', { state: { cursoCreado: true } });
       })
@@ -88,21 +77,8 @@ const VerificarCurso = () => {
       cuatrimestre,
     };
 
-    const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos/cambiarEstado', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(cursoData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al cambiar el estado del curso existente.');
-        }
-        return response.text(); // Usar .text() para manejar respuestas que no son JSON
-      })
+    // Llamar al backend para cambiar el estado del curso existente
+    cambiarEstadoCurso(cursoData)
       .then(() => {
         setShowConfirmPopup(false);
         // Después de desactivar el curso existente, confirmar la creación del nuevo curso

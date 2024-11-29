@@ -44,7 +44,7 @@ const CursosPage = () => {
     <div className="cursos-page">
       <Sidebar />
       <div className="content">
-        <h1>Cursos</h1>
+        <h1>Els meus cursos</h1>
         {showSuccessMessage && (
           <div className="success-message">Curs creat correctament!</div>
         )}

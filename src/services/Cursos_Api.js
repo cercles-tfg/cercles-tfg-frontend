@@ -26,9 +26,9 @@ export const obtenerCursos = async () => {
     throw error;
   }
 };
-
 // Crear un nuevo curso
-export const crearCurso = async (cursoData, token) => {
+export const crearCurso = async (cursoData) => {
+  const token = obtenerToken();
   try {
     const response = await fetch(`${API_BASE_URL}/cursos/crear`, {
       method: 'POST',
@@ -40,10 +40,11 @@ export const crearCurso = async (cursoData, token) => {
     });
 
     if (!response.ok) {
-      throw new Error('Error al crear el curso.');
+      const errorText = await response.text(); // Obtener el mensaje de error del servidor
+      throw new Error(`Error al crear el curso: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = await response.text(); // Cambiado a .text() si la respuesta no es JSON
     return data;
   } catch (error) {
     console.error('Error al crear el curso:', error);
@@ -158,6 +159,33 @@ export const obtenerProfesoresDisponibles = async () => {
     return data;
   } catch (error) {
     console.error('Error al obtener los profesores disponibles:', error);
+    throw error;
+  }
+};
+
+// Subir archivo de estudiantes
+export const subirArchivoEstudiantes = async (estudiantesFile) => {
+  const token = obtenerToken();
+  const formData = new FormData();
+  formData.append('file', estudiantesFile);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/cursos/uploadEstudiantes`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al subir el archivo de estudiantes.');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error al subir el archivo de estudiantes:', error);
     throw error;
   }
 };
