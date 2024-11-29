@@ -18,6 +18,8 @@ const CursoPage = () => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showConflictPopup, setShowConflictPopup] = useState(false);
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
+  const [showSaveConfirmPopup, setShowSaveConfirmPopup] = useState(false);
+  const [showDeleteConfirmPopup, setShowDeleteConfirmPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedCurso, setEditedCurso] = useState(null);
   const [newEstudiante, setNewEstudiante] = useState({
@@ -26,6 +28,8 @@ const CursoPage = () => {
   });
   const [profesoresDisponibles, setProfesoresDisponibles] = useState([]);
   const [nombresProfesores, setNombresProfesores] = useState([]);
+  const [profesoresBorrar, setProfesoresBorrar] = useState([]);
+  const [estudianteAEliminar, setEstudianteAEliminar] = useState(null);
 
   useEffect(() => {
     obtenerDetallesCurso(id)
@@ -123,6 +127,10 @@ const CursoPage = () => {
   };
 
   const handleSaveChanges = () => {
+    setShowSaveConfirmPopup(true);
+  };
+
+  const handleConfirmSaveChanges = () => {
     const cursoData = {
       nombreAsignatura: editedCurso.nombreAsignatura,
       añoInicio: editedCurso.añoInicio,
@@ -130,29 +138,34 @@ const CursoPage = () => {
       estudiantesAñadir: newEstudiante.nombre
         ? [{ nombre: newEstudiante.nombre, correo: newEstudiante.correo }]
         : [],
-      estudiantesBorrar: [],
+      estudiantesBorrar: estudianteAEliminar ? [estudianteAEliminar] : [],
       profesoresAñadir: nombresProfesores.map((nombre) => {
         const profesor = profesoresDisponibles.find(
           (prof) => prof.nombre === nombre,
         );
         return { nombre: profesor.nombre, correo: profesor.correo };
       }),
-      profesoresBorrar: [],
+      profesoresBorrar,
     };
     console.log('data: ', cursoData);
 
     modificarCurso(id, cursoData)
       .then(() => {
-        // Si no hubo ningún error, asumimos que la operación fue exitosa
         setCurso(editedCurso);
         setIsEditing(false);
-        setNewEstudiante({ nombre: '', correo: '' }); // Limpiar el campo después de guardar
+        setNewEstudiante({ nombre: '', correo: '' });
+        setShowSaveConfirmPopup(false);
+        setEstudianteAEliminar(null);
         console.log('Curso modificado con éxito');
       })
       .catch((error) => {
         setError(error.message);
         console.error('Error al modificar el curso:', error);
       });
+  };
+
+  const handleCancelSaveChanges = () => {
+    setShowSaveConfirmPopup(false);
   };
 
   const handleInputChange = (e) => {
@@ -165,9 +178,27 @@ const CursoPage = () => {
       setNombresProfesores(
         nombresProfesores.filter((p) => p !== profesor.nombre),
       );
+      setProfesoresBorrar((prev) => [...prev, profesor]);
     } else {
       setNombresProfesores([...nombresProfesores, profesor.nombre]);
+      setProfesoresBorrar((prev) =>
+        prev.filter((p) => p.nombre !== profesor.nombre),
+      );
     }
+  };
+
+  const handleDeleteStudent = (estudiante) => {
+    setEstudianteAEliminar(estudiante);
+    setShowDeleteConfirmPopup(true);
+  };
+
+  const handleConfirmDeleteStudent = () => {
+    handleSaveChanges();
+    setShowDeleteConfirmPopup(false);
+  };
+
+  const handleCancelDeleteStudent = () => {
+    setShowDeleteConfirmPopup(false);
   };
 
   return (
@@ -289,6 +320,7 @@ const CursoPage = () => {
                     <tr>
                       <th>Nom i Cognoms</th>
                       <th>Adreça electrònica</th>
+                      {isEditing && <th>Accions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -298,13 +330,31 @@ const CursoPage = () => {
                         <tr key={index}>
                           <td>{nombre}</td>
                           <td>{curso.correosEstudiantes[index]}</td>
+                          {isEditing && (
+                            <td>
+                              <button
+                                className="delete-button"
+                                onClick={() =>
+                                  handleDeleteStudent({
+                                    nombre,
+                                    correo: curso.correosEstudiantes[index],
+                                  })
+                                }
+                              >
+                                🗑️ Eliminar
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="2">No hi ha estudiants per mostrar.</td>
+                        <td colSpan={isEditing ? '3' : '2'}>
+                          No hi ha estudiants per mostrar.
+                        </td>
                       </tr>
                     )}
+
                     {isEditing && (
                       <tr>
                         <td>
@@ -338,39 +388,38 @@ const CursoPage = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="curso-section">
-                <h2>Professors</h2>
-                {isEditing ? (
-                  <div className="profesores-list">
-                    {profesoresDisponibles.map((profesor, index) => (
-                      <div key={index} className="professor-item">
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={nombresProfesores.includes(
-                              profesor.nombre,
-                            )}
-                            onChange={() => handleProfessorSelection(profesor)}
-                          />
-                          {profesor.nombre}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <ul className="curso-list">
-                    {nombresProfesores && nombresProfesores.length > 0 ? (
-                      nombresProfesores.map((nombre, index) => (
-                        <li key={index} className="curso-list-item">
-                          {nombre}
-                        </li>
-                      ))
-                    ) : (
-                      <p>No hi ha professors per mostrar.</p>
-                    )}
-                  </ul>
-                )}
-              </div>
+            </div>
+
+            <div className="curso-section">
+              <h2>Professors</h2>
+              {isEditing ? (
+                <div className="profesores-list">
+                  {profesoresDisponibles.map((profesor, index) => (
+                    <div key={index} className="professor-item">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={nombresProfesores.includes(profesor.nombre)}
+                          onChange={() => handleProfessorSelection(profesor)}
+                        />
+                        {profesor.nombre}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ul className="curso-list">
+                  {nombresProfesores && nombresProfesores.length > 0 ? (
+                    nombresProfesores.map((nombre, index) => (
+                      <li key={index} className="curso-list-item">
+                        {nombre}
+                      </li>
+                    ))
+                  ) : (
+                    <p>No hi ha professors per mostrar.</p>
+                  )}
+                </ul>
+              )}
             </div>
           </>
         ) : (
@@ -448,7 +497,60 @@ const CursoPage = () => {
                 <button
                   type="button"
                   className="confirm-button"
-                  onClick={handleSaveChanges}
+                  onClick={() => {
+                    handleSaveChanges();
+                    setShowAddConfirmPopup(false);
+                  }}
+                >
+                  Sí
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showSaveConfirmPopup && (
+          <div className="confirm-popup">
+            <div className="popup-content">
+              <p>Estàs segur de que vols realitzar aquests canvis?</p>
+              <div className="popup-buttons">
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={handleCancelSaveChanges}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className="confirm-button"
+                  onClick={handleConfirmSaveChanges}
+                >
+                  Sí
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showDeleteConfirmPopup && (
+          <div className="confirm-popup">
+            <div className="popup-content">
+              <p>
+                Estàs segur de que vols eliminar del curs{' '}
+                {curso.nombreAsignatura} l&apos;estudiant{' '}
+                {estudianteAEliminar?.nombre}?
+              </p>
+              <div className="popup-buttons">
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={handleCancelDeleteStudent}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className="confirm-button"
+                  onClick={handleConfirmDeleteStudent}
                 >
                   Sí
                 </button>
