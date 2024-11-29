@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../../components/common/Sidebar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './CrearCurso.css';
 

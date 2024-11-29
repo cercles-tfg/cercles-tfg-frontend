@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../../components/common/Sidebar';
 import './VerificarCurso.css';
 
 const VerificarCurso = () => {

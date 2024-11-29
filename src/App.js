@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import PerfilPage from './pages/PerfilPage';
+import LoginPage from './pages/usuarios/LoginPage';
+import HomePage from './pages/home/HomePage';
+import PerfilPage from './pages/usuarios/PerfilPage';
 import PrivateRoute from './utils/PrivateRoute';
-import CursosPage from './pages/CursosPage';
-import CursoPage from './pages/CursoPage';
-import CrearCurso from './components/CrearCurso';
-import VerificarCurso from './components/VerificarCurso';
-import ProjectesPage from './pages/ProjectesPage';
+import CursosPage from './pages/cursos/CursosPage';
+import CursoPage from './pages/cursos/CursoPage';
+import CrearCurso from './pages/cursos/CrearCurso';
+import VerificarCurso from './pages/cursos/VerificarCurso';
+import ProjectesPage from './pages/equipos/ProjectesPage';
 
 function App() {
   return (

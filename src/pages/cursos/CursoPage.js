@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../../components/common/Sidebar';
 import './CursoPage.css';
+import {
+  obtenerDetallesCurso,
+  cambiarEstadoCurso,
+  verificarCursoExistente,
+  obtenerProfesoresDisponibles,
+} from '../../services/Cursos_Api.js';
 
 const CursoPage = () => {
   const { id } = useParams();
@@ -10,25 +16,21 @@ const CursoPage = () => {
   const [error, setError] = useState('');
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showConflictPopup, setShowConflictPopup] = useState(false);
+  const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingProfessores, setIsEditingProfessores] = useState(false);
+  const [newEstudiante, setNewEstudiante] = useState({
+    nombre: '',
+    correo: '',
+  });
+  const [profesoresDisponibles, setProfesoresDisponibles] = useState([]);
+  const [nombresProfesores, setNombresProfesores] = useState([]);
 
   useEffect(() => {
-    // Obtener los detalles del curso desde el backend
-    const token = localStorage.getItem('jwtToken');
-    fetch(`http://localhost:8080/api/cursos/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los detalles del curso.');
-        }
-        return response.json();
-      })
+    obtenerDetallesCurso(id)
       .then((data) => {
         setCurso(data);
+        setNombresProfesores(data.nombresProfesores || []);
       })
       .catch((error) => {
         setError(error.message);
@@ -41,27 +43,13 @@ const CursoPage = () => {
   };
 
   const handleToggleEstado = () => {
-    // Si el curso está activo, mostramos el popup de confirmación directamente
     if (curso.activo) {
       setShowConfirmPopup(true);
     } else {
-      // Si el curso está inactivo, primero verificamos si existe otro curso activo con los mismos datos
-      const token = localStorage.getItem('jwtToken');
-      fetch('http://localhost:8080/api/cursos/verificarCursoExistente', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nombreAsignatura: curso.nombreAsignatura,
-          añoInicio: curso.añoInicio,
-          cuatrimestre: curso.cuatrimestre,
-        }),
-      })
+      // Verificamos si existe otro curso activo con los mismos datos
+      verificarCursoExistente(curso)
         .then((response) => {
           if (response.status === 409) {
-            // Si hay conflicto, mostramos el popup para resolverlo
             setShowConflictPopup(true);
           } else if (!response.ok) {
             throw new Error('Error al verificar el curso existente.');
@@ -78,28 +66,14 @@ const CursoPage = () => {
   };
 
   const handleConfirmEstado = () => {
-    const token = localStorage.getItem('jwtToken');
-    fetch(`http://localhost:8080/api/cursos/cambiarEstado`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        id: curso.id,
-        nombreAsignatura: curso.nombreAsignatura,
-        añoInicio: curso.añoInicio,
-        cuatrimestre: curso.cuatrimestre,
-      }),
+    cambiarEstadoCurso({
+      id: curso.id,
+      nombreAsignatura: curso.nombreAsignatura,
+      añoInicio: curso.añoInicio,
+      cuatrimestre: curso.cuatrimestre,
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al cambiar el estado del curso.');
-        }
-        return response.text();
-      })
       .then(() => {
-        // Actualizar el estado localmente en lugar de recargar la página
+        // Actualizar el estado localmente
         setCurso((prevCurso) => ({
           ...prevCurso,
           activo: !prevCurso.activo,
@@ -118,25 +92,11 @@ const CursoPage = () => {
 
   const handleResolveConflict = () => {
     // Llamar al backend para desactivar el curso existente
-    const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos/cambiarEstado', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        nombreAsignatura: curso.nombreAsignatura,
-        añoInicio: curso.añoInicio,
-        cuatrimestre: curso.cuatrimestre,
-      }),
+    cambiarEstadoCurso({
+      nombreAsignatura: curso.nombreAsignatura,
+      añoInicio: curso.añoInicio,
+      cuatrimestre: curso.cuatrimestre,
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al desactivar el curso existente.');
-        }
-        return response.text();
-      })
       .then(() => {
         setShowConflictPopup(false);
         // Intentar activar el curso actual después de desactivar el otro curso
@@ -144,12 +104,68 @@ const CursoPage = () => {
       })
       .catch((error) => {
         setError(error.message);
-        console.error('Error al desactivar el curso existente:', error);
+        console.error('Error al resolver el conflicto del curso:', error);
       });
   };
 
   const handleCancelConflict = () => {
     setShowConflictPopup(false);
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing((prevEditing) => !prevEditing);
+  };
+
+  const handleEditProfessoresToggle = () => {
+    setIsEditingProfessores((prevEditing) => {
+      if (!prevEditing) {
+        obtenerProfesoresDisponibles()
+          .then((data) => setProfesoresDisponibles(data))
+          .catch((error) => {
+            console.error('Error al obtener los profesores:', error);
+          });
+      }
+      return !prevEditing;
+    });
+  };
+
+  const handleAddStudent = () => {
+    setShowAddConfirmPopup(true);
+  };
+
+  const handleConfirmAddStudent = () => {
+    setCurso((prevCurso) => ({
+      ...prevCurso,
+      nombresEstudiantes: [
+        ...prevCurso.nombresEstudiantes,
+        newEstudiante.nombre,
+      ],
+      correosEstudiantes: [
+        ...prevCurso.correosEstudiantes,
+        newEstudiante.correo,
+      ],
+    }));
+    setNewEstudiante({ nombre: '', correo: '' });
+    setShowAddConfirmPopup(false);
+  };
+
+  const handleCancelAddStudent = () => {
+    setShowAddConfirmPopup(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewEstudiante((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleProfessorSelection = (profesor) => {
+    if (nombresProfesores.includes(profesor.nombre)) {
+      setNombresProfesores(
+        nombresProfesores.filter((p) => p !== profesor.nombre),
+      );
+    } else {
+      setNombresProfesores([...nombresProfesores, profesor.nombre]);
+    }
   };
 
   return (
@@ -201,7 +217,12 @@ const CursoPage = () => {
             </div>
             <div className="curso-lists">
               <div className="curso-section">
-                <h2>Estudiants</h2>
+                <div className="curso-section-header">
+                  <h2>Estudiants</h2>
+                  <button className="edit-button" onClick={handleEditToggle}>
+                    {isEditing ? "Deixar d'editar" : '✏️ Editar'}
+                  </button>
+                </div>
                 <table className="curso-table">
                   <thead>
                     <tr>
@@ -223,30 +244,86 @@ const CursoPage = () => {
                         <td colSpan="2">No hi ha estudiants per mostrar.</td>
                       </tr>
                     )}
+                    {isEditing && (
+                      <tr>
+                        <td>
+                          <input
+                            type="text"
+                            name="nombre"
+                            value={newEstudiante.nombre}
+                            onChange={handleInputChange}
+                            placeholder="Nom i Cognoms"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="email"
+                            name="correo"
+                            value={newEstudiante.correo}
+                            onChange={handleInputChange}
+                            placeholder="Adreça electrònica"
+                          />
+                        </td>
+                        <td>
+                          <button
+                            className="add-button"
+                            onClick={handleAddStudent}
+                          >
+                            Afegir
+                          </button>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
               <div className="curso-section">
-                <h2>Professors</h2>
-                <ul className="curso-list">
-                  {curso.nombresProfesores &&
-                  curso.nombresProfesores.length > 0 ? (
-                    curso.nombresProfesores.map((nombre, index) => (
-                      <li key={index} className="curso-list-item">
-                        {nombre}
-                      </li>
-                    ))
-                  ) : (
-                    <p>No hi ha professors per mostrar.</p>
-                  )}
-                </ul>
+                <div className="curso-section-header">
+                  <h2>Professors</h2>
+                  <button
+                    className="edit-button"
+                    onClick={handleEditProfessoresToggle}
+                  >
+                    {isEditingProfessores ? "Deixar d'editar" : '✏️ Editar'}
+                  </button>
+                </div>
+                {isEditingProfessores ? (
+                  <div className="profesores-list">
+                    {profesoresDisponibles.map((profesor, index) => (
+                      <div key={index} className="professor-item">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={nombresProfesores.includes(
+                              profesor.nombre,
+                            )}
+                            onChange={() => handleProfessorSelection(profesor)}
+                          />
+                          {profesor.nombre}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="curso-list">
+                    {nombresProfesores && nombresProfesores.length > 0 ? (
+                      nombresProfesores.map((nombre, index) => (
+                        <li key={index} className="curso-list-item">
+                          {nombre}
+                        </li>
+                      ))
+                    ) : (
+                      <p>No hi ha professors per mostrar.</p>
+                    )}
+                  </ul>
+                )}
               </div>
             </div>
           </>
         ) : (
           <p>Carregant les dades del curs...</p>
         )}
-
+        {/* Popups */}
         {showConfirmPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
@@ -273,7 +350,6 @@ const CursoPage = () => {
             </div>
           </div>
         )}
-
         {showConflictPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
@@ -293,6 +369,33 @@ const CursoPage = () => {
                   type="button"
                   className="confirm-button"
                   onClick={handleResolveConflict}
+                >
+                  Sí
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showAddConfirmPopup && (
+          <div className="confirm-popup">
+            <div className="popup-content">
+              <p>
+                Estàs segur/a de que vols afegir al Curs{' '}
+                {curso.nombreAsignatura} a l&apos;estudiant{' '}
+                {newEstudiante.nombre} amb Correu {newEstudiante.correo}?
+              </p>
+              <div className="popup-buttons">
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={handleCancelAddStudent}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className="confirm-button"
+                  onClick={handleConfirmAddStudent}
                 >
                   Sí
                 </button>

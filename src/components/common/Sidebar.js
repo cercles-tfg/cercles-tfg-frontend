@@ -7,7 +7,7 @@ import {
   FaBook,
 } from 'react-icons/fa';
 import './Sidebar.css';
-import Logout from '../components/Logout';
+import Logout from '../../components/auth/Logout';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);

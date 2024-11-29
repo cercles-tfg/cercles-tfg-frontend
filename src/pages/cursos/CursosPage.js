@@ -1,7 +1,9 @@
+// Nuevo archivo CursosPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../../components/common/Sidebar';
 import './CursosPage.css';
+import { obtenerCursos } from '../../services/Cursos_Api.js';
 
 const CursosPage = () => {
   const navigate = useNavigate();
@@ -21,20 +23,7 @@ const CursosPage = () => {
 
   useEffect(() => {
     // Obtener la lista de cursos del backend
-    const token = localStorage.getItem('jwtToken');
-    fetch('http://localhost:8080/api/cursos', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los cursos.');
-        }
-        return response.json();
-      })
+    obtenerCursos()
       .then((data) => {
         setCursos(data);
       })

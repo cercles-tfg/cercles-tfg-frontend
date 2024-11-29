@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../../components/common/Sidebar';
 import './HomePage.css';
-import homeImage from '../assets/images/homeImage.jpg';
+import homeImage from '../../assets/images/homeImage.jpg';
 
 const HomePage = () => {
   const [rol, setRol] = useState(null);
