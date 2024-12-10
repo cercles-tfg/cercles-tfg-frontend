@@ -32,7 +32,7 @@ const Sidebar = () => {
           <span className="link-text">Perfil</span>
         </a>
         {rol === 'Estudiante' && (
-          <a href="/projectes">
+          <a href="/equipos">
             <FaProjectDiagram />
             <span className="link-text">Projectes</span>
           </a>

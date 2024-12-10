@@ -8,7 +8,7 @@ import CursosPage from './pages/cursos/CursosPage';
 import CursoPage from './pages/cursos/CursoPage';
 import CrearCurso from './pages/cursos/CrearCurso';
 import VerificarCurso from './pages/cursos/VerificarCurso';
-import ProjectesPage from './pages/equipos/ProjectesPage';
+import EquiposPage from './pages/equipos/EquiposPage';
 
 function App() {
   return (
@@ -64,10 +64,10 @@ function App() {
           }
         />
         <Route
-          path="/projectes"
+          path="/equipos"
           element={
             <PrivateRoute requiredRole="ESTUDIANTE">
-              <ProjectesPage />
+              <EquiposPage />
             </PrivateRoute>
           }
         />
