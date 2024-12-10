@@ -30,6 +30,14 @@ const CursoPage = () => {
   const [nombresProfesores, setNombresProfesores] = useState([]);
   const [profesoresBorrar, setProfesoresBorrar] = useState([]);
   const [estudianteAEliminar, setEstudianteAEliminar] = useState(null);
+  const COLORS = [
+    '#6C9975',
+    '#BB6365',
+    '#785B75',
+    '#5E807F',
+    '#BA5A31',
+    '#355c7d',
+  ];
 
   useEffect(() => {
     obtenerDetallesCurso(id)
@@ -37,6 +45,7 @@ const CursoPage = () => {
         setCurso(data);
         setEditedCurso(data);
         setNombresProfesores(data.nombresProfesores || []);
+        console.log('Data ', data);
       })
       .catch((error) => {
         setError(error.message);
@@ -324,12 +333,12 @@ const CursoPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {curso.nombresEstudiantes &&
-                    curso.nombresEstudiantes.length > 0 ? (
-                      curso.nombresEstudiantes.map((nombre, index) => (
+                    {curso.nombresEstudiantesSinGrupo &&
+                    curso.nombresEstudiantesSinGrupo.length > 0 ? (
+                      curso.nombresEstudiantesSinGrupo.map((nombre, index) => (
                         <tr key={index}>
                           <td>{nombre}</td>
-                          <td>{curso.correosEstudiantes[index]}</td>
+                          <td>{curso.correosEstudiantesSinGrupo[index]}</td>
                           {isEditing && (
                             <td>
                               <button
@@ -350,7 +359,7 @@ const CursoPage = () => {
                     ) : (
                       <tr>
                         <td colSpan={isEditing ? '3' : '2'}>
-                          No hi ha estudiants per mostrar.
+                          No hi ha cap estudiant sense equip.
                         </td>
                       </tr>
                     )}
@@ -388,44 +397,82 @@ const CursoPage = () => {
                   </tbody>
                 </table>
               </div>
-            </div>
-
-            <div className="curso-section">
-              <h2>Professors</h2>
-              {isEditing ? (
-                <div className="profesores-list">
-                  {profesoresDisponibles.map((profesor, index) => (
-                    <div key={index} className="professor-item">
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={nombresProfesores.includes(profesor.nombre)}
-                          onChange={() => handleProfessorSelection(profesor)}
-                        />
-                        {profesor.nombre}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <ul className="curso-list">
-                  {nombresProfesores && nombresProfesores.length > 0 ? (
-                    nombresProfesores.map((nombre, index) => (
-                      <li key={index} className="curso-list-item">
-                        {nombre}
-                      </li>
+              <div className="curso-section">
+                <h2>Equips</h2>
+                <div className="equipos-container">
+                  {curso.equipos && curso.equipos.length > 0 ? (
+                    curso.equipos.map((equipo, index) => (
+                      <div
+                        key={index}
+                        className="equipo-card"
+                        style={{ borderColor: COLORS[index % COLORS.length] }}
+                      >
+                        <div
+                          className="equipo-card-header"
+                          style={{
+                            backgroundColor: COLORS[index % COLORS.length],
+                          }}
+                        >
+                          {equipo.nombreEquipo}
+                        </div>
+                        <div className="equipo-card-body">
+                          {equipo.miembros && equipo.miembros.length > 0 ? (
+                            equipo.miembros.map((miembro, miembroIndex) => (
+                              <div key={miembroIndex} className="equipo-member">
+                                <p>{miembro || 'Desconegut'}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <p>No hi ha membres en aquest equip.</p>
+                          )}
+                        </div>
+                      </div>
                     ))
                   ) : (
-                    <p>No hi ha professors per mostrar.</p>
+                    <p>Encara no hi ha cap equip format.</p>
                   )}
-                </ul>
-              )}
+                </div>
+                ;
+              </div>
+
+              <div className="curso-section">
+                <h2>Professors</h2>
+                {isEditing ? (
+                  <div className="profesores-list">
+                    {profesoresDisponibles.map((profesor, index) => (
+                      <div key={index} className="professor-item">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={nombresProfesores.includes(
+                              profesor.nombre,
+                            )}
+                            onChange={() => handleProfessorSelection(profesor)}
+                          />
+                          {profesor.nombre}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="curso-list">
+                    {nombresProfesores && nombresProfesores.length > 0 ? (
+                      nombresProfesores.map((nombre, index) => (
+                        <li key={index} className="curso-list-item">
+                          {nombre}
+                        </li>
+                      ))
+                    ) : (
+                      <p>No hi ha professors per mostrar.</p>
+                    )}
+                  </ul>
+                )}
+              </div>
             </div>
           </>
         ) : (
           <p>Carregant les dades del curs...</p>
         )}
-        {/* Popups */}
         {showConfirmPopup && (
           <div className="confirm-popup">
             <div className="popup-content">

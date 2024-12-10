@@ -4,19 +4,30 @@ import Sidebar from '../../components/common/Sidebar';
 import { getEquiposDeUsuario } from '../../services/Equipos_Api';
 import './EquiposPage.css';
 
+// Colores e íconos para las tarjetas
+const COLORS = [
+  '#6C9975',
+  '#BB6365',
+  '#785B75',
+  '#5E807F',
+  '#BA5A31',
+  '#355c7d',
+];
+const ICONS = ['fa-users', 'fa-laptop', 'fa-tasks', 'fa-code', 'fa-book'];
+
 const EquiposPage = () => {
   const navigate = useNavigate();
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Obtener el correo y token del localStorage
-  const usuarioCorreo = localStorage.getItem('userEmail');
+  // Obtener el ID y token del localStorage
+  const id = localStorage.getItem('id');
   const token = localStorage.getItem('jwtToken');
 
   useEffect(() => {
     const fetchEquipos = async () => {
-      if (!usuarioCorreo) {
+      if (!id) {
         setError('Usuario no autenticado.');
         setLoading(false);
         return;
@@ -24,7 +35,7 @@ const EquiposPage = () => {
 
       try {
         setLoading(true);
-        const equiposData = await getEquiposDeUsuario(usuarioCorreo, token);
+        const equiposData = await getEquiposDeUsuario(id, token);
         setEquipos(equiposData);
       } catch (error) {
         setError('No se pudieron cargar los equipos.');
@@ -34,9 +45,9 @@ const EquiposPage = () => {
     };
 
     fetchEquipos();
-  }, [usuarioCorreo, token]);
+  }, [id, token]);
 
-  const handleRowClick = (id) => {
+  const handleCardClick = (id) => {
     navigate(`/equipos/${id}`); // Redirige a la página de detalles del equipo
   };
 
@@ -53,28 +64,27 @@ const EquiposPage = () => {
       <Sidebar />
       <div className="content">
         <h1>Mis Equipos</h1>
-        <table className="equipos-table">
-          <thead>
-            <tr>
-              <th>Nombre del Equipo</th>
-              <th>Curso</th>
-              <th>Evaluador</th>
-            </tr>
-          </thead>
-          <tbody>
-            {equipos.map((equipo) => (
-              <tr
-                key={equipo.id}
-                onClick={() => handleRowClick(equipo.id)}
-                className="clicable-row"
-              >
-                <td>{equipo.nombre}</td>
-                <td>{equipo.cursoId}</td>
-                <td>{equipo.evaluadorId}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="cards-container">
+          {equipos.map((equipo, index) => (
+            <div
+              key={equipo.id}
+              className="card"
+              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              onClick={() => handleCardClick(equipo.id)}
+            >
+              <div className="icon-container">
+                <i className={`fas ${ICONS[index % ICONS.length]}`} />
+              </div>
+              <h2>{equipo.nombre}</h2>
+              <p>
+                <strong>Curso:</strong> {equipo.cursoId}
+              </p>
+              <p>
+                <strong>Evaluador:</strong> {equipo.evaluadorId}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
