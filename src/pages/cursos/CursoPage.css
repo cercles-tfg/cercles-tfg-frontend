@@ -249,6 +249,8 @@ p strong {
 /* Equipo card styling */
 .equipo-card {
   background-color: #ffffff;
+  cursor: pointer; /* Indica que es clicable */
+  position: relative;
   border: 2px solid #4caf50;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -353,6 +355,47 @@ h2 {
 
 .curso-list-item:last-child {
   border-bottom: none;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #e0e0e0;
+  transition: background-color 0.3s ease;
+}
+
+.filter-buttons button.active-filter {
+  background-color: #4caf50;
+  color: white;
+}
+
+.filter-buttons button:hover {
+  background-color: #d6d6d6;
+}
+
+.filter-buttons button.active-filter:hover {
+  background-color: #388e3c;
+}
+.toggle-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: white;
+  transition: transform 0.3s;
+}
+
+.toggle-button:hover {
+  transform: scale(1.2);
 }
 
 /* Responsive design for smaller screens */

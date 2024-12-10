@@ -30,6 +30,8 @@ const CursoPage = () => {
   const [nombresProfesores, setNombresProfesores] = useState([]);
   const [profesoresBorrar, setProfesoresBorrar] = useState([]);
   const [estudianteAEliminar, setEstudianteAEliminar] = useState(null);
+  const [mostrarMisEquipos, setMostrarMisEquipos] = useState(false);
+  const [expandedEquipos, setExpandedEquipos] = useState({});
   const COLORS = [
     '#6C9975',
     '#BB6365',
@@ -210,6 +212,13 @@ const CursoPage = () => {
     setShowDeleteConfirmPopup(false);
   };
 
+  const toggleEquipoExpand = (index) => {
+    setExpandedEquipos((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
   return (
     <div className="curso-page">
       <Sidebar />
@@ -298,10 +307,14 @@ const CursoPage = () => {
                     <strong>Actiu:</strong> {curso.activo ? 'Sí' : 'No'}
                   </p>
                   <p>
-                    <strong>Número d&apos;estudiants:</strong>{' '}
-                    {curso.nombresEstudiantes
-                      ? curso.nombresEstudiantes.length
-                      : 0}
+                    <strong>Número total d&apos;estudiants:</strong>{' '}
+                    {curso.nombresEstudiantesSinGrupo?.length ||
+                      0 +
+                        curso.equipos?.reduce(
+                          (total, equipo) => total + equipo.miembros.length,
+                          0,
+                        ) ||
+                      0}
                   </p>
                 </div>
                 <div className="toggle-container">
@@ -399,40 +412,80 @@ const CursoPage = () => {
               </div>
               <div className="curso-section">
                 <h2>Equips</h2>
+                <div className="filter-buttons">
+                  <button
+                    className={!mostrarMisEquipos ? 'active-filter' : ''}
+                    onClick={() => setMostrarMisEquipos(false)}
+                  >
+                    Tots els equips
+                  </button>
+                  <button
+                    className={mostrarMisEquipos ? 'active-filter' : ''}
+                    onClick={() => setMostrarMisEquipos(true)}
+                  >
+                    Els meus equips
+                  </button>
+                </div>
                 <div className="equipos-container">
                   {curso.equipos && curso.equipos.length > 0 ? (
-                    curso.equipos.map((equipo, index) => (
-                      <div
-                        key={index}
-                        className="equipo-card"
-                        style={{ borderColor: COLORS[index % COLORS.length] }}
-                      >
+                    curso.equipos
+                      .filter((equipo) =>
+                        mostrarMisEquipos
+                          ? equipo.idProfe ===
+                            parseInt(localStorage.getItem('id'))
+                          : true,
+                      )
+                      .map((equipo, index) => (
                         <div
-                          className="equipo-card-header"
-                          style={{
-                            backgroundColor: COLORS[index % COLORS.length],
-                          }}
+                          key={index}
+                          className="equipo-card"
+                          style={{ borderColor: COLORS[index % COLORS.length] }}
+                          onClick={() =>
+                            navigate(`/equipos/${equipo.id_equipo}`)
+                          }
                         >
-                          {equipo.nombreEquipo}
-                        </div>
-                        <div className="equipo-card-body">
-                          {equipo.miembros && equipo.miembros.length > 0 ? (
-                            equipo.miembros.map((miembro, miembroIndex) => (
-                              <div key={miembroIndex} className="equipo-member">
-                                <p>{miembro || 'Desconegut'}</p>
-                              </div>
-                            ))
-                          ) : (
-                            <p>No hi ha membres en aquest equip.</p>
+                          <div
+                            className="equipo-card-header"
+                            style={{
+                              backgroundColor: COLORS[index % COLORS.length],
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <span>{equipo.nombreEquipo}</span>
+                            <button
+                              className="toggle-button"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Evita que el clic en el botón dispare la redirección
+                                toggleEquipoExpand(index);
+                              }}
+                            >
+                              {expandedEquipos[index] ? '▲' : '▼'}
+                            </button>
+                          </div>
+                          {expandedEquipos[index] && (
+                            <div className="equipo-card-body">
+                              {equipo.miembros && equipo.miembros.length > 0 ? (
+                                equipo.miembros.map((miembro, miembroIndex) => (
+                                  <div
+                                    key={miembroIndex}
+                                    className="equipo-member"
+                                  >
+                                    <p>{miembro || 'Desconegut'}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p>No hi ha membres en aquest equip.</p>
+                              )}
+                            </div>
                           )}
                         </div>
-                      </div>
-                    ))
+                      ))
                   ) : (
                     <p>Encara no hi ha cap equip format.</p>
                   )}
                 </div>
-                ;
               </div>
 
               <div className="curso-section">
