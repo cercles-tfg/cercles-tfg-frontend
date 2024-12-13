@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
-import { getEquipoDetalle } from '../../services/Equipos_Api';
+import {
+  getEquipoDetalle,
+  borrarEquipo,
+  salirEquipo,
+} from '../../services/Equipos_Api';
 import './EquipoPage.css';
 
 const COLORS = [
@@ -19,8 +23,11 @@ const EquipoPage = () => {
   const [equipo, setEquipo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupAction, setPopupAction] = useState(''); // 'borrar' o 'salir'
 
   const token = localStorage.getItem('jwtToken');
+  const idEstudiante = parseInt(localStorage.getItem('id'));
 
   useEffect(() => {
     const fetchEquipoDetalle = async () => {
@@ -40,6 +47,25 @@ const EquipoPage = () => {
 
   const handleBackClick = () => {
     navigate(-1); // Regresa a la página anterior
+  };
+
+  const handlePopupConfirm = async () => {
+    try {
+      if (popupAction === 'borrar') {
+        await borrarEquipo(id, token);
+      } else if (popupAction === 'salir') {
+        await salirEquipo(id, idEstudiante, token);
+      }
+      navigate('/equipos');
+    } catch (error) {
+      setError('Error al realizar la acción.');
+    } finally {
+      setShowPopup(false);
+    }
+  };
+
+  const handlePopupCancel = () => {
+    setShowPopup(false);
   };
 
   if (loading) {
@@ -62,6 +88,28 @@ const EquipoPage = () => {
           Torna enrere
         </button>
         <h1 className="equipo-title">{equipo.nombre}</h1>
+
+        <div className="action-buttons">
+          <button
+            className="delete-button"
+            onClick={() => {
+              setPopupAction('borrar');
+              setShowPopup(true);
+            }}
+          >
+            Borrar equip
+          </button>
+          <button
+            className="leave-button"
+            onClick={() => {
+              setPopupAction('salir');
+              setShowPopup(true);
+            }}
+          >
+            Sortir d&apos;aquest equip
+          </button>
+        </div>
+
         <div className="equipo-info">
           <div className="equipo-info-content">
             <p>
@@ -104,6 +152,31 @@ const EquipoPage = () => {
             ))}
           </div>
         </div>
+
+        {showPopup && (
+          <div className="confirm-popup">
+            <div className="popup-content">
+              <h3>
+                Estas segur/a que vols{' '}
+                {popupAction === 'borrar'
+                  ? 'borrar aquest equip'
+                  : "sortir d'aquest equip"}
+                ?
+              </h3>
+              <p className="popup-subtext">
+                {popupAction === 'borrar'
+                  ? "Es perdrà tota la informació d'aquest equip."
+                  : "Perdràs totes les dades d'aquest equip."}
+              </p>
+              <button className="confirm-button" onClick={handlePopupConfirm}>
+                Confirmar
+              </button>
+              <button className="cancel-button" onClick={handlePopupCancel}>
+                Cancel·lar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

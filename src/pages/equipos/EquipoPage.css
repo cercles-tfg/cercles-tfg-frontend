@@ -18,6 +18,7 @@
   margin-top: 20px;
 }
 
+/* Back button styling */
 .back-button {
   background-color: #4caf50;
   color: #fff;
@@ -27,6 +28,9 @@
   cursor: pointer;
   border-radius: 4px;
   margin-bottom: 20px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
 }
 
 .back-button:hover {
@@ -34,6 +38,7 @@
   transform: scale(1.05);
 }
 
+/* Title styling */
 .equipo-title {
   text-align: center;
   margin-bottom: 20px;
@@ -41,6 +46,51 @@
   font-size: 28px;
 }
 
+/* Action buttons styling */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.delete-button,
+.leave-button {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
+}
+
+.delete-button:hover,
+.leave-button:hover {
+  transform: scale(1.05);
+}
+
+.delete-button {
+  background-color: #f44336;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+.leave-button {
+  background-color: #ff9800;
+}
+
+.leave-button:hover {
+  background-color: #e68a00;
+}
+
+/* Info section styling */
 .equipo-info {
   display: flex;
   justify-content: space-between;
@@ -52,6 +102,7 @@
   margin-bottom: 30px;
 }
 
+/* Members section styling */
 .equipo-section {
   margin-top: 20px;
   background-color: #f9f9f9;
@@ -60,7 +111,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Styling for members section */
 .equipo-members {
   display: flex;
   flex-wrap: wrap;
@@ -79,6 +129,7 @@
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  background-color: #6c757d; /* Default color */
 }
 
 .member-circle:hover {
@@ -91,15 +142,94 @@
   margin-bottom: 8px;
 }
 
-.member-details {
-  text-align: center;
-}
-
 .member-name {
   font-size: 12px;
   font-weight: bold;
+  color: #fff;
 }
 
-.member-email {
-  font-size: 10px;
+/* Popup styling */
+.confirm-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  text-align: center;
+}
+
+.popup-content h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirm-button,
+.cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.confirm-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.confirm-button:hover {
+  background-color: #45a049;
+}
+
+.cancel-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .equipo-content {
+    padding: 15px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .back-button,
+  .delete-button,
+  .leave-button {
+    width: 100%;
+  }
+
+  .popup-content {
+    width: 90%;
+  }
 }

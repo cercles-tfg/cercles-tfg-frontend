@@ -106,10 +106,17 @@ const CrearEquipo = () => {
     estudiante.nombre.toLowerCase().includes(busqueda.toLowerCase()),
   );
 
+  const handleBackClick = () => {
+    navigate(-1); // Regresa a la página anterior
+  };
+
   return (
     <div className="crear-equipo-page">
       <Sidebar />
       <div className="content">
+        <button className="back-button" onClick={handleBackClick}>
+          Torna enrere
+        </button>
         <h1>CREA UN NOU EQUIP</h1>
 
         {error && <div className="error-message">{error}</div>}

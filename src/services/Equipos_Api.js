@@ -137,16 +137,57 @@ export const crearEquipo = async (equipoData, token) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.text(); // Usamos .text() para texto plano
+      const errorData = await response.text();
       throw new Error(errorData || 'Error al crear el equipo.');
     }
 
-    const successMessage = await response.text(); // Captura el texto plano de la respuesta
+    const successMessage = await response.text();
     console.log('Response:', successMessage);
 
-    return successMessage; // Devuelve el texto plano (si necesitas usarlo en otro lado)
+    return successMessage;
   } catch (error) {
     console.error('Error al crear el equipo:', error.message);
+    throw error;
+  }
+};
+
+// Borrar un equipo
+export const borrarEquipo = async (equipoId, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/equipos/${equipoId}/borrar`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al borrar el equipo.');
+    }
+  } catch (error) {
+    console.error('Error al borrar el equipo:', error.message);
+    throw error;
+  }
+};
+
+// Salir de un equipo
+export const salirEquipo = async (equipoId, estudianteId, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/equipos/${equipoId}/salir`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ estudianteId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al salir del equipo.');
+    }
+  } catch (error) {
+    console.error('Error al salir del equipo:', error.message);
     throw error;
   }
 };
