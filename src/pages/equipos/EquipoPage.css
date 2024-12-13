@@ -211,6 +211,59 @@
   background-color: #d32f2f;
 }
 
+.edit-members {
+  margin-top: 20px;
+}
+
+.students-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.student-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.add-member-button,
+.remove-member-button {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-member-button:hover {
+  background-color: #45a049;
+}
+
+.remove-member-button {
+  background-color: #f44336;
+}
+
+.remove-member-button:hover {
+  background-color: #d32f2f;
+}
+
+.edit-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 /* Responsive styling */
 @media (max-width: 768px) {
   .equipo-content {

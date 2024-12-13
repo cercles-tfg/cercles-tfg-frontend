@@ -191,3 +191,39 @@ export const salirEquipo = async (equipoId, estudianteId, token) => {
     throw error;
   }
 };
+
+export const añadirMiembros = async (equipoId, data, token) => {
+  const response = await fetch(
+    `${API_BASE_URL}/equipos/${equipoId}/añadir_miembro`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Error al añadir miembros al equipo.');
+  }
+};
+
+export const borrarMiembros = async (equipoId, data, token) => {
+  const response = await fetch(
+    `${API_BASE_URL}/equipos/${equipoId}/borrar_miembros`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Error al borrar miembros del equipo.');
+  }
+};
