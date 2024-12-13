@@ -249,7 +249,7 @@ p strong {
 /* Equipo card styling */
 .equipo-card {
   background-color: #ffffff;
-  cursor: pointer; /* Indica que es clicable */
+  cursor: pointer;
   position: relative;
   border: 2px solid #4caf50;
   border-radius: 8px;

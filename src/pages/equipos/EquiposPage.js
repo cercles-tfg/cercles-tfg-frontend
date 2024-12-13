@@ -51,6 +51,10 @@ const EquiposPage = () => {
     navigate(`/equipos/${id}`); // Redirige a la página de detalles del equipo
   };
 
+  const handleCreateEquipoClick = () => {
+    navigate('/equipos/crear'); // Redirige a la página de creación de equipos
+  };
+
   if (loading) {
     return <div>Cargando equipos...</div>;
   }
@@ -63,7 +67,12 @@ const EquiposPage = () => {
     <div className="equipos-page">
       <Sidebar />
       <div className="content">
-        <h1>Mis Equipos</h1>
+        <div className="header-container">
+          <h1>Els meus equips</h1>
+          <button className="create-button" onClick={handleCreateEquipoClick}>
+            + Crear un nou equip
+          </button>
+        </div>
         <div className="cards-container">
           {equipos.map((equipo, index) => (
             <div

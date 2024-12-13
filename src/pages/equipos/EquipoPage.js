@@ -78,7 +78,7 @@ const EquipoPage = () => {
         </div>
 
         <div className="equipo-section">
-          <h2>Professor evaluador</h2>
+          <h2>Professor avaluador</h2>
           <p>
             <strong>Nom:</strong> {equipo.evaluadorNombre}
           </p>
