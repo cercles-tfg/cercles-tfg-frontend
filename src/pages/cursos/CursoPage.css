@@ -200,6 +200,31 @@ input:checked + .slider:before {
   transform: scale(1.2);
 }
 
+.delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+.popup-content p {
+  font-size: 16px;
+  color: #333;
+}
+
+.popup-content strong {
+  color: #f44336;
+}
+
 /* Styling for Add button inside table */
 .add-button {
   background-color: #4caf50;

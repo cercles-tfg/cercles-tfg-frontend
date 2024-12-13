@@ -8,6 +8,7 @@ import {
   verificarCursoExistente,
   obtenerProfesoresDisponibles,
   modificarCurso,
+  borrarCurso,
 } from '../../services/Cursos_Api.js';
 
 const CursoPage = () => {
@@ -20,6 +21,7 @@ const CursoPage = () => {
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showSaveConfirmPopup, setShowSaveConfirmPopup] = useState(false);
   const [showDeleteConfirmPopup, setShowDeleteConfirmPopup] = useState(false);
+  const [showDeleteStudentPopup, setShowDeleteStudentPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedCurso, setEditedCurso] = useState(null);
   const [newEstudiante, setNewEstudiante] = useState({
@@ -200,7 +202,7 @@ const CursoPage = () => {
 
   const handleDeleteStudent = (estudiante) => {
     setEstudianteAEliminar(estudiante);
-    setShowDeleteConfirmPopup(true);
+    setShowDeleteStudentPopup(true);
   };
 
   const handleConfirmDeleteStudent = () => {
@@ -217,6 +219,20 @@ const CursoPage = () => {
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const handleConfirmDeleteCourse = () => {
+    borrarCurso(id, localStorage.getItem('jwtToken'))
+      .then(() => {
+        navigate('/cursos');
+      })
+      .catch((error) => {
+        setError('Error al intentar borrar el curs.');
+        console.error('Error al borrar el curso:', error);
+      })
+      .finally(() => {
+        setShowDeleteConfirmPopup(false);
+      });
   };
 
   return (
@@ -240,9 +256,17 @@ const CursoPage = () => {
                   </button>
                 </>
               ) : (
-                <button className="edit-button" onClick={handleEditToggle}>
-                  ✏️ Editar
-                </button>
+                <>
+                  <button className="edit-button" onClick={handleEditToggle}>
+                    ✏️ Editar
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => setShowDeleteConfirmPopup(true)}
+                  >
+                    🗑️ Borrar curso
+                  </button>
+                </>
               )}
             </div>
 
@@ -308,13 +332,12 @@ const CursoPage = () => {
                   </p>
                   <p>
                     <strong>Número total d&apos;estudiants:</strong>{' '}
-                    {curso.nombresEstudiantesSinGrupo?.length ||
-                      0 +
-                        curso.equipos?.reduce(
-                          (total, equipo) => total + equipo.miembros.length,
-                          0,
-                        ) ||
-                      0}
+                    {(curso.nombresEstudiantesSinGrupo?.length || 0) +
+                      (curso.equipos?.reduce(
+                        (total, equipo) =>
+                          total + (equipo.miembros?.length || 0),
+                        0,
+                      ) || 0)}
                   </p>
                 </div>
                 <div className="toggle-container">
@@ -336,7 +359,7 @@ const CursoPage = () => {
 
             <div className="curso-lists">
               <div className="curso-section">
-                <h2>Estudiants</h2>
+                <h2>Estudiants sense equip</h2>
                 <table className="curso-table">
                   <thead>
                     <tr>
@@ -552,6 +575,36 @@ const CursoPage = () => {
             </div>
           </div>
         )}
+        {showDeleteConfirmPopup && (
+          <div className="confirm-popup">
+            <div className="popup-content">
+              <p>
+                Estàs segur/a de que vols eliminar el curs{' '}
+                {curso.nombreAsignatura}?
+              </p>
+              <p>
+                <strong>Aquesta acció no es pot desfer.</strong>
+              </p>
+              <div className="popup-buttons">
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={() => setShowDeleteConfirmPopup(false)}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className="confirm-button"
+                  onClick={handleConfirmDeleteCourse}
+                >
+                  Sí
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showConflictPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
@@ -631,11 +684,11 @@ const CursoPage = () => {
             </div>
           </div>
         )}
-        {showDeleteConfirmPopup && (
+        {showDeleteStudentPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
               <p>
-                Estàs segur de que vols eliminar del curs{' '}
+                Estàs segur/a de que vols eliminar del curs{' '}
                 {curso.nombreAsignatura} l&apos;estudiant{' '}
                 {estudianteAEliminar?.nombre}?
               </p>
@@ -643,7 +696,7 @@ const CursoPage = () => {
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={handleCancelDeleteStudent}
+                  onClick={() => setShowDeleteStudentPopup(false)}
                 >
                   No
                 </button>
