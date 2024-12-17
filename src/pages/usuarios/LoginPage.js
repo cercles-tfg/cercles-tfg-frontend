@@ -11,8 +11,6 @@ const LoginPage = () => {
     const googleToken = credentialResponse.credential;
     const payload = JSON.parse(atob(googleToken.split('.')[1]));
     const email = payload.email;
-    console.log('email es', email);
-    console.log('token: ', googleToken);
 
     // Llamada al backend para verificar si el usuario existe y obtener el JWT
     fetch('http://localhost:8080/api/auth/login', {
@@ -33,6 +31,7 @@ const LoginPage = () => {
         localStorage.setItem('jwtToken', data.token);
         localStorage.setItem('userEmail', email);
         localStorage.setItem('rol', data.rol);
+        localStorage.setItem('id', data.id);
         navigate('/home');
       })
       .catch((error) => {

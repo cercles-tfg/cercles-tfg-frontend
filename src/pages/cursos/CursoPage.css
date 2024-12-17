@@ -200,6 +200,31 @@ input:checked + .slider:before {
   transform: scale(1.2);
 }
 
+.delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+.popup-content p {
+  font-size: 16px;
+  color: #333;
+}
+
+.popup-content strong {
+  color: #f44336;
+}
+
 /* Styling for Add button inside table */
 .add-button {
   background-color: #4caf50;
@@ -234,6 +259,73 @@ p strong {
   border-radius: 4px;
   text-align: center;
   margin-bottom: 20px;
+}
+
+/*Seccion de tarjetas */
+/* Equipos container styling */
+.equipos-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+/* Equipo card styling */
+.equipo-card {
+  background-color: #ffffff;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.equipo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.equipo-card-header {
+  background-color: #4caf50;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.equipo-card-body {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.equipo-member {
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.equipo-member:last-child {
+  margin-bottom: 0;
+}
+
+.equipo-member p {
+  margin: 5px 0;
+  font-size: 14px;
 }
 
 /* Students and Professors section */
@@ -288,6 +380,47 @@ h2 {
 
 .curso-list-item:last-child {
   border-bottom: none;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #e0e0e0;
+  transition: background-color 0.3s ease;
+}
+
+.filter-buttons button.active-filter {
+  background-color: #4caf50;
+  color: white;
+}
+
+.filter-buttons button:hover {
+  background-color: #d6d6d6;
+}
+
+.filter-buttons button.active-filter:hover {
+  background-color: #388e3c;
+}
+.toggle-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: white;
+  transition: transform 0.3s;
+}
+
+.toggle-button:hover {
+  transform: scale(1.2);
 }
 
 /* Responsive design for smaller screens */

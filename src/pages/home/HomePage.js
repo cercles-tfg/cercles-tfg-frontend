@@ -21,7 +21,7 @@ const HomePage = () => {
   };
 
   const handleNavigateToProjects = () => {
-    window.location.href = '/projectes';
+    window.location.href = '/equipos';
   };
 
   if (!rol) {

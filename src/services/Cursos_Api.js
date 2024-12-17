@@ -223,3 +223,26 @@ export const modificarCurso = async (id, cursoData) => {
     throw error;
   }
 };
+
+// Borrar un curso
+export const borrarCurso = async (id, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/cursos/${id}/borrar`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al borrar el curso.');
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error('Error al borrar el curso:', error);
+    throw error;
+  }
+};
