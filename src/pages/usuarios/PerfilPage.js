@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import Sidebar from '../components/Sidebar';
-import TaigaCallbackHandler from '../components/TaigaCallbackHandler';
+import Sidebar from '../../components/common/Sidebar';
+import GitHubCallbackHandler from '../../components/auth/GitHubCallbackHandler';
+import TaigaCallbackHandler from '../../components/auth/TaigaCallbackHandler';
 import './PerfilPage.css';
 
 const PerfilPage = () => {
