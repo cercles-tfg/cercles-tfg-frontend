@@ -323,3 +323,21 @@ export const confirmarOrganizacion = async (
     );
   }
 };
+
+// Obtener métricas del equipo
+export const getMetrics = async (org, estudiantesIds, token) => {
+  const queryParams = `estudiantesIds=${estudiantesIds.join(',')}`;
+  const url = `${API_BASE_URL}/github/metrics/${org}?${queryParams}`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al obtener las métricas');
+  }
+
+  return await response.json();
+};

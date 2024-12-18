@@ -11,6 +11,7 @@ import VerificarCurso from './pages/cursos/VerificarCurso';
 import EquiposPage from './pages/equipos/EquiposPage';
 import EquipoPage from './pages/equipos/EquipoPage';
 import CrearEquipo from './pages/equipos/CrearEquipo';
+import EquipoMetricsPage from './pages/equipos/EquipoMetricsPage';
 
 function App() {
   return (
@@ -86,6 +87,14 @@ function App() {
           element={
             <PrivateRoute>
               <CrearEquipo />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/equipo/:id/metrics"
+          element={
+            <PrivateRoute>
+              <EquipoMetricsPage />
             </PrivateRoute>
           }
         />

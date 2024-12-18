@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link, Route, Routes } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import {
   getEquipoDetalle,
@@ -13,6 +13,7 @@ import {
   confirmarOrganizacion,
 } from '../../services/Equipos_Api';
 import './EquipoPage.css';
+import EquipoMetricsPage from './EquipoMetricsPage';
 
 const COLORS = [
   '#6C9975',
@@ -228,7 +229,6 @@ const EquipoPage = () => {
             </button>
           </div>
         ) : null}
-
         <div className="equipo-info">
           <div className="equipo-info-content">
             <p>
@@ -239,9 +239,22 @@ const EquipoPage = () => {
               <strong>Quatrimestre:</strong> {equipo.cuatrimestre}
             </p>
             <p>
-              <strong>Actiu:</strong> {equipo.activo ? 'Sí' : 'No'}
+              <strong>El curs està actiu?</strong> {equipo.activo ? 'Sí' : 'No'}
             </p>
           </div>
+        </div>
+        <div className="equipo-section">
+          <h2>Altres funcionalitats</h2>
+          {isProfesor && equipo.gitOrganizacion && (
+            <Link
+              to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantes=${equipo.estudiantes
+                .map((estudiante) => estudiante.id)
+                .join(',')}`}
+              className="metrics-link"
+            >
+              📊 Veure mètriques de GitHub
+            </Link>
+          )}
         </div>
 
         {/* Organización GitHub */}
@@ -379,7 +392,6 @@ const EquipoPage = () => {
             </>
           )}
         </div>
-
         <div className="equipo-section">
           <h2>Membres de l&apos;equip</h2>
           {isEditing ? (
@@ -449,7 +461,6 @@ const EquipoPage = () => {
             </div>
           )}
         </div>
-
         {showPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
