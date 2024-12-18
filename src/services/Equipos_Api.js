@@ -22,6 +22,7 @@ export const getEquiposDeUsuario = async (id, token) => {
   }
 };
 
+//obtener detalle de un equipo
 export const getEquipoDetalle = async (id, token) => {
   try {
     const response = await fetch(`${API_BASE_URL}/equipos/${id}`, {
@@ -192,6 +193,7 @@ export const salirEquipo = async (equipoId, estudianteId, token) => {
   }
 };
 
+//añadir miembros a un equipo
 export const añadirMiembros = async (equipoId, data, token) => {
   const response = await fetch(
     `${API_BASE_URL}/equipos/${equipoId}/añadir_miembro`,
@@ -210,6 +212,7 @@ export const añadirMiembros = async (equipoId, data, token) => {
   }
 };
 
+//borrar miembros de un equipo
 export const borrarMiembros = async (equipoId, data, token) => {
   const response = await fetch(
     `${API_BASE_URL}/equipos/${equipoId}/borrar_miembros`,
@@ -225,5 +228,98 @@ export const borrarMiembros = async (equipoId, data, token) => {
 
   if (!response.ok) {
     throw new Error('Error al borrar miembros del equipo.');
+  }
+};
+
+//obtener url de instalacion del github app en organizacion
+export const obtenerUrlInstalacion = async (equipoId, token) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/github/instalacion?equipoId=${equipoId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`, // Asegúrate de pasar el token correctamente
+        },
+      },
+    );
+    const data = await response.json();
+    return data.url; // Devuelve la URL de instalación
+  } catch (error) {
+    console.error(
+      'Error al obtener la URL de instalación de GitHub App:',
+      error,
+    );
+    throw new Error('Error desconocido al obtener la URL de instalación.');
+  }
+};
+
+//validar org
+export const validarOrganizacion = async (
+  profesorId,
+  miembrosIds,
+  organizacionUrl,
+  token,
+) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/github/validar-organizacion`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          profesorId,
+          miembrosIds,
+          organizacionUrl,
+        }),
+      },
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al validar la organización.');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error al validar la organización:', error);
+    throw new Error(
+      error.message || 'Error desconocido al validar la organización.',
+    );
+  }
+};
+
+//confirmar en bd org
+export const confirmarOrganizacion = async (
+  equipoId,
+  organizacionUrl,
+  token,
+) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/github/confirmar-organizacion`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          equipoId,
+          organizacionUrl,
+        }),
+      },
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al confirmar la organización.');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error al confirmar la organización:', error);
+    throw new Error(
+      error.message || 'Error desconocido al confirmar la organización.',
+    );
   }
 };

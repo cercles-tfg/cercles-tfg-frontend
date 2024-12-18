@@ -102,6 +102,52 @@
   margin-bottom: 30px;
 }
 
+.github-org-link {
+  color: #0058a3;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.github-org-link:hover {
+  color: #003e70;
+}
+
+.git-org-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.git-org-message {
+  font-size: 1rem;
+  color: #333;
+}
+
+.git-org-input-field {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.validate-git-org-button {
+  background-color: #28a745;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.validate-git-org-button:hover {
+  background-color: #218838;
+}
+
 /* Members section styling */
 .equipo-section {
   margin-top: 20px;

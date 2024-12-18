@@ -1,83 +1,91 @@
 .perfil-page {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start; /* Alinea hacia arriba */
+  height: 100vh;
   background-color: #f5f5f5;
+  padding-top: 2rem; /* Añade espacio en la parte superior */
 }
 
 .content {
-  margin-left: 250px;
-  margin-top: 60px;
-  padding: 2rem;
-  width: calc(100% - 250px);
-  transition: margin-left 0.3s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  overflow-y: auto;
+  text-align: left;
+  width: 100%;
+  max-width: 1500px; /* Caja más ancha */
+  padding: 2rem 3rem;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar.closed + .content {
-  margin-left: 80px;
-  width: calc(100% - 80px);
+.content h1 {
+  margin-top: 0; /* Elimina el espacio superior extra */
+  font-size: 2.5rem;
+}
+
+.content p {
+  font-size: 1.1rem;
+  color: #333;
 }
 
 .connections-container {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   gap: 2rem;
-  margin-top: 3rem;
-  width: 100%;
-  max-width: 900px;
+  margin-top: 1.5rem;
 }
 
 .github-connection-box,
 .taiga-connection-box {
-  background: rgba(0, 88, 163, 0.1);
+  background: #f9f9f9;
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 48%;
   text-align: center;
-  max-width: 400px;
 }
 
-.github-info,
-.taiga-info {
-  font-size: 1.2em;
-  color: #333;
+.github-connection-box h2,
+.taiga-connection-box h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #0058a3;
 }
 
-.github-info h2,
-.taiga-info h2 {
-  font-size: 1.8em;
-  margin-bottom: 0.5em;
+input[type='text'],
+input[type='password'] {
+  width: 100%; /* Asegura que los campos sean iguales y ocupen el ancho */
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border 0.3s ease-in-out;
 }
 
-.github-link,
-.taiga-link {
-  color: #0366d6;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s;
+input[type='text']:focus,
+input[type='password']:focus {
+  border-color: #0058a3;
+  outline: none;
 }
 
-.github-link:hover,
-.taiga-link:hover {
-  color: #024ea2;
+.taiga-connection-box label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #555;
+  font-weight: 600;
 }
 
 .github-connect-button,
 .taiga-connect-button {
   background-color: #0058a3;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
+  width: 100%; /* Botón de ancho completo */
   transition:
     background-color 0.3s ease,
     box-shadow 0.3s ease;
@@ -86,18 +94,24 @@
 .github-connect-button:hover,
 .taiga-connect-button:hover {
   background-color: #003e70;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.github-connect-button:active,
-.taiga-connect-button:active {
-  background-color: #002a4d;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.github-info p,
+.taiga-info p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #333;
 }
 
-.github-description,
-.taiga-description {
-  font-size: 1em;
-  color: #555;
-  margin-top: 10px;
+.github-link,
+.taiga-link {
+  color: #0058a3;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.github-link:hover,
+.taiga-link:hover {
+  text-decoration: underline;
 }

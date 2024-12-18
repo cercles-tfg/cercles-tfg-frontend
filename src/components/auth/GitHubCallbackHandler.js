@@ -7,7 +7,7 @@ const GitHubCallbackHandler = ({ onGitHubConnected }) => {
     const jwtToken = localStorage.getItem('jwtToken');
 
     if (code && jwtToken) {
-      fetch('http://localhost:8080/api/usuarios/github/callback', {
+      fetch('http://localhost:8080/api/github/callback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

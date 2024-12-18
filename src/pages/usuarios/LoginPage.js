@@ -21,6 +21,7 @@ const LoginPage = () => {
       body: JSON.stringify({ googleToken }),
     })
       .then((response) => {
+        console.log('Respuesta del backend:', response);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

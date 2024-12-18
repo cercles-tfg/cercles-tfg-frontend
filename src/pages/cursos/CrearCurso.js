@@ -141,7 +141,7 @@ const CrearCurso = () => {
             <input
               type="file"
               id="estudiantesFile"
-              accept=".csv, .xlsx, .xls"
+              accept=".xlsx"
               onChange={(e) => setEstudiantesFile(e.target.files[0])}
               required
             />
