@@ -4,6 +4,7 @@ import {
   getEvaluacionesDetalle,
   getEvaluacionesPorEquipo,
 } from '../../services/Evaluaciones_Api';
+import { getEquipoDetalle } from '../../services/Equipos_Api';
 import Sidebar from '../../components/common/Sidebar';
 import './EvaluacionesGeneralesPage.css';
 
@@ -12,36 +13,51 @@ const EvaluacionesGeneralesPage = () => {
   const token = localStorage.getItem('jwtToken');
   const [detalles, setDetalles] = useState([]);
   const [medias, setMedias] = useState([]);
+  const [equipo, setEquipo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchEquipoDetalle = async () => {
+      try {
+        const equipoData = await getEquipoDetalle(equipoId, token);
+        setEquipo(equipoData);
+      } catch (error) {
+        setError('No se pudo cargar la información del equipo.');
+      }
+    };
+
     const fetchEvaluaciones = async () => {
       try {
-        setLoading(true);
-
         const detallesData = await getEvaluacionesDetalle(
           equipoId,
           token,
           [1, 2, 3],
         );
-        setDetalles(detallesData);
-
         const mediasData = await getEvaluacionesPorEquipo(equipoId, token);
+        setDetalles(detallesData);
         setMedias(mediasData);
       } catch (error) {
-        console.error('Error al cargar las evaluaciones:', error);
-        setError('Error al carregar les dades.');
-      } finally {
-        setLoading(false);
+        setError('Error al cargar las evaluaciones.');
       }
     };
 
-    fetchEvaluaciones();
+    setLoading(true);
+    Promise.all([fetchEquipoDetalle(), fetchEvaluaciones()])
+      .catch((error) => setError('Error al cargar los datos.'))
+      .finally(() => setLoading(false));
   }, [equipoId, token]);
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p className="error-message">{error}</p>;
+
+  if (!equipo) return <p>No se pudo cargar la información del equipo.</p>;
+
+  // Crear un mapeo de IDs a nombres de estudiantes
+  const idToName = equipo.estudiantes.reduce((map, estudiante) => {
+    map[estudiante.id] = estudiante.nombre;
+    return map;
+  }, {});
 
   const estudiantes = medias.map((media) => media.estudianteId);
 
@@ -59,7 +75,7 @@ const EvaluacionesGeneralesPage = () => {
               <tr>
                 <th>Companys</th>
                 {estudiantes.map((id) => (
-                  <th key={`media-general-${id}`}>E{id}</th>
+                  <th key={`media-general-${id}`}>{idToName[id]}</th>
                 ))}
               </tr>
             </thead>
@@ -70,9 +86,9 @@ const EvaluacionesGeneralesPage = () => {
                   <td
                     key={`media-general-companeros-${media.estudianteId}`}
                     className={
-                      media.mediaGeneralDeCompañeros >= 11
+                      media.mediaGeneralDeCompañeros > 11
                         ? 'high-value'
-                        : media.mediaGeneralDeCompañeros <= 9
+                        : media.mediaGeneralDeCompañeros < 9
                           ? 'low-value'
                           : ''
                     }
@@ -126,16 +142,16 @@ const EvaluacionesGeneralesPage = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>Estudiant / Evaluat</th>
+                    <th>Estudiant Evaluador / Evaluat</th>
                     {estudiantes.map((id) => (
-                      <th key={`evaluado-${evalId}-${id}`}>E{id}</th>
+                      <th key={`evaluado-${evalId}-${id}`}>{idToName[id]}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {estudiantes.map((evaluadorId) => (
                     <tr key={`evaluador-${evalId}-${evaluadorId}`}>
-                      <td>E{evaluadorId}</td>
+                      <td>{idToName[evaluadorId]}</td>
                       {estudiantes.map((evaluadoId) => {
                         const evaluacion = evalDetalles.find(
                           (detalle) => detalle.evaluadoId === evaluadoId,
@@ -161,7 +177,7 @@ const EvaluacionesGeneralesPage = () => {
 
                   {/* Fila Mitjana */}
                   <tr>
-                    <td>Mitjana</td>
+                    <td>Mitjana de l&apos;avaluació dels companys</td>
                     {estudiantes.map((evaluadoId) => {
                       const mediaCompaneros = medias
                         .find(
