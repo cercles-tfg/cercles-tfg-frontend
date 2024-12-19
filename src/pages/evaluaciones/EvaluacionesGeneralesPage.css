@@ -1,0 +1,59 @@
+.evaluaciones-page {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.content {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  max-width: 95%;
+  overflow-x: auto;
+  margin-bottom: 20px; /* Asegura que haya separación entre la tabla y el siguiente contenido */
+  margin-top: 20px;
+}
+
+.tabla-medias-generales {
+  margin-top: 300px;
+  margin-bottom: 40px; /* Espacio entre la tabla y otras secciones */
+  width: 100%;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+}
+
+.evaluacion-tabla {
+  margin-bottom: 40px;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+table th {
+  background-color: #f7f7f7;
+  font-size: 14px;
+}
+
+table td {
+  font-size: 14px;
+}
+
+h2,
+h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+@media screen and (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    width: 100%;
+  }
+}

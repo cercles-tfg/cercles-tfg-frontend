@@ -90,6 +90,23 @@
   background-color: #e68a00;
 }
 
+.metrics-links-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espacio entre los enlaces */
+}
+
+.metrics-link {
+  text-decoration: none;
+  color: #007bff; /* Cambia el color si lo prefieres */
+  font-weight: bold;
+}
+
+.metrics-link:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
 /* Info section styling */
 .equipo-info {
   display: flex;

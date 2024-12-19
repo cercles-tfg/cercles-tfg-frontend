@@ -1,14 +1,25 @@
 const API_BASE_URL = 'http://localhost:8080/api/evaluaciones';
 
 // Obtener evaluaciones detalle
-export const getEvaluacionesDetalle = async (id, token) => {
+export const getEvaluacionesDetalle = async (
+  equipoId,
+  token,
+  evaluacionIds,
+) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/equipo/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+    const params = new URLSearchParams({
+      evaluacionIds: evaluacionIds.join(','),
     });
+
+    const response = await fetch(
+      `${API_BASE_URL}/equipo/${equipoId}?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -20,6 +31,30 @@ export const getEvaluacionesDetalle = async (id, token) => {
     return await response.json();
   } catch (error) {
     console.error('Error al obtener los detalles del equipo:', error);
+    throw error;
+  }
+};
+
+// Obtener evaluaciones por equipo
+export const getEvaluacionesPorEquipo = async (equipoId, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/equipo/${equipoId}/medias`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || 'Error al obtener las evaluaciones del equipo.',
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener las evaluaciones del equipo:', error);
     throw error;
   }
 };
@@ -79,30 +114,6 @@ export const isEvaluacionRealizada = async (equipoId, estudianteId, token) => {
       'Error al comprobar si la evaluación ya fue realizada:',
       error,
     );
-    throw error;
-  }
-};
-
-// Obtener evaluaciones por equipo
-export const getEvaluacionesPorEquipo = async (equipoId, token) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/equipo/${equipoId}/medias`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || 'Error al obtener las evaluaciones del equipo.',
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error al obtener las evaluaciones del equipo:', error);
     throw error;
   }
 };

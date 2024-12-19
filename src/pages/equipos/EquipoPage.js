@@ -283,12 +283,20 @@ const EquipoPage = () => {
           <h2>Altres funcionalitats</h2>
           {isProfesor && equipo.gitOrganizacion ? (
             <>
-              <Link
-                to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
-                className="metrics-link"
-              >
-                📊 Veure mètriques de GitHub
-              </Link>
+              <div className="metrics-links-container">
+                <Link
+                  to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
+                  className="metrics-link"
+                >
+                  📊 Veure mètriques de GitHub
+                </Link>
+                <Link
+                  to={`/equipo/${id}/evaluaciones_generales`}
+                  className="metrics-link"
+                >
+                  📊 Veure dades d&apos;avaluacions
+                </Link>
+              </div>
             </>
           ) : (
             <>
