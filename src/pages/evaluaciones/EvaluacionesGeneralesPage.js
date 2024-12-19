@@ -52,7 +52,7 @@ const EvaluacionesGeneralesPage = () => {
         <h1>Dades d&apos;avaluacions</h1>
 
         {/* Tabla con medias generales */}
-        <h2>Detalls per avaluació</h2>
+        <h2>Mitjanes Generals</h2>
         {medias.length > 0 ? (
           <table className="tabla-medias-generales">
             <thead>
@@ -67,7 +67,16 @@ const EvaluacionesGeneralesPage = () => {
               <tr>
                 <td>Mitjana entre companys</td>
                 {medias.map((media) => (
-                  <td key={`media-general-companeros-${media.estudianteId}`}>
+                  <td
+                    key={`media-general-companeros-${media.estudianteId}`}
+                    className={
+                      media.mediaGeneralDeCompañeros >= 11
+                        ? 'high-value'
+                        : media.mediaGeneralDeCompañeros <= 9
+                          ? 'low-value'
+                          : ''
+                    }
+                  >
                     {media.mediaGeneralDeCompañeros?.toFixed(2) || 'N/A'}
                   </td>
                 ))}
@@ -85,6 +94,18 @@ const EvaluacionesGeneralesPage = () => {
         ) : (
           <p>No hi ha dades disponibles per a les mitjanes generals.</p>
         )}
+
+        {/* Índice de colores */}
+        <div className="indice-colores">
+          <div className="indice-item">
+            <div className="indice-cuadro high-value"></div>
+            <span>Molt per sobre (&gt; 11)</span>
+          </div>
+          <div className="indice-item">
+            <div className="indice-cuadro low-value"></div>
+            <span>Molt per sota (&lt; 9)</span>
+          </div>
+        </div>
 
         {/* Tablas por evaluación */}
         <h2>Detalls per avaluació</h2>
@@ -123,9 +144,13 @@ const EvaluacionesGeneralesPage = () => {
                           (detalle) => detalle.evaluadorId === evaluadorId,
                         )?.puntuacion;
 
+                        // Resaltar diagonal
+                        const isDiagonal = evaluadorId === evaluadoId;
+
                         return (
                           <td
                             key={`detalle-${evalId}-${evaluadorId}-${evaluadoId}`}
+                            className={isDiagonal ? 'diagonal-highlight' : ''}
                           >
                             {puntuacion ? puntuacion.toFixed(2) : 'N/A'}
                           </td>
@@ -133,6 +158,8 @@ const EvaluacionesGeneralesPage = () => {
                       })}
                     </tr>
                   ))}
+
+                  {/* Fila Mitjana */}
                   <tr>
                     <td>Mitjana</td>
                     {estudiantes.map((evaluadoId) => {
@@ -148,8 +175,18 @@ const EvaluacionesGeneralesPage = () => {
                           (evalMedia) => evalMedia.evaluacionId === evalId,
                         )?.mediaDeCompañeros;
 
+                      const cellClass = [
+                        mediaCompaneros > 11 ? 'high-value' : '',
+                        mediaCompaneros < 9 ? 'low-value' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ');
+
                       return (
-                        <td key={`mitjana-${evalId}-${evaluadoId}`}>
+                        <td
+                          key={`mitjana-${evalId}-${evaluadoId}`}
+                          className={cellClass}
+                        >
                           {mediaCompaneros ? mediaCompaneros.toFixed(2) : 'N/A'}
                         </td>
                       );

@@ -51,6 +51,38 @@ h3 {
   text-align: left;
 }
 
+/*colores*/
+.diagonal-highlight {
+  background-color: rgba(173, 216, 230, 0.4); /* Azul difuminado */
+}
+
+.high-value {
+  background-color: rgba(144, 238, 144, 0.6); /* Verde claro */
+}
+
+.low-value {
+  background-color: rgba(255, 99, 71, 0.6); /* Rojo claro */
+}
+
+.indice-colores {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.indice-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.indice-cuadro {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  border: 1px solid #ddd;
+}
+
 @media screen and (max-width: 768px) {
   .content {
     margin-left: 0;
