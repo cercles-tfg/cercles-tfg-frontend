@@ -42,6 +42,7 @@ const EquipoPage = () => {
   const [githubAppInstalada, setGithubAppInstalada] = useState(false);
   const [comprobandoValidacion, setComprobandoValidacion] = useState(false);
   const [gitOrganizacion, setGitOrganizacion] = useState(null);
+  const [estIds, setEstIds] = useState(null);
 
   const token = localStorage.getItem('jwtToken');
   const idEstudiante = parseInt(localStorage.getItem('id'));
@@ -52,7 +53,12 @@ const EquipoPage = () => {
         setLoading(true);
         const equipoData = await getEquipoDetalle(id, token);
         console.log('data ', equipoData);
+
         setEquipo(equipoData);
+        const estudiantesIds = equipoData.estudiantes.map(
+          (estudiante) => estudiante.id,
+        );
+        setEstIds(estudiantesIds);
         setGithubAppInstalada(equipoData.githubAppInstalada);
         setGitOrganizacion(equipoData.gitOrganizacion);
       } catch (error) {
@@ -246,14 +252,14 @@ const EquipoPage = () => {
         <div className="equipo-section">
           <h2>Altres funcionalitats</h2>
           {isProfesor && equipo.gitOrganizacion && (
-            <Link
-              to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantes=${equipo.estudiantes
-                .map((estudiante) => estudiante.id)
-                .join(',')}`}
-              className="metrics-link"
-            >
-              📊 Veure mètriques de GitHub
-            </Link>
+            <>
+              <Link
+                to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
+                className="metrics-link"
+              >
+                📊 Veure mètriques de GitHub
+              </Link>
+            </>
           )}
         </div>
 

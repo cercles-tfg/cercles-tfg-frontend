@@ -75,7 +75,7 @@ function App() {
           }
         />
         <Route
-          path="/equipos/:id"
+          path="/equipos/:id/*"
           element={
             <PrivateRoute>
               <EquipoPage />
@@ -85,7 +85,7 @@ function App() {
         <Route
           path="/equipos/crear"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="ESTUDIANTE">
               <CrearEquipo />
             </PrivateRoute>
           }
@@ -93,7 +93,7 @@ function App() {
         <Route
           path="/equipo/:id/metrics"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="PROFESOR">
               <EquipoMetricsPage />
             </PrivateRoute>
           }

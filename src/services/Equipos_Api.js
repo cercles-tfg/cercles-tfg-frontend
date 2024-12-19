@@ -326,17 +326,23 @@ export const confirmarOrganizacion = async (
 
 // Obtener métricas del equipo
 export const getMetrics = async (org, estudiantesIds, token) => {
+  if (!org || !estudiantesIds?.length) {
+    throw new Error('Faltan parámetros necesarios.');
+  }
+
   const queryParams = `estudiantesIds=${estudiantesIds.join(',')}`;
   const url = `${API_BASE_URL}/github/metrics/${org}?${queryParams}`;
+  console.log('token', token);
 
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json', // Corregido
     },
   });
 
   if (!response.ok) {
-    throw new Error('Error al obtener las métricas');
+    throw new Error(`Error al obtener las métricas: ${response.statusText}`);
   }
 
   return await response.json();

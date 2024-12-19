@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getMetrics } from '../../services/Equipos_Api';
 import { Bar, Pie } from 'react-chartjs-2';
 import {
@@ -24,58 +24,64 @@ ChartJS.register(
   BarElement,
 );
 
-const EquipoMetricsPage = () => {
+const EquipoMetricsPage = ({}) => {
+  const { id } = useParams();
   const [searchParams] = useSearchParams();
   const org = searchParams.get('org');
-  const estudiantesIds = searchParams
-    .get('estudiantes')
-    ?.split(',')
-    .map(Number);
+  const estudiantesIdsString = searchParams.get('estudiantesIds');
+  const estudiantesIds = estudiantesIdsString
+    ? estudiantesIdsString.split(',').map(Number)
+    : [];
   const token = localStorage.getItem('jwtToken');
 
   const [metrics, setMetrics] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(0); // Para la barra de carga
   const [error, setError] = useState(null);
+  const [localOrg, setLocalOrg] = useState(null);
+  const [localEstudiantesIds, setLocalEstudiantesIds] = useState([]);
 
   useEffect(() => {
-    let interval;
+    // Actualiza solo si hay cambios
+    if (
+      org !== localOrg ||
+      JSON.stringify(estudiantesIds) !== JSON.stringify(localEstudiantesIds)
+    ) {
+      setLocalOrg(org);
+      setLocalEstudiantesIds(estudiantesIds);
+    }
+  }, [org, estudiantesIds]);
+
+  useEffect(() => {
+    if (!localOrg || !localEstudiantesIds?.length) return;
 
     const fetchMetrics = async () => {
       try {
         setLoading(true);
-        setProgress(0);
-
-        // Ciclo de la barra de progreso
-        interval = setInterval(() => {
-          setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
-        }, 50);
-
-        // Validación de parámetros
-        if (!org || !estudiantesIds || estudiantesIds.length === 0) {
-          throw new Error('Faltan parámetros o estudiantes.');
-        }
-
-        // Llamada al backend
-        const data = await getMetrics(org, estudiantesIds, token);
+        console.log('Realizando llamada con:', localOrg, localEstudiantesIds);
+        const data = await getMetrics(localOrg, localEstudiantesIds, token);
         setMetrics(data);
-
-        // Finalizar carga
-        clearInterval(interval);
-        setProgress(100);
       } catch (error) {
-        console.error(error.message);
+        console.error('Error en fetchMetrics:', error.message);
         setError('Error al obtener las métricas.');
       } finally {
-        clearInterval(interval);
         setLoading(false);
       }
     };
 
     fetchMetrics();
+  }, [localOrg, localEstudiantesIds, token]);
+
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
+      }, 50);
+    }
 
     return () => clearInterval(interval);
-  }, [org, estudiantesIds, token]);
+  }, [loading]);
 
   if (loading) {
     return (
@@ -174,7 +180,7 @@ const EquipoMetricsPage = () => {
           />
         </div>
 
-        {/* Gráfico de Barras */}
+        {/* Gráfico de Barras: Línies afegides i eliminades */}
         <h2>Línies de codi afegides i eliminades</h2>
         <div className="chart-container">
           <Bar
