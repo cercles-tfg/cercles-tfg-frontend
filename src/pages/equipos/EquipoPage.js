@@ -12,6 +12,11 @@ import {
   validarOrganizacion,
   confirmarOrganizacion,
 } from '../../services/Equipos_Api';
+import {
+  isEvaluacionActiva,
+  isEvaluacionRealizada,
+} from '../../services/Evaluaciones_Api';
+
 import './EquipoPage.css';
 import EquipoMetricsPage from './EquipoMetricsPage';
 
@@ -47,6 +52,9 @@ const EquipoPage = () => {
   const token = localStorage.getItem('jwtToken');
   const idEstudiante = parseInt(localStorage.getItem('id'));
   const isProfesor = localStorage.getItem('rol') === 'Profesor';
+  const [evaluacionActiva, setEvaluacionActiva] = useState(false);
+  const [evaluacionRealizada, setEvaluacionRealizada] = useState(false);
+
   useEffect(() => {
     const fetchEquipoDetalle = async () => {
       try {
@@ -70,6 +78,28 @@ const EquipoPage = () => {
 
     fetchEquipoDetalle();
   }, [id, token]);
+
+  useEffect(() => {
+    if (!equipo) return;
+    const fetchEvaluacionStatus = async () => {
+      try {
+        const activa = await isEvaluacionActiva(equipo.id, token);
+        const realizada = await isEvaluacionRealizada(
+          equipo.id,
+          idEstudiante,
+          token,
+        );
+        console.log('realizada ', realizada);
+
+        setEvaluacionActiva(activa);
+        setEvaluacionRealizada(realizada);
+      } catch (error) {
+        console.error('Error al comprobar el estado de la evaluación:', error);
+      }
+    };
+
+    fetchEvaluacionStatus();
+  }, [equipo]);
 
   // Redirigir a la instalación de GitHub App
   const handleInstallGitHubApp = async () => {
@@ -251,7 +281,7 @@ const EquipoPage = () => {
         </div>
         <div className="equipo-section">
           <h2>Altres funcionalitats</h2>
-          {isProfesor && equipo.gitOrganizacion && (
+          {isProfesor && equipo.gitOrganizacion ? (
             <>
               <Link
                 to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
@@ -259,6 +289,21 @@ const EquipoPage = () => {
               >
                 📊 Veure mètriques de GitHub
               </Link>
+            </>
+          ) : (
+            <>
+              {evaluacionActiva && !evaluacionRealizada ? (
+                <Link
+                  to={`/equipo/${equipo.id}/evaluacion`}
+                  className="evaluacion-link"
+                >
+                  Evalua als teus companys
+                </Link>
+              ) : (
+                <span className="evaluacion-link-disabled">
+                  No hi ha evaluacions actives
+                </span>
+              )}
             </>
           )}
         </div>

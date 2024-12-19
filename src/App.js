@@ -12,6 +12,7 @@ import EquiposPage from './pages/equipos/EquiposPage';
 import EquipoPage from './pages/equipos/EquipoPage';
 import CrearEquipo from './pages/equipos/CrearEquipo';
 import EquipoMetricsPage from './pages/equipos/EquipoMetricsPage';
+import EvaluacionPage from './pages/equipos/EvaluacionPage';
 
 function App() {
   return (
@@ -95,6 +96,14 @@ function App() {
           element={
             <PrivateRoute requiredRole="PROFESOR">
               <EquipoMetricsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/equipo/:equipoId/evaluacion"
+          element={
+            <PrivateRoute>
+              <EvaluacionPage />
             </PrivateRoute>
           }
         />

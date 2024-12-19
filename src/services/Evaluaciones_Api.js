@@ -1,0 +1,165 @@
+const API_BASE_URL = 'http://localhost:8080/api/evaluaciones';
+
+// Obtener evaluaciones detalle
+export const getEvaluacionesDetalle = async (id, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/equipo/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || 'Error al obtener los detalles del equipo.',
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener los detalles del equipo:', error);
+    throw error;
+  }
+};
+
+// Comprobar si la evaluación está activa
+export const isEvaluacionActiva = async (equipoId, token) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/equipo/${equipoId}/evaluacion-activa`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || 'Error al comprobar si la evaluación está activa.',
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al comprobar si la evaluación está activa:', error);
+    throw error;
+  }
+};
+
+// Comprobar si la evaluación ya fue realizada
+export const isEvaluacionRealizada = async (equipoId, estudianteId, token) => {
+  console.log('realizada ', equipoId, estudianteId);
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/equipo/${equipoId}/evaluacion-realizada/${estudianteId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message ||
+          'Error al comprobar si la evaluación ya fue realizada.',
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(
+      'Error al comprobar si la evaluación ya fue realizada:',
+      error,
+    );
+    throw error;
+  }
+};
+
+// Obtener evaluaciones por equipo
+export const getEvaluacionesPorEquipo = async (equipoId, token) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/equipo/${equipoId}/medias`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || 'Error al obtener las evaluaciones del equipo.',
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener las evaluaciones del equipo:', error);
+    throw error;
+  }
+};
+
+export const crearEvaluacionDetalle = async (
+  evaluacionId,
+  evaluadorId,
+  detalles,
+  token,
+) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/estudiante/crear`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        evaluacionId,
+        evaluadorId,
+        detalles,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(
+        `Error al crear la evaluación: ${response.status} - ${errorData}`,
+      );
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error('Error al crear la evaluación:', error);
+    throw error;
+  }
+};
+
+export const getEvaluacionActivaId = async (equipoId, token) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/evaluaciones/equipo/${equipoId}/evaluacion-activa-id`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Error al obtener la evaluación activa.');
+    }
+
+    return await response.json(); // Devuelve el evaluacionId
+  } catch (error) {
+    console.error('Error al obtener la evaluación activa:', error);
+    throw error;
+  }
+};

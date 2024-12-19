@@ -8,33 +8,37 @@ const TaigaCallbackHandler = ({
   onSuccess,
   onError,
 }) => {
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const code = queryParams.get('code');
+  const handleTaigaAuth = async () => {
+    try {
+      const queryParams = new URLSearchParams(window.location.search);
+      const code = queryParams.get('code');
 
-    const handleTaigaAuth = async () => {
-      try {
-        const credentials =
-          authType === 'normal' ? { username, password } : { code };
-        await conectarTaiga(authType, credentials);
+      const credentials =
+        authType === 'normal' ? { username, password } : { code: code || '' };
 
-        onSuccess('Cuenta de Taiga conectada correctamente.');
-        const newUrl = window.location.href.split('?')[0];
-        window.history.replaceState(null, '', newUrl);
-        window.location.reload();
-      } catch (error) {
-        console.error('Error al conectar a Taiga:', error);
-        onError(error.message);
+      // Evitar llamadas si no hay credenciales válidas
+      if (
+        (authType === 'normal' && (!username || !password)) ||
+        (authType === 'github' && !code)
+      ) {
+        return;
       }
-    };
 
-    if (
-      (authType === 'normal' && username && password) ||
-      (authType === 'github' && code)
-    ) {
-      handleTaigaAuth();
+      await conectarTaiga(authType, credentials);
+      onSuccess('Cuenta de Taiga conectada correctamente.');
+
+      // Limpiar parámetros de la URL
+      const newUrl = window.location.href.split('?')[0];
+      window.history.replaceState(null, '', newUrl);
+    } catch (error) {
+      console.error('Error al conectar a Taiga:', error);
+      onError(error.message || 'Error al conectar a Taiga.');
     }
-  }, [authType, username, password, onSuccess, onError]);
+  };
+
+  useEffect(() => {
+    // Ya no se ejecuta automáticamente al cargar la página
+  }, []);
 
   return null;
 };

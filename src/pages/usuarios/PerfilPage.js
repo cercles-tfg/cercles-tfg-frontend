@@ -54,15 +54,33 @@ const PerfilPage = () => {
 
   const handleTaigaConnect = () => {
     if (!username || !password) {
-      setErrorMessage('Els camps de usuari i contrasenya són obligatoris.');
+      alert('Els camps de usuari i contrasenya són obligatoris.');
       return;
     }
+
     conectarTaiga('normal', { username, password })
       .then(() => {
-        setSuccessMessage('Compte de Taiga connectada correctament.');
+        alert('Compte de Taiga connectada correctament.');
         fetchUserData();
       })
-      .catch((err) => setErrorMessage(err.message));
+      .catch((err) => alert(`Error al conectar con Taiga: ${err.message}`));
+  };
+
+  const handleGitHubTaigaConnect = () => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const code = queryParams.get('code');
+
+    if (!code) {
+      alert('Error: No se recibió el código de GitHub.');
+      return;
+    }
+
+    conectarTaiga('github', { code })
+      .then(() => {
+        alert('Compte de Taiga connectada correctament.');
+        fetchUserData();
+      })
+      .catch((err) => alert(`Error al conectar con Taiga: ${err.message}`));
   };
 
   useEffect(() => {
@@ -175,18 +193,7 @@ const PerfilPage = () => {
 
                 {authType === 'github' && (
                   <button
-                    onClick={() => {
-                      if (!gitUsername) {
-                        handleTaigaGitHubError();
-                      } else {
-                        conectarTaiga('github', {})
-                          .then(() => {
-                            setSuccessMessage('Compte de Taiga connectada.');
-                            fetchUserData();
-                          })
-                          .catch((err) => setErrorMessage(err.message));
-                      }
-                    }}
+                    onClick={handleGitHubTaigaConnect}
                     className="taiga-connect-button"
                   >
                     Connecta amb GitHub
