@@ -16,6 +16,12 @@ const CrearCurso = () => {
   const [profesoresDisponibles, setProfesoresDisponibles] = useState([]);
   const [estudiantesFile, setEstudiantesFile] = useState(null);
   const [estudiantesData, setEstudiantesData] = useState([]);
+  const [fechasEvaluacion, setFechasEvaluacion] = useState({
+    evaluacion1: '',
+    evaluacion2: '',
+    evaluacion3: '',
+  });
+  const [errorFechas, setErrorFechas] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,9 +51,19 @@ const CrearCurso = () => {
     );
   };
 
+  const handleFechaChange = (e, evaluacion) => {
+    setFechasEvaluacion((prev) => ({ ...prev, [evaluacion]: e.target.value }));
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (selectedProfesores.length === 0 || !estudiantesFile) {
+    if (
+      selectedProfesores.length === 0 ||
+      !estudiantesFile ||
+      !fechasEvaluacion.evaluacion1 ||
+      !fechasEvaluacion.evaluacion2 ||
+      !fechasEvaluacion.evaluacion3
+    ) {
       return;
     }
 
@@ -64,6 +80,7 @@ const CrearCurso = () => {
             return { id: prof.id, nombre: prof.nombre, correo: prof.correo };
           }),
           estudiantes: data,
+          fechasEvaluacion,
         },
       });
     } catch (error) {
@@ -117,9 +134,7 @@ const CrearCurso = () => {
             </select>
           </div>
           <div className="form-group">
-            <label>
-              Selecciona els professors (pots seleccionar-ne més d&apos;un)
-            </label>
+            <label>Selecció de professors</label>
             <div className="profesor-selection-group">
               {profesoresDisponibles.map((profesor) => (
                 <div
@@ -146,6 +161,29 @@ const CrearCurso = () => {
               required
             />
           </div>
+          <div className="form-group">
+            <label>Fechas de evaluación</label>
+            {['evaluacion1', 'evaluacion2', 'evaluacion3'].map(
+              (evaluacion, index) => (
+                <div key={evaluacion} className="evaluacion-fechas">
+                  <label>Avaluació {index + 1}</label>
+                  <input
+                    type="date"
+                    value={fechasEvaluacion[evaluacion].inicio}
+                    onChange={(e) => handleFechaChange(e, evaluacion, 'inicio')}
+                    required
+                  />
+                  <input
+                    type="date"
+                    value={fechasEvaluacion[evaluacion].fin}
+                    onChange={(e) => handleFechaChange(e, evaluacion, 'fin')}
+                    required
+                  />
+                </div>
+              ),
+            )}
+          </div>
+          {errorFechas && <p className="error-message">{errorFechas}</p>}
           <div className="form-buttons">
             <button
               type="button"

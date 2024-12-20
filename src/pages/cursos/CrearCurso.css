@@ -59,6 +59,25 @@ select {
   background-color: #f1f1f1;
 }
 
+.evaluacion-fechas {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.evaluacion-fechas label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.evaluacion-fechas input[type='date'] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .error-message {
   color: red;
   font-size: 0.9em;
