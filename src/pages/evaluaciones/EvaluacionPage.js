@@ -36,6 +36,7 @@ const EvaluacionPage = () => {
       try {
         const equipoData = await getEquipoDetalle(equipoId, token);
         setEquipo(equipoData);
+        console.log('eq data ', equipoData);
 
         // Inicializar puntuaciones en 0 para cada estudiante
         const inicialPuntuaciones = equipoData.estudiantes.reduce(
@@ -121,7 +122,9 @@ const EvaluacionPage = () => {
         <button className="back-button" onClick={handleBackClick}>
           Torna enrere
         </button>
-        <h1>Avaluació (Equip: {equipo.nombre})</h1>
+        <h1>
+          Avaluació per {equipo.nombreAsignatura} (Equip: {equipo.nombre})
+        </h1>
         <h2>
           Recorda que la suma total de les xifres ha de ser equivalent al nombre
           de membres de l&apos;equip * 10

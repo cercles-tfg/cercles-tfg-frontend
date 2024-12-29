@@ -3,7 +3,7 @@ import { googleLogout } from '@react-oauth/google';
 import { FaSignOutAlt } from 'react-icons/fa';
 import './Logout.css';
 
-const Logout = () => {
+const Logout = ({ isSidebarOpen }) => {
   const [showModal, setShowModal] = useState(false);
 
   const handleLogoutClick = () => {
@@ -25,7 +25,7 @@ const Logout = () => {
     <>
       <div onClick={handleLogoutClick} className="logout-button">
         <FaSignOutAlt className="logout-icon" />
-        <span className="logout-text">Sortir</span>
+        {isSidebarOpen && <span className="logout-text">Sortir</span>}
       </div>
 
       {showModal && (

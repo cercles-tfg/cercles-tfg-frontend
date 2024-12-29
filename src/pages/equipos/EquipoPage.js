@@ -101,7 +101,7 @@ const EquipoPage = () => {
     fetchEvaluacionStatus();
   }, [equipo]);
 
-  // Redirigir a la instalación de GitHub App
+  /*/ Redirigir a la instalación de GitHub App
   const handleInstallGitHubApp = async () => {
     try {
       const instalacionUrl = await obtenerUrlInstalacion(equipo.id, token);
@@ -109,7 +109,7 @@ const EquipoPage = () => {
     } catch (error) {
       setError('Error al obtener la URL de instalación.');
     }
-  };
+  };*/
 
   // Validar la organización
   const handleValidateGitOrg = async () => {
@@ -235,6 +235,20 @@ const EquipoPage = () => {
     return <div>No s&apos;ha trobat la informació de l&apos;equip.</div>;
   }
 
+  if (!equipo.activo) {
+    return (
+      <div className="inactive-overlay">
+        <Sidebar />
+        <div className="inactive-popup">
+          <h2>Els curs al que pertany aquest equip ja no està disponible.</h2>
+          <button className="back-button" onClick={handleBackClick}>
+            Torna enrere
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="equipo-page">
       <Sidebar />
@@ -272,10 +286,7 @@ const EquipoPage = () => {
               {equipo.añoInicio})
             </p>
             <p>
-              <strong>Quatrimestre:</strong> {equipo.cuatrimestre}
-            </p>
-            <p>
-              <strong>El curs està actiu?</strong> {equipo.activo ? 'Sí' : 'No'}
+              <strong>Quadrimestre:</strong> {equipo.cuatrimestre}
             </p>
           </div>
         </div>
@@ -337,7 +348,7 @@ const EquipoPage = () => {
                   to={`/equipo/${equipo.id}/evaluacion`}
                   className="evaluacion-link"
                 >
-                  Evalua als teus companys
+                  Avalua als teus companys
                 </Link>
               ) : (
                 <span className="evaluacion-link-disabled">
@@ -354,7 +365,6 @@ const EquipoPage = () => {
 
           {isProfesor ? (
             equipo.gitOrganizacion ? (
-              // Si el profesor ve que la organización ya está configurada
               <>
                 <p>
                   ✅ L&apos;organització de GitHub està configurada:
@@ -369,7 +379,6 @@ const EquipoPage = () => {
                 </p>
               </>
             ) : (
-              // Si el profesor ve que aún no está configurada
               <p>
                 Els estudiants encara no han definit la seva organització de
                 GitHub.
@@ -379,7 +388,8 @@ const EquipoPage = () => {
             // Vista para estudiantes
             <>
               {/* Si la GitHub App no está instalada */}
-              {!githubAppInstalada ? (
+              {
+                /*!githubAppInstalada ? (
                 <>
                   <p>
                     Per validar la organització, instal·leu primer la GitHub
@@ -392,94 +402,109 @@ const EquipoPage = () => {
                     Instal·lar GitHub App
                   </button>
                 </>
-              ) : equipo.gitOrganizacion ? (
-                // Si la organización ya está configurada
-                <>
-                  <p>
-                    ✅ L&apos;organització de GitHub està configurada:
-                    <a
-                      href={`https://github.com/${equipo.gitOrganizacion}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="github-org-link"
-                    >
-                      {equipo.gitOrganizacion}
-                    </a>
-                  </p>
-                </>
-              ) : (
-                // Si la organización aún no está configurada
-                <>
-                  {!comprobandoValidacion ? (
-                    <>
-                      <p>
-                        Introduïu la URL de l&apos;organització de GitHub del
-                        vostre equip i cliqueu validar:
-                      </p>
-                      <input
-                        type="text"
-                        placeholder="https://github.com/organització"
-                        value={gitOrgUrl}
-                        onChange={(e) => setGitOrgUrl(e.target.value)}
-                        className="git-org-input-field"
-                      />
-                      <button
-                        onClick={handleValidateGitOrg}
-                        className="validate-git-org-button"
+              ) : */ equipo.gitOrganizacion ? (
+                  // organización ya está configurada
+                  <>
+                    <p>
+                      ✅ L&apos;organització de GitHub està configurada:
+                      <a
+                        href={`https://github.com/${equipo.gitOrganizacion}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="github-org-link"
                       >
-                        Validar
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {/* Checklist de validación */}
-                      <div className="validation-results">
+                        {equipo.gitOrganizacion}
+                      </a>
+                    </p>
+                  </>
+                ) : (
+                  // Si la organización aún no está configurada
+                  <>
+                    {!comprobandoValidacion ? (
+                      <>
                         <p>
-                          {validationResults?.todosUsuariosGitConfigurados
-                            ? '✅ Tots els membres tenen un compte de GitHub associat.'
-                            : '❌ No tots els membres tenen un compte de GitHub associat.'}
+                          Introdueix la URL de l&apos;organització de GitHub del
+                          teu equip. Assegura&apos;t de que el perfil de
+                          <strong> professorat-amep</strong> n&apos;és membre i
+                          que té permisos d&apos;<strong>Owner</strong>.
                         </p>
-                        <p>
-                          {validationResults?.todosMiembrosEnOrganizacion
-                            ? '✅ Tots els membres pertanyen a la organització.'
-                            : '❌ No tots els membres pertanyen a la organització.'}
-                        </p>
-                        <p>
-                          {validationResults?.profesorEnOrganizacion
-                            ? '✅ El professor pertany a la organització.'
-                            : '❌ El professor no pertany a la organització.'}
-                        </p>
-                        {/* Botón para confirmar organización si todo es correcto */}
-                        {validationResults?.todosUsuariosGitConfigurados &&
-                        validationResults?.todosMiembrosEnOrganizacion &&
-                        validationResults?.profesorEnOrganizacion ? (
-                          <button
-                            onClick={async () => {
-                              try {
-                                await handleConfirmGitOrg();
-                                alert(
-                                  "L'organització s'ha confirmat correctament! Actualitzant vista...",
-                                );
-                              } catch (error) {
-                                setError(
-                                  "Hi ha hagut un error al confirmar l'organització.",
-                                );
-                              }
-                            }}
-                            className="confirm-git-org-button"
-                          >
-                            Confirmar organització
-                          </button>
-                        ) : (
-                          <p className="error-message">
-                            Solucioneu els problemes abans de confirmar.
+                        <input
+                          type="text"
+                          placeholder="https://github.com/organització"
+                          value={gitOrgUrl}
+                          onChange={(e) => setGitOrgUrl(e.target.value)}
+                          className="git-org-input-field"
+                        />
+                        <button
+                          onClick={handleValidateGitOrg}
+                          className="validate-git-org-button"
+                        >
+                          Validar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {/* Checklist de validación */}
+                        <div className="validation-results">
+                          <p>
+                            {validationResults?.professoratEsMiembro
+                              ? '✅ L&apos;usuari professorat-amep és membre de l&apos;organització.'
+                              : '❌ L&apos;usuari professorat-amep no és membre de l&apos;organització.'}
                           </p>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
+                          <p>
+                            {validationResults?.professoratEsAdmin
+                              ? '✅ L&apos;usuari professorat-amep té permissos d&apos;owner en l&apos;organització.'
+                              : '❌ L&apos;usuari professorat-amep no té permissos d&apos;owner en l&apos;organització.'}
+                          </p>
+                          <p>
+                            {validationResults?.todosUsuariosGitConfigurados
+                              ? '✅ Tots els membres tenen un compte de GitHub associat.'
+                              : '❌ No tots els membres tenen un compte de GitHub associat.'}
+                          </p>
+                          <p>
+                            {validationResults?.todosMiembrosEnOrganizacion
+                              ? '✅ Tots els membres pertanyen a la organització.'
+                              : '❌ No tots els membres pertanyen a la organització.'}
+                          </p>
+                          <p>
+                            {validationResults?.profesorEnOrganizacion
+                              ? '✅ El professor pertany a la organització.'
+                              : '❌ El professor no pertany a la organització.'}
+                          </p>
+                          {/* Botón para confirmar organización si todo es correcto */}
+                          {validationResults?.professoratEsMiembro &&
+                          validationResults?.professoratEsAdmin &&
+                          validationResults?.todosUsuariosGitConfigurados &&
+                          validationResults?.todosMiembrosEnOrganizacion &&
+                          validationResults?.profesorEnOrganizacion ? (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await handleConfirmGitOrg();
+                                  alert(
+                                    "L'organització s'ha confirmat correctament! Actualitzant vista...",
+                                  );
+                                } catch (error) {
+                                  setError(
+                                    "Hi ha hagut un error al confirmar l'organització.",
+                                  );
+                                }
+                              }}
+                              className="confirm-git-org-button"
+                            >
+                              Confirmar organització
+                            </button>
+                          ) : (
+                            <p className="error-message">
+                              Solucioneu els problemes abans de confirmar.
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )
+              }
             </>
           )}
         </div>

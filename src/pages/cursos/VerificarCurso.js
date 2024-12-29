@@ -108,7 +108,7 @@ const VerificarCurso = () => {
             <strong>Any d&apos;inici:</strong> {añoInicio}
           </p>
           <p>
-            <strong>Quatrimestre:</strong>{' '}
+            <strong>Quadrimestre:</strong>{' '}
             {cuatrimestre === '1' ? 'Tardor' : 'Primavera'}
           </p>
           <p>
@@ -187,7 +187,7 @@ const VerificarCurso = () => {
           <div className="confirm-popup">
             <div className="popup-content">
               <p>
-                Ja existeix un curs actiu amb el mateix nom, any i quatrimestre.
+                Ja existeix un curs actiu amb el mateix nom, any i quadrimestre.
                 Vols desactivar-lo?
               </p>
               <div className="popup-buttons">

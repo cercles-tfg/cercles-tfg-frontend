@@ -1,4 +1,47 @@
-/* General styling for the page */
+/* inactivo */
+.inactive-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Fondo gris difuminado */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Asegura que esté por encima de todo */
+}
+
+.inactive-popup {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+}
+
+.inactive-popup h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.inactive-popup .back-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inactive-popup .back-button:hover {
+  background-color: #0056b3;
+}
+
+/* activo */
 .equipo-page {
   display: flex;
   flex-direction: column;

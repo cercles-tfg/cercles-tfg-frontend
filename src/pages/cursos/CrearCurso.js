@@ -161,7 +161,7 @@ const CrearCurso = () => {
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="cuatrimestre">Quatrimestre</label>
+            <label htmlFor="cuatrimestre">Quadrimestre</label>
             <select
               id="cuatrimestre"
               value={cuatrimestre}

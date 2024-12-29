@@ -231,7 +231,7 @@ export const borrarMiembros = async (equipoId, data, token) => {
   }
 };
 
-//obtener url de instalacion del github app en organizacion
+/*/obtener url de instalacion del github app en organizacion
 export const obtenerUrlInstalacion = async (equipoId, token) => {
   try {
     const response = await fetch(
@@ -252,7 +252,7 @@ export const obtenerUrlInstalacion = async (equipoId, token) => {
     );
     throw new Error('Error desconocido al obtener la URL de instalación.');
   }
-};
+};*/
 
 //validar org
 export const validarOrganizacion = async (

@@ -49,3 +49,11 @@
 .sidebar.closed .link-text {
   display: none;
 }
+
+.logout-container {
+  margin-top: auto;
+}
+
+.sidebar.closed .logout-text {
+  display: none;
+}

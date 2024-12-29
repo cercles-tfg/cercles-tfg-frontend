@@ -609,7 +609,7 @@ const CursoPage = () => {
           <div className="confirm-popup">
             <div className="popup-content">
               <p>
-                Ja existeix un curs actiu amb el mateix nom, any i quatrimestre.
+                Ja existeix un curs actiu amb el mateix nom, any i quadrimestre.
                 Vols desactivar-lo per poder activar aquest?
               </p>
               <div className="popup-buttons">

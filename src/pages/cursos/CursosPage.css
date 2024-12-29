@@ -21,15 +21,6 @@ html {
   margin-bottom: 20px;
 }
 
-.success-message {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
 .create-course-button {
   background-color: #0056a4;
   color: white;
@@ -79,6 +70,20 @@ html {
   background-color: #f1f1f1; /* Cambiar el color de la fila al pasar el ratón */
 }
 
+.toggle-inactive-courses {
+  color: #0056a4;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toggle-inactive-courses:hover {
+  text-decoration: underline;
+}
+
 /* Estilo responsivo para pantallas pequeñas */
 @media (max-width: 768px) {
   .cursos-page .content {
@@ -92,7 +97,7 @@ html {
   }
 
   .create-course-button {
-    font-size: 13px; /* Reducir tamaño de fuente en pantallas más pequeñas */
+    font-size: 13px;
     padding: 6px 12px; /* Reducir el padding para mejorar en pantallas pequeñas */
   }
 }

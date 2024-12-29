@@ -43,8 +43,8 @@ const Sidebar = () => {
             <span className="link-text">Cursos</span>
           </a>
         )}
-        <div>
-          <Logout />
+        <div className={`logout-container ${isOpen ? '' : 'closed'}`}>
+          <Logout isSidebarOpen={isOpen} />
         </div>
       </div>
     </div>
