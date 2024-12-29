@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { getMetrics } from '../../services/Equipos_Api';
 import { Bar, Pie } from 'react-chartjs-2';
 import {
@@ -26,6 +26,7 @@ ChartJS.register(
 
 const EquipoMetricsPage = ({}) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const org = searchParams.get('org');
   const estudiantesIdsString = searchParams.get('estudiantesIds');
@@ -86,17 +87,20 @@ const EquipoMetricsPage = ({}) => {
   if (loading) {
     return (
       <div className="loading-container">
-        <h3>Carregant mètriques...</h3>
         <div className="progress-bar">
           <div className="progress" style={{ width: `${progress}%` }}></div>
         </div>
         <img src={loadingGif} alt="Cargando..." className="loading-gif" />
         <p className="loading-text">
-          Obtenint les dades... Si us plau, espereu! ⏳
+          Carregant les dades... Si us plau, espereu! ⏳
         </p>
       </div>
     );
   }
+
+  const handleBackClick = () => {
+    navigate(-1);
+  };
 
   if (error) return <div className="error-message">{error}</div>;
 
@@ -104,9 +108,11 @@ const EquipoMetricsPage = ({}) => {
     <div className="metrics-page">
       <Sidebar />
       <div className="metrics-content">
-        <h1>Mètriques de GitHub</h1>
+        <button className="back-button" onClick={handleBackClick}>
+          Torna enrere
+        </button>
+        <h1>Mètriques de GitHub de l&apos;organització {localOrg}</h1>
 
-        {/* Tabla de métricas */}
         <table>
           <thead>
             <tr>
@@ -114,6 +120,8 @@ const EquipoMetricsPage = ({}) => {
               {metrics.map((m) => (
                 <th key={m.username}>{m.nombre}</th>
               ))}
+              <th className="mitjana-column">Mitjana</th>{' '}
+              {/* Nueva columna con clase */}
             </tr>
           </thead>
           <tbody>
@@ -122,24 +130,52 @@ const EquipoMetricsPage = ({}) => {
               {metrics.map((m) => (
                 <td key={`commits-${m.username}`}>{m.totalCommits}</td>
               ))}
+              <td className="mitjana-column">
+                {(
+                  metrics.reduce((sum, m) => sum + m.totalCommits, 0) /
+                  metrics.length
+                ).toFixed(2)}
+              </td>{' '}
+              {/* Media de Commits */}
             </tr>
             <tr>
               <td>#Línies ++</td>
               {metrics.map((m) => (
                 <td key={`linesAdded-${m.username}`}>{m.linesAdded}</td>
               ))}
+              <td className="mitjana-column">
+                {(
+                  metrics.reduce((sum, m) => sum + m.linesAdded, 0) /
+                  metrics.length
+                ).toFixed(2)}
+              </td>{' '}
+              {/* Media de Línies ++ */}
             </tr>
             <tr>
               <td>#Línies --</td>
               {metrics.map((m) => (
                 <td key={`linesRemoved-${m.username}`}>{m.linesRemoved}</td>
               ))}
+              <td className="mitjana-column">
+                {(
+                  metrics.reduce((sum, m) => sum + m.linesRemoved, 0) /
+                  metrics.length
+                ).toFixed(2)}
+              </td>{' '}
+              {/* Media de Línies -- */}
             </tr>
             <tr>
               <td>#PRs</td>
               {metrics.map((m) => (
                 <td key={`prs-${m.username}`}>{m.pullRequestsCreated}</td>
               ))}
+              <td className="mitjana-column">
+                {(
+                  metrics.reduce((sum, m) => sum + m.pullRequestsCreated, 0) /
+                  metrics.length
+                ).toFixed(2)}
+              </td>{' '}
+              {/* Media de PRs */}
             </tr>
           </tbody>
         </table>

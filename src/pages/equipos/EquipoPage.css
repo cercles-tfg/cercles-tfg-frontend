@@ -220,6 +220,29 @@
   background-color: #218838;
 }
 
+.error-message-button {
+  background-color: #dc3545; /* Rojo */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
+}
+
+.error-message-button:hover {
+  background-color: #c82333; /* Rojo oscuro */
+  transform: scale(1.05);
+}
+
+.error-message-button:active {
+  background-color: #a71d2a; /* Más oscuro al hacer clic */
+}
+
 /* Members section styling */
 .equipo-section {
   margin-top: 20px;

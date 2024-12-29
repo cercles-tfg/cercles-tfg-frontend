@@ -17,6 +17,12 @@ h1 {
   margin-bottom: 20px;
   font-size: 2rem;
 }
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #333;
+}
 
 table {
   width: 80%;
@@ -40,6 +46,16 @@ th {
 
 tr:nth-child(even) {
   background-color: #f9f9f9;
+}
+
+.mitjana-column {
+  background-color: rgba(173, 216, 230, 0.5);
+  font-weight: bold;
+  color: #333;
+}
+
+th.mitjana-column {
+  background-color: rgba(135, 206, 250, 0.7);
 }
 
 .chart-container {

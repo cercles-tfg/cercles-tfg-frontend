@@ -332,7 +332,6 @@ export const getMetrics = async (org, estudiantesIds, token) => {
 
   const queryParams = `estudiantesIds=${estudiantesIds.join(',')}`;
   const url = `${API_BASE_URL}/github/metrics/${org}?${queryParams}`;
-  console.log('token', token);
 
   const response = await fetch(url, {
     headers: {

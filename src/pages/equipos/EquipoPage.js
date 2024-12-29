@@ -44,7 +44,6 @@ const EquipoPage = () => {
   const [showConfirmChangesPopup, setShowConfirmChangesPopup] = useState(false);
   const [gitOrgUrl, setGitOrgUrl] = useState('');
   const [validationResults, setValidationResults] = useState(null);
-  const [githubAppInstalada, setGithubAppInstalada] = useState(false);
   const [comprobandoValidacion, setComprobandoValidacion] = useState(false);
   const [gitOrganizacion, setGitOrganizacion] = useState(null);
   const [estIds, setEstIds] = useState(null);
@@ -67,7 +66,6 @@ const EquipoPage = () => {
           (estudiante) => estudiante.id,
         );
         setEstIds(estudiantesIds);
-        setGithubAppInstalada(equipoData.githubAppInstalada);
         setGitOrganizacion(equipoData.gitOrganizacion);
       } catch (error) {
         setError("No se pudo carregar la informació de l'equip.");
@@ -448,13 +446,13 @@ const EquipoPage = () => {
                         <div className="validation-results">
                           <p>
                             {validationResults?.professoratEsMiembro
-                              ? '✅ L&apos;usuari professorat-amep és membre de l&apos;organització.'
-                              : '❌ L&apos;usuari professorat-amep no és membre de l&apos;organització.'}
+                              ? "✅ L'usuari professorat-amep és membre de l'organització."
+                              : "❌ L'usuari professorat-amep no és membre de l'organització."}
                           </p>
                           <p>
                             {validationResults?.professoratEsAdmin
-                              ? '✅ L&apos;usuari professorat-amep té permissos d&apos;owner en l&apos;organització.'
-                              : '❌ L&apos;usuari professorat-amep no té permissos d&apos;owner en l&apos;organització.'}
+                              ? "✅ L'usuari professorat-amep té permissos d'owner en l'organització."
+                              : "❌ L'usuari professorat-amep no té permissos d'owner en l'organització."}
                           </p>
                           <p>
                             {validationResults?.todosUsuariosGitConfigurados
@@ -471,7 +469,7 @@ const EquipoPage = () => {
                               ? '✅ El professor pertany a la organització.'
                               : '❌ El professor no pertany a la organització.'}
                           </p>
-                          {/* Botón para confirmar organización si todo es correcto */}
+                          {/* Botón para reintroducir la organización si hay problemas */}
                           {validationResults?.professoratEsMiembro &&
                           validationResults?.professoratEsAdmin &&
                           validationResults?.todosUsuariosGitConfigurados &&
@@ -495,9 +493,13 @@ const EquipoPage = () => {
                               Confirmar organització
                             </button>
                           ) : (
-                            <p className="error-message">
+                            <button
+                              className="error-message-button"
+                              onClick={() => setComprobandoValidacion(false)}
+                            >
                               Solucioneu els problemes abans de confirmar.
-                            </p>
+                              Reintroduïr la organització de github
+                            </button>
                           )}
                         </div>
                       </>
@@ -506,6 +508,23 @@ const EquipoPage = () => {
                 )
               }
             </>
+          )}
+        </div>
+        {/* Organización GitHub */}
+        <div className="equipo-section">
+          <h2>Projecte de Taiga</h2>
+          {isProfesor ? (
+            equipo.taigaProyecto ? (
+              <>
+                <p>✅ El projecte de Taiga està configurat:</p>
+              </>
+            ) : (
+              <p>
+                Els estudiants encara no han definit el seu projecte de Taiga.
+              </p>
+            )
+          ) : (
+            <></>
           )}
         </div>
         <div className="equipo-section">

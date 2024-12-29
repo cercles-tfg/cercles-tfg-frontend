@@ -90,28 +90,47 @@ const EvaluacionesGeneralesPage = () => {
             <tbody>
               <tr>
                 <td>Mitjana entre companys</td>
-                {medias.map((media) => (
-                  <td
-                    key={`media-general-companeros-${media.estudianteId}`}
-                    className={
-                      media.mediaGeneralDeCompañeros > 11
-                        ? 'high-value'
-                        : media.mediaGeneralDeCompañeros < 9
-                          ? 'low-value'
-                          : ''
-                    }
-                  >
-                    {media.mediaGeneralDeCompañeros?.toFixed(2) || 'N/A'}
-                  </td>
-                ))}
+                {medias.map((media) => {
+                  const valor = media.mediaGeneralDeCompañeros;
+                  return (
+                    <td
+                      key={`media-general-companeros-${media.estudianteId}`}
+                      className={
+                        valor === undefined
+                          ? 'na-value'
+                          : valor > 11
+                            ? 'high-value'
+                            : valor < 9
+                              ? 'low-value'
+                              : ''
+                      }
+                    >
+                      {valor?.toFixed(2) || 'N/A'}
+                    </td>
+                  );
+                })}
               </tr>
               <tr>
                 <td>Autoavaluació</td>
-                {medias.map((media) => (
-                  <td key={`media-general-propia-${media.estudianteId}`}>
-                    {media.mediaGeneralPropia?.toFixed(2) || 'N/A'}
-                  </td>
-                ))}
+                {medias.map((media) => {
+                  const valor = media.mediaGeneralPropia;
+                  return (
+                    <td
+                      key={`media-general-propia-${media.estudianteId}`}
+                      className={
+                        valor === undefined
+                          ? 'na-value'
+                          : valor > 11
+                            ? 'high-value'
+                            : valor < 9
+                              ? 'low-value'
+                              : ''
+                      }
+                    >
+                      {valor?.toFixed(2) || 'N/A'}
+                    </td>
+                  );
+                })}
               </tr>
             </tbody>
           </table>
