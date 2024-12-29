@@ -58,6 +58,7 @@ const VerificarCurso = () => {
         nombre: estudiante.nombre,
         correo: estudiante.correo,
       })),
+      periodosEvaluacion: state.periodosEvaluacion,
     };
 
     crearCurso(newCursoData)
@@ -118,6 +119,19 @@ const VerificarCurso = () => {
             {profesores.map((prof) => prof.nombre).join(', ')}
           </p>
         </div>
+        <h2>Períodes d&apos;avaluació</h2>
+        <div className="evaluation-periods">
+          {state.periodosEvaluacion.length > 0 ? (
+            state.periodosEvaluacion.map((periodo, index) => (
+              <p key={index}>
+                <strong>Avaluació {index + 1}:</strong> Del{' '}
+                {periodo.fechaInicio} al {periodo.fechaFin}
+              </p>
+            ))
+          ) : (
+            <p>No hi ha períodes d&apos;avaluació establerts.</p>
+          )}
+        </div>
         <h2>Estudiants</h2>
         <div className="students-table">
           <table>
@@ -169,7 +183,6 @@ const VerificarCurso = () => {
             Confirmar curs
           </button>
         </div>
-
         {showConfirmPopup && (
           <div className="confirm-popup">
             <div className="popup-content">

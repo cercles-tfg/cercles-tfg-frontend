@@ -281,15 +281,46 @@ const EquipoPage = () => {
         </div>
         <div className="equipo-section">
           <h2>Altres funcionalitats</h2>
-          {isProfesor && equipo.gitOrganizacion ? (
+          {isProfesor ? (
             <>
               <div className="metrics-links-container">
-                <Link
-                  to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
-                  className="metrics-link"
-                >
-                  📊 Veure mètriques de GitHub
-                </Link>
+                {/* Link a métricas de GitHub */}
+                {equipo.gitOrganizacion ? (
+                  <Link
+                    to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
+                    className="metrics-link"
+                  >
+                    📊 Veure mètriques de GitHub
+                  </Link>
+                ) : (
+                  <div className="metrics-link-disabled">
+                    📊 Veure mètriques de GitHub
+                    <span className="disabled-message">
+                      Aquest equip encara no ha configurat la seva organització
+                      de Github, per tant no hi ha dades a veure.
+                    </span>
+                  </div>
+                )}
+
+                {/* Link a Taiga */}
+                {equipo.taigaProyecto ? (
+                  <Link
+                    to={`/equipo/${id}/taiga-metrics?project=${equipo.taigaProyecto}`}
+                    className="metrics-link"
+                  >
+                    📊 Veure mètriques de Taiga
+                  </Link>
+                ) : (
+                  <div className="metrics-link-disabled">
+                    📊 Veure mètriques de Taiga
+                    <span className="disabled-message">
+                      Aquest equip encara no ha configurat el seu projecte de
+                      Taiga, per tant no hi ha dades a veure.
+                    </span>
+                  </div>
+                )}
+
+                {/* Link a dades d'avaluacions */}
                 <Link
                   to={`/equipo/${id}/evaluaciones_generales`}
                   className="metrics-link"
@@ -300,6 +331,7 @@ const EquipoPage = () => {
             </>
           ) : (
             <>
+              {/* Link de evaluación para estudiantes */}
               {evaluacionActiva && !evaluacionRealizada ? (
                 <Link
                   to={`/equipo/${equipo.id}/evaluacion`}

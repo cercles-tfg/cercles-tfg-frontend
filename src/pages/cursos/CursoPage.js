@@ -49,7 +49,7 @@ const CursoPage = () => {
         setCurso(data);
         setEditedCurso(data);
         setNombresProfesores(data.nombresProfesores || []);
-        console.log('Data ', data);
+        console.log('Data curso ', data);
       })
       .catch((error) => {
         setError(error.message);

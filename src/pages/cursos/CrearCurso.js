@@ -16,11 +16,12 @@ const CrearCurso = () => {
   const [profesoresDisponibles, setProfesoresDisponibles] = useState([]);
   const [estudiantesFile, setEstudiantesFile] = useState(null);
   const [estudiantesData, setEstudiantesData] = useState([]);
-  const [fechasEvaluacion, setFechasEvaluacion] = useState({
-    evaluacion1: '',
-    evaluacion2: '',
-    evaluacion3: '',
-  });
+  const [numPeriodosEvaluacion, setNumPeriodosEvaluacion] = useState(3);
+  const [periodosEvaluacion, setPeriodosEvaluacion] = useState([
+    { fechaInicio: '', fechaFin: '' },
+    { fechaInicio: '', fechaFin: '' },
+    { fechaInicio: '', fechaFin: '' },
+  ]);
   const [errorFechas, setErrorFechas] = useState('');
 
   const navigate = useNavigate();
@@ -51,19 +52,57 @@ const CrearCurso = () => {
     );
   };
 
-  const handleFechaChange = (e, evaluacion) => {
-    setFechasEvaluacion((prev) => ({ ...prev, [evaluacion]: e.target.value }));
+  const handleNumPeriodosChange = (e) => {
+    const newNumPeriodos = parseInt(e.target.value, 10);
+    setNumPeriodosEvaluacion(newNumPeriodos);
+
+    const newPeriodos = Array(newNumPeriodos)
+      .fill(null)
+      .map(
+        (_, index) =>
+          periodosEvaluacion[index] || { fechaInicio: '', fechaFin: '' },
+      );
+
+    setPeriodosEvaluacion(newPeriodos);
+  };
+
+  const handleFechaChange = (index, field, value) => {
+    setPeriodosEvaluacion((prev) => {
+      const updatedPeriodos = prev.map((periodo, i) =>
+        i === index ? { ...periodo, [field]: value } : periodo,
+      );
+
+      if (field === 'fechaInicio' && index > 0) {
+        const prevPeriodo = updatedPeriodos[index - 1];
+        if (new Date(value) < new Date(prevPeriodo.fechaFin)) {
+          setErrorFechas(
+            `La data d'inici de l'avaluació ${index + 1} ha de ser posterior a la data de fi de l'avaluació ${index}.`,
+          );
+          return prev;
+        } else {
+          setErrorFechas('');
+        }
+      }
+
+      if (field === 'fechaFin' && index >= 0) {
+        const currPeriodo = updatedPeriodos[index];
+        if (new Date(value) < new Date(currPeriodo.fechaInicio)) {
+          setErrorFechas(
+            `La data de fi de l'avaluació ${index + 1} ha de ser igual o posterior a la seva data d'inici.`,
+          );
+          return prev;
+        } else {
+          setErrorFechas('');
+        }
+      }
+
+      return updatedPeriodos;
+    });
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (
-      selectedProfesores.length === 0 ||
-      !estudiantesFile ||
-      !fechasEvaluacion.evaluacion1 ||
-      !fechasEvaluacion.evaluacion2 ||
-      !fechasEvaluacion.evaluacion3
-    ) {
+    if (selectedProfesores.length === 0 || !estudiantesFile) {
       return;
     }
 
@@ -80,7 +119,7 @@ const CrearCurso = () => {
             return { id: prof.id, nombre: prof.nombre, correo: prof.correo };
           }),
           estudiantes: data,
-          fechasEvaluacion,
+          periodosEvaluacion,
         },
       });
     } catch (error) {
@@ -162,26 +201,43 @@ const CrearCurso = () => {
             />
           </div>
           <div className="form-group">
-            <label>Fechas de evaluación</label>
-            {['evaluacion1', 'evaluacion2', 'evaluacion3'].map(
-              (evaluacion, index) => (
-                <div key={evaluacion} className="evaluacion-fechas">
-                  <label>Avaluació {index + 1}</label>
-                  <input
-                    type="date"
-                    value={fechasEvaluacion[evaluacion].inicio}
-                    onChange={(e) => handleFechaChange(e, evaluacion, 'inicio')}
-                    required
-                  />
-                  <input
-                    type="date"
-                    value={fechasEvaluacion[evaluacion].fin}
-                    onChange={(e) => handleFechaChange(e, evaluacion, 'fin')}
-                    required
-                  />
-                </div>
-              ),
-            )}
+            <label>
+              Indica quants períodes d&apos;avaluació tindrà aquest curs:
+            </label>
+            <select
+              value={numPeriodosEvaluacion}
+              onChange={handleNumPeriodosChange}
+            >
+              {[...Array(6).keys()].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Dates d&apos;avaluació</label>
+            {periodosEvaluacion.map((periodo, index) => (
+              <div key={index} className="evaluacion-fechas">
+                <label>Avaluació {index + 1}</label>
+                <input
+                  type="date"
+                  value={periodo.fechaInicio}
+                  onChange={(e) =>
+                    handleFechaChange(index, 'fechaInicio', e.target.value)
+                  }
+                  required
+                />
+                <input
+                  type="date"
+                  value={periodo.fechaFin}
+                  onChange={(e) =>
+                    handleFechaChange(index, 'fechaFin', e.target.value)
+                  }
+                  required
+                />
+              </div>
+            ))}
           </div>
           {errorFechas && <p className="error-message">{errorFechas}</p>}
           <div className="form-buttons">

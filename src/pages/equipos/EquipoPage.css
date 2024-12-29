@@ -107,6 +107,18 @@
   color: #0056b3;
 }
 
+.metrics-link-disabled {
+  color: gray;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.disabled-message {
+  font-size: 0.9rem;
+  color: gray;
+  margin-left: 10px;
+}
+
 /* Info section styling */
 .equipo-info {
   display: flex;

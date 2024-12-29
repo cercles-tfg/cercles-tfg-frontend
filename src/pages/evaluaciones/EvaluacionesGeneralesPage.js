@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   getEvaluacionesDetalle,
   getEvaluacionesPorEquipo,
@@ -16,6 +16,7 @@ const EvaluacionesGeneralesPage = () => {
   const [equipo, setEquipo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEquipoDetalle = async () => {
@@ -61,10 +62,17 @@ const EvaluacionesGeneralesPage = () => {
 
   const estudiantes = medias.map((media) => media.estudianteId);
 
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="evaluaciones-page">
       <Sidebar />
       <div className="content">
+        <button className="back-button" onClick={handleBackClick}>
+          Torna enrere
+        </button>
         <h1>Dades d&apos;avaluacions</h1>
 
         {/* Tabla con medias generales */}

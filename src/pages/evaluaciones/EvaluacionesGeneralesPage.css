@@ -13,6 +13,26 @@
   margin-top: 20px;
 }
 
+/* Back button styling */
+.back-button {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
+}
+
+.back-button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
 .tabla-medias-generales {
   margin-top: 300px;
   margin-bottom: 40px; /* Espacio entre la tabla y otras secciones */

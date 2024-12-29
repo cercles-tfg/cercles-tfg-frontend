@@ -108,12 +108,19 @@ const EvaluacionPage = () => {
     }
   };
 
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
   if (!equipo) return <p>Cargando...</p>;
 
   return (
     <div className="evaluacion-page">
       <Sidebar />
       <div className="evaluacion-content">
+        <button className="back-button" onClick={handleBackClick}>
+          Torna enrere
+        </button>
         <h1>Avaluació (Equip: {equipo.nombre})</h1>
         <h2>
           Recorda que la suma total de les xifres ha de ser equivalent al nombre
