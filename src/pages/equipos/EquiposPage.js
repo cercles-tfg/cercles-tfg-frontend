@@ -93,7 +93,7 @@ const EquiposPage = () => {
               </div>
               <h2>{equipo.nombre}</h2>
               <p>
-                <strong>Curso:</strong> {equipo.cursoNombre}
+                <strong>Curs:</strong> {equipo.cursoNombre}
               </p>
             </div>
           ))}

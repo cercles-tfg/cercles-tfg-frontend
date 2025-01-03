@@ -179,14 +179,16 @@ export const subirArchivoEstudiantes = async (estudiantesFile) => {
     });
 
     if (!response.ok) {
-      throw new Error('Error al subir el archivo de estudiantes.');
+      // Leer y lanzar el error desde el cuerpo de la respuesta
+      const errorData = await response.json();
+      throw { response: errorData };
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error al subir el archivo de estudiantes:', error);
-    throw error;
+    throw error; // Lanzar el error para que sea manejado en el frontend
   }
 };
 

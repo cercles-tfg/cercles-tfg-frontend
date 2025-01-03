@@ -16,9 +16,38 @@ const VerificarCurso = () => {
 
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: 'none',
+  });
+
+  const sortedEstudiantes = React.useMemo(() => {
+    let sortedData = [...estudiantes];
+    if (sortConfig.key) {
+      sortedData.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortedData;
+  }, [estudiantes, sortConfig]);
+
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    } else if (sortConfig.key === key && sortConfig.direction === 'desc') {
+      direction = 'none';
+    }
+    setSortConfig({ key: direction === 'none' ? null : key, direction });
+  };
 
   const handleConfirmCurso = () => {
-    // Primero, verificar si ya existe un curso similar activo
     const cursoData = {
       nombreAsignatura,
       añoInicio,
@@ -28,13 +57,11 @@ const VerificarCurso = () => {
     verificarCursoExistente(cursoData)
       .then((response) => {
         if (response.status === 409) {
-          // Si ya existe un curso activo, mostramos el popup de confirmación
           setShowConfirmPopup(true);
           return null;
         } else if (!response.ok) {
           throw new Error('Error al verificar el curso existente.');
         } else {
-          // Si no hay conflicto, proceder a crear el curso
           return createCurso();
         }
       })
@@ -57,6 +84,7 @@ const VerificarCurso = () => {
       estudiantes: estudiantes.map((estudiante) => ({
         nombre: estudiante.nombre,
         correo: estudiante.correo,
+        grupo: estudiante.grupo,
       })),
       periodosEvaluacion: state.periodosEvaluacion,
     };
@@ -78,11 +106,9 @@ const VerificarCurso = () => {
       cuatrimestre,
     };
 
-    // Llamar al backend para cambiar el estado del curso existente
     cambiarEstadoCurso(cursoData)
       .then(() => {
         setShowConfirmPopup(false);
-        // Después de desactivar el curso existente, confirmar la creación del nuevo curso
         createCurso();
       })
       .catch((error) => {
@@ -122,38 +148,77 @@ const VerificarCurso = () => {
         <h2>Períodes d&apos;avaluació</h2>
         <div className="evaluation-periods">
           {state.periodosEvaluacion.length > 0 ? (
-            state.periodosEvaluacion.map((periodo, index) => (
-              <p key={index}>
-                <strong>Avaluació {index + 1}:</strong> Del{' '}
-                {periodo.fechaInicio} al {periodo.fechaFin}
-              </p>
-            ))
+            state.periodosEvaluacion.map((periodo, index) => {
+              const fechaInicioFormateada = new Intl.DateTimeFormat('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }).format(new Date(periodo.fechaInicio));
+
+              const fechaFinFormateada = new Intl.DateTimeFormat('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }).format(new Date(periodo.fechaFin));
+
+              return (
+                <p key={index}>
+                  <strong>Avaluació {index + 1}:</strong> Del{' '}
+                  {fechaInicioFormateada} al {fechaFinFormateada}
+                </p>
+              );
+            })
           ) : (
             <p>No hi ha períodes d&apos;avaluació establerts.</p>
           )}
         </div>
+
         <h2>Estudiants</h2>
+        <div className="total-students">
+          Nombre total d&apos;estudiants del curs: {estudiantes.length}
+        </div>
         <div className="students-table">
           <table>
             <thead>
               <tr>
-                <th>Nom i Cognoms</th>
-                <th>Adreça electrònica</th>
+                <th onClick={() => handleSort('grupo')}>
+                  Grup{' '}
+                  <span
+                    className={`sort-icon ${
+                      sortConfig.key === 'grupo' ? sortConfig.direction : 'none'
+                    }`}
+                  />
+                </th>
+                <th onClick={() => handleSort('nombre')}>
+                  Nom i Cognoms{' '}
+                  <span
+                    className={`sort-icon ${
+                      sortConfig.key === 'nombre'
+                        ? sortConfig.direction
+                        : 'none'
+                    }`}
+                  />
+                </th>
+                <th onClick={() => handleSort('correo')}>
+                  Adreça electrònica{' '}
+                  <span
+                    className={`sort-icon ${
+                      sortConfig.key === 'correo'
+                        ? sortConfig.direction
+                        : 'none'
+                    }`}
+                  />
+                </th>
               </tr>
             </thead>
             <tbody>
-              {estudiantes.length > 0 ? (
-                estudiantes.map((estudiante, index) => (
-                  <tr key={index}>
-                    <td>{`${estudiante.nombre}`}</td>
-                    <td>{estudiante.correo}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="2">No hi ha estudiants per mostrar.</td>
+              {sortedEstudiantes.map((estudiante, index) => (
+                <tr key={index}>
+                  <td>{estudiante.grupo}</td>
+                  <td>{estudiante.nombre}</td>
+                  <td>{estudiante.correo}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>

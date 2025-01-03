@@ -8,7 +8,6 @@ import {
   borrarMiembros,
   añadirMiembros,
   getEstudiantesCurso,
-  obtenerUrlInstalacion,
   validarOrganizacion,
   confirmarOrganizacion,
 } from '../../services/Equipos_Api';
@@ -41,6 +40,8 @@ const EquipoPage = () => {
   const [estudiantesSinEquipo, setEstudiantesSinEquipo] = useState([]);
   const [miembrosAEliminar, setMiembrosAEliminar] = useState([]);
   const [miembrosAAgregar, setMiembrosAAgregar] = useState([]);
+  const [miembrosSeleccionados, setMiembrosSeleccionados] = useState([]);
+
   const [showConfirmChangesPopup, setShowConfirmChangesPopup] = useState(false);
   const [gitOrgUrl, setGitOrgUrl] = useState('');
   const [validationResults, setValidationResults] = useState(null);
@@ -98,16 +99,6 @@ const EquipoPage = () => {
 
     fetchEvaluacionStatus();
   }, [equipo]);
-
-  /*/ Redirigir a la instalación de GitHub App
-  const handleInstallGitHubApp = async () => {
-    try {
-      const instalacionUrl = await obtenerUrlInstalacion(equipo.id, token);
-      window.location.href = instalacionUrl;
-    } catch (error) {
-      setError('Error al obtener la URL de instalación.');
-    }
-  };*/
 
   // Validar la organización
   const handleValidateGitOrg = async () => {
@@ -174,17 +165,36 @@ const EquipoPage = () => {
       }
     }
     setIsEditing(!isEditing);
-  };
-
-  const handleRemoveMember = (estudianteId) => {
-    if (!miembrosAEliminar.includes(estudianteId)) {
-      setMiembrosAEliminar((prev) => [...prev, estudianteId]);
-    }
+    setMiembrosAEliminar([]);
+    setMiembrosAAgregar([]);
+    setMiembrosSeleccionados([]);
   };
 
   const handleAddMember = (estudianteId) => {
-    if (!miembrosAAgregar.includes(estudianteId)) {
+    if (miembrosSeleccionados.includes(estudianteId)) {
+      // Si ya está seleccionado, deseleccionarlo
+      setMiembrosAAgregar((prev) => prev.filter((id) => id !== estudianteId));
+      setMiembrosSeleccionados((prev) =>
+        prev.filter((id) => id !== estudianteId),
+      );
+    } else {
+      // Si no está seleccionado, añadirlo
       setMiembrosAAgregar((prev) => [...prev, estudianteId]);
+      setMiembrosSeleccionados((prev) => [...prev, estudianteId]);
+    }
+  };
+
+  const handleRemoveMember = (estudianteId) => {
+    if (miembrosSeleccionados.includes(estudianteId)) {
+      // Si ya está seleccionado, deseleccionarlo
+      setMiembrosAEliminar((prev) => prev.filter((id) => id !== estudianteId));
+      setMiembrosSeleccionados((prev) =>
+        prev.filter((id) => id !== estudianteId),
+      );
+    } else {
+      // Si no está seleccionado, añadirlo
+      setMiembrosAEliminar((prev) => [...prev, estudianteId]);
+      setMiembrosSeleccionados((prev) => [...prev, estudianteId]);
     }
   };
 
@@ -210,6 +220,7 @@ const EquipoPage = () => {
       }
       setMiembrosAEliminar([]);
       setMiembrosAAgregar([]);
+      setMiembrosSeleccionados([]);
       setIsEditing(false);
       const equipoData = await getEquipoDetalle(id, token);
       setEquipo(equipoData);
@@ -264,7 +275,7 @@ const EquipoPage = () => {
                 setShowPopup(true);
               }}
             >
-              Borrar equip
+              Esborrar equip
             </button>
             <button
               className="leave-button"
@@ -284,7 +295,12 @@ const EquipoPage = () => {
               {equipo.añoInicio})
             </p>
             <p>
-              <strong>Quadrimestre:</strong> {equipo.cuatrimestre}
+              <strong>Quadrimestre:</strong>{' '}
+              {equipo.cuatrimestre === 1
+                ? 'Tardor'
+                : equipo.cuatrimestre === 2
+                  ? 'Primavera'
+                  : 'Desconegut'}
             </p>
           </div>
         </div>
@@ -385,132 +401,116 @@ const EquipoPage = () => {
           ) : (
             // Vista para estudiantes
             <>
-              {/* Si la GitHub App no está instalada */}
-              {
-                /*!githubAppInstalada ? (
+              {equipo.gitOrganizacion ? (
+                // organización ya está configurada
                 <>
                   <p>
-                    Per validar la organització, instal·leu primer la GitHub
-                    App:
+                    ✅ L&apos;organització de GitHub està configurada:
+                    <a
+                      href={`https://github.com/${equipo.gitOrganizacion}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="github-org-link"
+                    >
+                      {equipo.gitOrganizacion}
+                    </a>
                   </p>
-                  <button
-                    onClick={handleInstallGitHubApp}
-                    className="validate-git-org-button"
-                  >
-                    Instal·lar GitHub App
-                  </button>
                 </>
-              ) : */ equipo.gitOrganizacion ? (
-                  // organización ya está configurada
-                  <>
-                    <p>
-                      ✅ L&apos;organització de GitHub està configurada:
-                      <a
-                        href={`https://github.com/${equipo.gitOrganizacion}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="github-org-link"
+              ) : (
+                // Si la organización aún no está configurada
+                <>
+                  {!comprobandoValidacion ? (
+                    <>
+                      <p>
+                        Introdueix la URL de l&apos;organització de GitHub del
+                        teu equip. Assegura&apos;t de que el perfil de
+                        <strong> professorat-amep</strong> n&apos;és membre i
+                        que té permisos d&apos;<strong>Owner</strong>.
+                      </p>
+                      <input
+                        type="text"
+                        placeholder="https://github.com/organització"
+                        value={gitOrgUrl}
+                        onChange={(e) => setGitOrgUrl(e.target.value)}
+                        className="git-org-input-field"
+                      />
+                      <button
+                        onClick={handleValidateGitOrg}
+                        className="validate-git-org-button"
                       >
-                        {equipo.gitOrganizacion}
-                      </a>
-                    </p>
-                  </>
-                ) : (
-                  // Si la organización aún no está configurada
-                  <>
-                    {!comprobandoValidacion ? (
-                      <>
+                        Validar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Checklist de validación */}
+                      <div className="validation-results">
                         <p>
-                          Introdueix la URL de l&apos;organització de GitHub del
-                          teu equip. Assegura&apos;t de que el perfil de
-                          <strong> professorat-amep</strong> n&apos;és membre i
-                          que té permisos d&apos;<strong>Owner</strong>.
+                          {validationResults?.professoratEsMiembro
+                            ? "✅ L'usuari professorat-amep és membre de l'organització."
+                            : "❌ L'usuari professorat-amep no és membre de l'organització."}
                         </p>
-                        <input
-                          type="text"
-                          placeholder="https://github.com/organització"
-                          value={gitOrgUrl}
-                          onChange={(e) => setGitOrgUrl(e.target.value)}
-                          className="git-org-input-field"
-                        />
-                        <button
-                          onClick={handleValidateGitOrg}
-                          className="validate-git-org-button"
-                        >
-                          Validar
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        {/* Checklist de validación */}
-                        <div className="validation-results">
-                          <p>
-                            {validationResults?.professoratEsMiembro
-                              ? "✅ L'usuari professorat-amep és membre de l'organització."
-                              : "❌ L'usuari professorat-amep no és membre de l'organització."}
-                          </p>
-                          <p>
-                            {validationResults?.professoratEsAdmin
-                              ? "✅ L'usuari professorat-amep té permissos d'owner en l'organització."
-                              : "❌ L'usuari professorat-amep no té permissos d'owner en l'organització."}
-                          </p>
-                          <p>
-                            {validationResults?.todosUsuariosGitConfigurados
-                              ? '✅ Tots els membres tenen un compte de GitHub associat.'
-                              : '❌ No tots els membres tenen un compte de GitHub associat.'}
-                          </p>
-                          <p>
-                            {validationResults?.todosMiembrosEnOrganizacion
-                              ? '✅ Tots els membres pertanyen a la organització.'
-                              : '❌ No tots els membres pertanyen a la organització.'}
-                          </p>
-                          <p>
-                            {validationResults?.profesorEnOrganizacion
-                              ? '✅ El professor pertany a la organització.'
-                              : '❌ El professor no pertany a la organització.'}
-                          </p>
-                          {/* Botón para reintroducir la organización si hay problemas */}
-                          {validationResults?.professoratEsMiembro &&
-                          validationResults?.professoratEsAdmin &&
-                          validationResults?.todosUsuariosGitConfigurados &&
-                          validationResults?.todosMiembrosEnOrganizacion &&
-                          validationResults?.profesorEnOrganizacion ? (
-                            <button
-                              onClick={async () => {
-                                try {
-                                  await handleConfirmGitOrg();
-                                  alert(
-                                    "L'organització s'ha confirmat correctament! Actualitzant vista...",
-                                  );
-                                } catch (error) {
-                                  setError(
-                                    "Hi ha hagut un error al confirmar l'organització.",
-                                  );
-                                }
-                              }}
-                              className="confirm-git-org-button"
-                            >
-                              Confirmar organització
-                            </button>
-                          ) : (
-                            <button
-                              className="error-message-button"
-                              onClick={() => setComprobandoValidacion(false)}
-                            >
-                              Solucioneu els problemes abans de confirmar.
-                              Reintroduïr la organització de github
-                            </button>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </>
-                )
-              }
+                        <p>
+                          {validationResults?.professoratEsAdmin
+                            ? "✅ L'usuari professorat-amep té permissos d'owner en l'organització."
+                            : "❌ L'usuari professorat-amep no té permissos d'owner en l'organització."}
+                        </p>
+                        <p>
+                          {validationResults?.todosUsuariosGitConfigurados
+                            ? '✅ Tots els membres tenen un compte de GitHub associat.'
+                            : '❌ No tots els membres tenen un compte de GitHub associat.'}
+                        </p>
+                        <p>
+                          {validationResults?.todosMiembrosEnOrganizacion
+                            ? '✅ Tots els membres pertanyen a la organització.'
+                            : '❌ No tots els membres pertanyen a la organització.'}
+                        </p>
+                        <p>
+                          {validationResults?.profesorEnOrganizacion
+                            ? '✅ El professor pertany a la organització.'
+                            : '❌ El professor no pertany a la organització.'}
+                        </p>
+                        {/* Botón para reintroducir la organización si hay problemas */}
+                        {validationResults?.professoratEsMiembro &&
+                        validationResults?.professoratEsAdmin &&
+                        validationResults?.todosUsuariosGitConfigurados &&
+                        validationResults?.todosMiembrosEnOrganizacion &&
+                        validationResults?.profesorEnOrganizacion ? (
+                          <button
+                            onClick={async () => {
+                              try {
+                                await handleConfirmGitOrg();
+                                alert(
+                                  "L'organització s'ha confirmat correctament! Actualitzant vista...",
+                                );
+                              } catch (error) {
+                                setError(
+                                  "Hi ha hagut un error al confirmar l'organització.",
+                                );
+                              }
+                            }}
+                            className="confirm-git-org-button"
+                          >
+                            Confirmar organització
+                          </button>
+                        ) : (
+                          <button
+                            className="error-message-button"
+                            onClick={() => setComprobandoValidacion(false)}
+                          >
+                            Solucioneu els problemes abans de confirmar.
+                            Reintroduïr la organització de github
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </>
           )}
         </div>
-        {/* Organización GitHub */}
+        {/* Organización Taiga */}
         <div className="equipo-section">
           <h2>Projecte de Taiga</h2>
           {isProfesor ? (
@@ -538,7 +538,11 @@ const EquipoPage = () => {
                     <div key={estudiante.id} className="student-item">
                       <span>{estudiante.nombre}</span>
                       <button
-                        className="add-member-button"
+                        className={`add-member-button ${
+                          miembrosSeleccionados.includes(estudiante.id)
+                            ? 'selected'
+                            : ''
+                        }`}
                         onClick={() => handleAddMember(estudiante.id)}
                       >
                         Afegir
@@ -552,10 +556,14 @@ const EquipoPage = () => {
                     <div key={miembro.id} className="student-item">
                       <span>{miembro.nombre}</span>
                       <button
-                        className="remove-member-button"
+                        className={`remove-member-button ${
+                          miembrosSeleccionados.includes(miembro.id)
+                            ? 'selected'
+                            : ''
+                        }`}
                         onClick={() => handleRemoveMember(miembro.id)}
                       >
-                        🗑️
+                        🗑️ Eliminar
                       </button>
                     </div>
                   ))}
@@ -587,10 +595,9 @@ const EquipoPage = () => {
                   </div>
                 </div>
               ))}
-              {/* Botón de edición solo visible para estudiantes */}
               {!isProfesor && (
                 <button className="edit-button" onClick={handleEditToggle}>
-                  ✏️ Editar
+                  ✏️ Modificar membres
                 </button>
               )}
             </div>
@@ -623,8 +630,10 @@ const EquipoPage = () => {
         {showConfirmChangesPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
-              <h3>Estàs segur/a de que vols fer aquests canvis?</h3>
-              <p>Aquests canvis no es poden desfer.</p>
+              <h3>
+                Estàs segur/a de que vols fer aquestes modificacions als membres
+                de l&apos;equip?
+              </h3>
               <button className="confirm-button" onClick={handleConfirmChanges}>
                 Confirmar
               </button>

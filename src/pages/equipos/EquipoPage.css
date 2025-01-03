@@ -398,6 +398,17 @@
   background-color: #d32f2f;
 }
 
+.add-member-button.selected,
+.remove-member-button.selected {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.add-member-button.selected:hover,
+.remove-member-button.selected:hover {
+  background-color: #ffc107;
+}
+
 .edit-actions {
   margin-top: 20px;
   display: flex;

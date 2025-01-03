@@ -14,6 +14,8 @@ import CrearEquipo from './pages/equipos/CrearEquipo';
 import EquipoMetricsPage from './pages/equipos/EquipoMetricsPage';
 import EvaluacionPage from './pages/evaluaciones/EvaluacionPage';
 import EvaluacionesGeneralesPage from './pages/evaluaciones/EvaluacionesGeneralesPage';
+import NotFoundPage from './pages/common/NotFoundPage';
+import ForbiddenPage from './pages/common/ForbiddenPage';
 
 function App() {
   return (
@@ -39,7 +41,7 @@ function App() {
         <Route
           path="/cursos"
           element={
-            <PrivateRoute requiredRole="PROFESOR">
+            <PrivateRoute requiredRole="Profesor">
               <CursosPage />
             </PrivateRoute>
           }
@@ -47,7 +49,7 @@ function App() {
         <Route
           path="/cursos/:id"
           element={
-            <PrivateRoute requiredRole="PROFESOR">
+            <PrivateRoute requiredRole="Profesor">
               <CursoPage />
             </PrivateRoute>
           }
@@ -55,7 +57,7 @@ function App() {
         <Route
           path="/cursos/crear"
           element={
-            <PrivateRoute requiredRole="PROFESOR">
+            <PrivateRoute requiredRole="Profesor">
               <CrearCurso />
             </PrivateRoute>
           }
@@ -63,7 +65,7 @@ function App() {
         <Route
           path="/cursos/crear/verificar"
           element={
-            <PrivateRoute requiredRole="PROFESOR">
+            <PrivateRoute requiredRole="Profesor">
               <VerificarCurso />
             </PrivateRoute>
           }
@@ -71,13 +73,13 @@ function App() {
         <Route
           path="/equipos"
           element={
-            <PrivateRoute requiredRole="ESTUDIANTE">
+            <PrivateRoute requiredRole="Estudiante">
               <EquiposPage />
             </PrivateRoute>
           }
         />
         <Route
-          path="/equipos/:id/*"
+          path="/equipos/:id/"
           element={
             <PrivateRoute>
               <EquipoPage />
@@ -87,7 +89,7 @@ function App() {
         <Route
           path="/equipos/crear"
           element={
-            <PrivateRoute requiredRole="ESTUDIANTE">
+            <PrivateRoute requiredRole="Estudiante">
               <CrearEquipo />
             </PrivateRoute>
           }
@@ -95,7 +97,7 @@ function App() {
         <Route
           path="/equipo/:id/metrics"
           element={
-            <PrivateRoute requiredRole="PROFESOR">
+            <PrivateRoute requiredRole="Profesor">
               <EquipoMetricsPage />
             </PrivateRoute>
           }
@@ -103,7 +105,7 @@ function App() {
         <Route
           path="/equipo/:equipoId/evaluacion"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="Estudiante">
               <EvaluacionPage />
             </PrivateRoute>
           }
@@ -111,11 +113,13 @@ function App() {
         <Route
           path="/equipo/:equipoId/evaluaciones_generales"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="Profesor">
               <EvaluacionesGeneralesPage />
             </PrivateRoute>
           }
         />
+        <Route path="/forbidden" element={<ForbiddenPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

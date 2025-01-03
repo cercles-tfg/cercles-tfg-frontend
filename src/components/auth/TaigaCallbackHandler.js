@@ -8,37 +8,35 @@ const TaigaCallbackHandler = ({
   onSuccess,
   onError,
 }) => {
-  const handleTaigaAuth = async () => {
-    try {
-      const queryParams = new URLSearchParams(window.location.search);
-      const code = queryParams.get('code');
-
-      const credentials =
-        authType === 'normal' ? { username, password } : { code: code || '' };
-
-      // Evitar llamadas si no hay credenciales válidas
-      if (
-        (authType === 'normal' && (!username || !password)) ||
-        (authType === 'github' && !code)
-      ) {
-        return;
-      }
-
-      await conectarTaiga(authType, credentials);
-      onSuccess('Cuenta de Taiga conectada correctamente.');
-
-      // Limpiar parámetros de la URL
-      const newUrl = window.location.href.split('?')[0];
-      window.history.replaceState(null, '', newUrl);
-    } catch (error) {
-      console.error('Error al conectar a Taiga:', error);
-      onError(error.message || 'Error al conectar a Taiga.');
-    }
-  };
-
   useEffect(() => {
-    // Ya no se ejecuta automáticamente al cargar la página
-  }, []);
+    const handleTaigaAuth = async () => {
+      try {
+        const credentials =
+          authType === 'normal'
+            ? { username, password }
+            : { code: localStorage.getItem('githubCode') };
+
+        if (
+          (authType === 'normal' && (!username || !password)) ||
+          (authType === 'github' && !credentials.code)
+        ) {
+          return;
+        }
+
+        await conectarTaiga(authType, credentials);
+        onSuccess('Compte de Taiga connectada correctament.');
+
+        if (authType === 'github') {
+          localStorage.removeItem('githubCode');
+        }
+      } catch (error) {
+        console.error('Error al conectar a Taiga:', error);
+        onError(error.message || 'Error al conectar a Taiga.');
+      }
+    };
+
+    handleTaigaAuth();
+  }, [authType, username, password, onSuccess, onError]);
 
   return null;
 };

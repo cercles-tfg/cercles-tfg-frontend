@@ -11,8 +11,9 @@ const GitHubCallbackHandler = ({ onGitHubConnected }) => {
         .then((data) => {
           if (data.message === 'Cuenta de GitHub asociada exitosamente') {
             console.log('GitHub connected:', data);
-            onGitHubConnected(); // Notificamos al perfil para recargar los datos
-            // Eliminar el parámetro "code" de la URL después de la conexión
+            onGitHubConnected();
+            localStorage.setItem('githubCode', code);
+
             const newUrl = window.location.href.split('?')[0];
             window.history.replaceState(null, '', newUrl);
           } else {

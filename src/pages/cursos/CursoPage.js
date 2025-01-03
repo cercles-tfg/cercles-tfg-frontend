@@ -258,13 +258,13 @@ const CursoPage = () => {
               ) : (
                 <>
                   <button className="edit-button" onClick={handleEditToggle}>
-                    ✏️ Editar
+                    ✏️ Modificar curs
                   </button>
                   <button
                     className="delete-button"
                     onClick={() => setShowDeleteConfirmPopup(true)}
                   >
-                    🗑️ Borrar curso
+                    🗑️ Esborrar Curs
                   </button>
                 </>
               )}
@@ -307,7 +307,7 @@ const CursoPage = () => {
                     )}
                   </p>
                   <p>
-                    <strong>Cuatrimestre:</strong>{' '}
+                    <strong>Quadrimestre:</strong>{' '}
                     {isEditing ? (
                       <select
                         value={editedCurso.cuatrimestre}
@@ -328,16 +328,21 @@ const CursoPage = () => {
                     )}
                   </p>
                   <p>
-                    <strong>Actiu:</strong> {curso.activo ? 'Sí' : 'No'}
-                  </p>
-                  <p>
-                    <strong>Número total d&apos;estudiants:</strong>{' '}
+                    <strong>Nombre total d&apos;estudiants:</strong>{' '}
                     {(curso.nombresEstudiantesSinGrupo?.length || 0) +
                       (curso.equipos?.reduce(
                         (total, equipo) =>
                           total + (equipo.miembros?.length || 0),
                         0,
                       ) || 0)}
+                  </p>
+                  <p>
+                    <strong>Nombre total d&apos;equips:</strong>{' '}
+                    {curso.equipos?.length || 0}
+                  </p>
+                  <p>
+                    <strong>Nombre total d&apos;estudiants sense grup:</strong>{' '}
+                    {curso.nombresEstudiantesSinGrupo?.length || 0}
                   </p>
                 </div>
                 <div className="toggle-container">
@@ -358,6 +363,116 @@ const CursoPage = () => {
             </div>
 
             <div className="curso-lists">
+              <div className="curso-section">
+                <h2>Professors</h2>
+                {isEditing ? (
+                  <div className="profesores-list">
+                    {profesoresDisponibles.map((profesor, index) => (
+                      <div key={index} className="professor-item">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={nombresProfesores.includes(
+                              profesor.nombre,
+                            )}
+                            onChange={() => handleProfessorSelection(profesor)}
+                          />
+                          {profesor.nombre}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="curso-list">
+                    {nombresProfesores && nombresProfesores.length > 0 ? (
+                      nombresProfesores.map((nombre, index) => (
+                        <li key={index} className="curso-list-item">
+                          {nombre}
+                        </li>
+                      ))
+                    ) : (
+                      <p>No hi ha professors per mostrar.</p>
+                    )}
+                  </ul>
+                )}
+              </div>
+              <div className="curso-section">
+                <h2>Equips</h2>
+                <div className="filter-buttons">
+                  <button
+                    className={!mostrarMisEquipos ? 'active-filter' : ''}
+                    onClick={() => setMostrarMisEquipos(false)}
+                  >
+                    Tots els equips
+                  </button>
+                  <button
+                    className={mostrarMisEquipos ? 'active-filter' : ''}
+                    onClick={() => setMostrarMisEquipos(true)}
+                  >
+                    Els meus equips
+                  </button>
+                </div>
+                <div className="equipos-container">
+                  {curso.equipos && curso.equipos.length > 0 ? (
+                    curso.equipos
+                      .filter((equipo) =>
+                        mostrarMisEquipos
+                          ? equipo.idProfe ===
+                            parseInt(localStorage.getItem('id'))
+                          : true,
+                      )
+                      .map((equipo, index) => (
+                        <div
+                          key={index}
+                          className="equipo-card"
+                          style={{ borderColor: COLORS[index % COLORS.length] }}
+                          onClick={() =>
+                            navigate(`/equipos/${equipo.id_equipo}`)
+                          }
+                        >
+                          <div
+                            className="equipo-card-header"
+                            style={{
+                              backgroundColor: COLORS[index % COLORS.length],
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <span>{equipo.nombreEquipo}</span>
+                            <button
+                              className="toggle-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleEquipoExpand(index);
+                              }}
+                            >
+                              {expandedEquipos[index] ? '▲' : '▼'}
+                            </button>
+                          </div>
+                          {expandedEquipos[index] && (
+                            <div className="equipo-card-body">
+                              {equipo.miembros && equipo.miembros.length > 0 ? (
+                                equipo.miembros.map((miembro, miembroIndex) => (
+                                  <div
+                                    key={miembroIndex}
+                                    className="equipo-member"
+                                  >
+                                    <p>{miembro || 'Desconegut'}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p>No hi ha membres en aquest equip.</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                  ) : (
+                    <p>Encara no hi ha cap equip format.</p>
+                  )}
+                </div>
+              </div>
               <div className="curso-section">
                 <h2>Estudiants sense equip</h2>
                 <table className="curso-table">
@@ -432,117 +547,6 @@ const CursoPage = () => {
                     )}
                   </tbody>
                 </table>
-              </div>
-              <div className="curso-section">
-                <h2>Equips</h2>
-                <div className="filter-buttons">
-                  <button
-                    className={!mostrarMisEquipos ? 'active-filter' : ''}
-                    onClick={() => setMostrarMisEquipos(false)}
-                  >
-                    Tots els equips
-                  </button>
-                  <button
-                    className={mostrarMisEquipos ? 'active-filter' : ''}
-                    onClick={() => setMostrarMisEquipos(true)}
-                  >
-                    Els meus equips
-                  </button>
-                </div>
-                <div className="equipos-container">
-                  {curso.equipos && curso.equipos.length > 0 ? (
-                    curso.equipos
-                      .filter((equipo) =>
-                        mostrarMisEquipos
-                          ? equipo.idProfe ===
-                            parseInt(localStorage.getItem('id'))
-                          : true,
-                      )
-                      .map((equipo, index) => (
-                        <div
-                          key={index}
-                          className="equipo-card"
-                          style={{ borderColor: COLORS[index % COLORS.length] }}
-                          onClick={() =>
-                            navigate(`/equipos/${equipo.id_equipo}`)
-                          }
-                        >
-                          <div
-                            className="equipo-card-header"
-                            style={{
-                              backgroundColor: COLORS[index % COLORS.length],
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <span>{equipo.nombreEquipo}</span>
-                            <button
-                              className="toggle-button"
-                              onClick={(e) => {
-                                e.stopPropagation(); // Evita que el clic en el botón dispare la redirección
-                                toggleEquipoExpand(index);
-                              }}
-                            >
-                              {expandedEquipos[index] ? '▲' : '▼'}
-                            </button>
-                          </div>
-                          {expandedEquipos[index] && (
-                            <div className="equipo-card-body">
-                              {equipo.miembros && equipo.miembros.length > 0 ? (
-                                equipo.miembros.map((miembro, miembroIndex) => (
-                                  <div
-                                    key={miembroIndex}
-                                    className="equipo-member"
-                                  >
-                                    <p>{miembro || 'Desconegut'}</p>
-                                  </div>
-                                ))
-                              ) : (
-                                <p>No hi ha membres en aquest equip.</p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))
-                  ) : (
-                    <p>Encara no hi ha cap equip format.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="curso-section">
-                <h2>Professors</h2>
-                {isEditing ? (
-                  <div className="profesores-list">
-                    {profesoresDisponibles.map((profesor, index) => (
-                      <div key={index} className="professor-item">
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={nombresProfesores.includes(
-                              profesor.nombre,
-                            )}
-                            onChange={() => handleProfessorSelection(profesor)}
-                          />
-                          {profesor.nombre}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <ul className="curso-list">
-                    {nombresProfesores && nombresProfesores.length > 0 ? (
-                      nombresProfesores.map((nombre, index) => (
-                        <li key={index} className="curso-list-item">
-                          {nombre}
-                        </li>
-                      ))
-                    ) : (
-                      <p>No hi ha professors per mostrar.</p>
-                    )}
-                  </ul>
-                )}
               </div>
             </div>
           </>

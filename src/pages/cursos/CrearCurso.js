@@ -23,26 +23,58 @@ const CrearCurso = () => {
     { fechaInicio: '', fechaFin: '' },
   ]);
   const [errorFechas, setErrorFechas] = useState('');
+  const [uploadErrors, setUploadErrors] = useState([]);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const idProfesorLoggeado = parseInt(localStorage.getItem('id'));
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    obtenerProfesoresDisponibles()
-      .then(setProfesoresDisponibles)
-      .catch((error) => {
-        console.error('Error al obtener los profesores:', error);
-      });
+    const fetchProfesores = async () => {
+      try {
+        const profesores = await obtenerProfesoresDisponibles();
+        setProfesoresDisponibles(profesores);
 
+        if (profesores.some((prof) => prof.id === idProfesorLoggeado)) {
+          setSelectedProfesores((prevSelected) =>
+            prevSelected.includes(idProfesorLoggeado)
+              ? prevSelected
+              : [...prevSelected, idProfesorLoggeado],
+          );
+        }
+      } catch (error) {
+        console.error('Error al obtener los profesores:', error);
+      }
+    };
+
+    fetchProfesores();
+
+    // Cargar datos de location.state
     if (location.state) {
-      const { nombreAsignatura, añoInicio, cuatrimestre, selectedProfesores } =
-        location.state;
-      setNombreAsignatura(nombreAsignatura);
-      setAñoInicio(añoInicio);
-      setCuatrimestre(cuatrimestre);
-      setSelectedProfesores(selectedProfesores);
+      const {
+        nombreAsignatura,
+        añoInicio,
+        cuatrimestre,
+        selectedProfesores,
+        periodosEvaluacion,
+      } = location.state;
+
+      setNombreAsignatura(nombreAsignatura || '');
+      setAñoInicio(añoInicio || currentYear);
+      setCuatrimestre(cuatrimestre || '1');
+      setSelectedProfesores(selectedProfesores || []);
+      setNumPeriodosEvaluacion(periodosEvaluacion?.length || 3);
+      setPeriodosEvaluacion(
+        periodosEvaluacion ||
+          Array(3).fill({
+            fechaInicio: '',
+            fechaFin: '',
+          }),
+      );
     }
-  }, [location.state]);
+  }, [location.state, idProfesorLoggeado, currentYear]);
 
   const handleProfesorClick = (id) => {
     setSelectedProfesores((prevSelected) =>
@@ -54,16 +86,23 @@ const CrearCurso = () => {
 
   const handleNumPeriodosChange = (e) => {
     const newNumPeriodos = parseInt(e.target.value, 10);
+
+    setPeriodosEvaluacion((prev) => {
+      if (newNumPeriodos > prev.length) {
+        return [
+          ...prev,
+          ...Array(newNumPeriodos - prev.length).fill({
+            fechaInicio: '',
+            fechaFin: '',
+          }),
+        ];
+      } else if (newNumPeriodos < prev.length) {
+        return prev.slice(0, newNumPeriodos);
+      }
+      return prev;
+    });
+
     setNumPeriodosEvaluacion(newNumPeriodos);
-
-    const newPeriodos = Array(newNumPeriodos)
-      .fill(null)
-      .map(
-        (_, index) =>
-          periodosEvaluacion[index] || { fechaInicio: '', fechaFin: '' },
-      );
-
-    setPeriodosEvaluacion(newPeriodos);
   };
 
   const handleFechaChange = (index, field, value) => {
@@ -102,7 +141,12 @@ const CrearCurso = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (selectedProfesores.length === 0 || !estudiantesFile) {
+    if (selectedProfesores.length === 0) {
+      alert('Si us plau, selecciona almenys un professor.');
+      return;
+    }
+
+    if (!estudiantesFile) {
       return;
     }
 
@@ -123,7 +167,15 @@ const CrearCurso = () => {
         },
       });
     } catch (error) {
-      console.error('Error al procesar el archivo:', error);
+      console.error('Error completo:', error);
+
+      if (error.response?.errores) {
+        console.log('Errores detectados:', error.response.errores);
+        setUploadErrors(error.response.errores);
+        setShowErrorPopup(true);
+      } else {
+        console.error('Error inesperado:', error);
+      }
     }
   };
 
@@ -133,7 +185,7 @@ const CrearCurso = () => {
       <div className="create-course-form">
         <h1>Crear un nou curs</h1>
         <form onSubmit={handleFormSubmit}>
-          <div className="form-group">
+          <div className="form-group-curso">
             <label htmlFor="nombreAsignatura">Nom de l&apos;assignatura</label>
             <input
               type="text"
@@ -143,7 +195,7 @@ const CrearCurso = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group-curso">
             <label htmlFor="añoInicio">Any d&apos;inici</label>
             <select
               id="añoInicio"
@@ -160,7 +212,7 @@ const CrearCurso = () => {
               )}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group-curso">
             <label htmlFor="cuatrimestre">Quadrimestre</label>
             <select
               id="cuatrimestre"
@@ -172,7 +224,7 @@ const CrearCurso = () => {
               <option value="2">Primavera</option>
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group-curso">
             <label>Selecció de professors</label>
             <div className="profesor-selection-group">
               {profesoresDisponibles.map((profesor) => (
@@ -188,9 +240,46 @@ const CrearCurso = () => {
               ))}
             </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="estudiantesFile">
-              Pujar document excel amb els estudiants
+          <div className="form-group-curso">
+            <label htmlFor="estudiantesFile" className="file-label">
+              Pujar document excel amb els estudiants{' '}
+              <span
+                className="tooltip-icon"
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+              >
+                ?
+              </span>
+              {showTooltip && (
+                <div className="tooltip">
+                  <p>
+                    El fitxer ha de ser un document Excel (.xlsx) amb les dades
+                    dels integrants d&apos;aquest nou curs que tingui les
+                    següents tres columnes:{' '}
+                  </p>
+                  <table className="tooltip-table">
+                    <thead>
+                      <tr>
+                        <th>Grup</th>
+                        <th>Cognoms, Nom</th>
+                        <th>Correu electrònic</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>AMEP1</td>
+                        <td>Pérez Martínez, Laura</td>
+                        <td>laura.perezmartinez@estudiantat.upc.edu</td>
+                      </tr>
+                      <tr>
+                        <td>AMEP2</td>
+                        <td>Lopez Núñez, Alex </td>
+                        <td>alex.lopeznunez@estudiantat.upc.edu</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </label>
             <input
               type="file"
@@ -200,7 +289,7 @@ const CrearCurso = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group-curso">
             <label>
               Indica quants períodes d&apos;avaluació tindrà aquest curs:
             </label>
@@ -215,29 +304,41 @@ const CrearCurso = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group-curso">
             <label>Dates d&apos;avaluació</label>
-            {periodosEvaluacion.map((periodo, index) => (
-              <div key={index} className="evaluacion-fechas">
-                <label>Avaluació {index + 1}</label>
-                <input
-                  type="date"
-                  value={periodo.fechaInicio}
-                  onChange={(e) =>
-                    handleFechaChange(index, 'fechaInicio', e.target.value)
-                  }
-                  required
-                />
-                <input
-                  type="date"
-                  value={periodo.fechaFin}
-                  onChange={(e) =>
-                    handleFechaChange(index, 'fechaFin', e.target.value)
-                  }
-                  required
-                />
-              </div>
-            ))}
+            {numPeriodosEvaluacion === 0 ? (
+              <p className="no-periodos">
+                S&apos;ha seleccionat que no hi hagi cap període
+                d&apos;avaluació
+              </p>
+            ) : (
+              periodosEvaluacion.map((periodo, index) => (
+                <div key={index} className="evaluacion-fechas">
+                  <label>Avaluació {index + 1}</label>
+                  <input
+                    type="date"
+                    value={periodo.fechaInicio}
+                    min={
+                      index > 0
+                        ? periodosEvaluacion[index - 1].fechaFin || undefined
+                        : undefined
+                    }
+                    onChange={(e) =>
+                      handleFechaChange(index, 'fechaInicio', e.target.value)
+                    }
+                    required
+                  />
+                  <input
+                    type="date"
+                    value={periodo.fechaFin}
+                    onChange={(e) =>
+                      handleFechaChange(index, 'fechaFin', e.target.value)
+                    }
+                    required
+                  />
+                </div>
+              ))
+            )}
           </div>
           {errorFechas && <p className="error-message">{errorFechas}</p>}
           <div className="form-buttons">
@@ -252,6 +353,26 @@ const CrearCurso = () => {
               Crear curs
             </button>
           </div>
+          {showErrorPopup && (
+            <div className="error-popup">
+              <div className="popup-content">
+                <h2>Errors en l&apos;arxiu d&apos;estudiants</h2>
+                <ul>
+                  {uploadErrors.map((error, index) => (
+                    <li key={index}>
+                      <strong>{error}</strong>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  className="close-popup-button"
+                  onClick={() => setShowErrorPopup(false)}
+                >
+                  Tanca
+                </button>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

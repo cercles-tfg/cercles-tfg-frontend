@@ -22,6 +22,7 @@ const CrearEquipo = () => {
   const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   const idEstudiante = parseInt(localStorage.getItem('id'));
   const token = localStorage.getItem('jwtToken');
@@ -30,9 +31,11 @@ const CrearEquipo = () => {
     const fetchCursos = async () => {
       try {
         const cursosData = await getCursosDeEstudiante(idEstudiante, token);
-        setCursos(cursosData || []);
+        const cursosActivos = cursosData.filter((curso) => curso.activo);
+        setCursos(cursosActivos || []);
       } catch (error) {
         setError('Error al cargar los cursos disponibles.');
+        setShowErrorPopup(true);
       }
     };
 
@@ -40,6 +43,16 @@ const CrearEquipo = () => {
   }, [idEstudiante, token]);
 
   const handleCursoChange = async (cursoId) => {
+    if (!cursoId) {
+      setCursoSeleccionado(null);
+      setNombreCursoSeleccionado('');
+      setEstudiantesSinGrupo([]);
+      setProfesores([]);
+      setEstudiantesSeleccionados([]);
+      setProfesorSeleccionado(null);
+      return;
+    }
+
     setCursoSeleccionado(cursoId);
     setNombreCursoSeleccionado(
       cursos.find((curso) => curso.id === parseInt(cursoId))
@@ -60,6 +73,7 @@ const CrearEquipo = () => {
       setProfesores(profesoresData || []);
     } catch (error) {
       setError('Error al cargar los estudiantes o profesores del curso.');
+      setShowErrorPopup(true);
     }
   };
 
@@ -75,7 +89,6 @@ const CrearEquipo = () => {
 
   const handleCreateClick = async () => {
     try {
-      // Asegurarte de que el estudiante loggeado no esté duplicado
       const uniqueEstudiantes = [
         ...new Set([...estudiantesSeleccionados, parseInt(idEstudiante)]),
       ];
@@ -87,12 +100,11 @@ const CrearEquipo = () => {
         evaluadorId: profesorSeleccionado,
       };
 
-      console.log('Equipo Data:', equipoData); // Verifica los datos antes de enviar
       await crearEquipo(equipoData, token);
       navigate('/equipos');
     } catch (error) {
       setError(error.response?.data?.message || 'Error al crear el equipo.');
-      setShowConfirmPopup(false);
+      setShowErrorPopup(true);
     }
   };
 
@@ -106,20 +118,23 @@ const CrearEquipo = () => {
     estudiante.nombre.toLowerCase().includes(busqueda.toLowerCase()),
   );
 
-  const handleBackClick = () => {
-    navigate(-1); // Regresa a la página anterior
-  };
-
   return (
-    <div className="crear-equipo-page">
+    <div
+      className={`crear-equipo-page ${showConfirmPopup ? 'popup-active' : ''}`}
+    >
       <Sidebar />
-      <div className="content">
-        <button className="back-button" onClick={handleBackClick}>
+      <div className="crear-equipo-content">
+        <button className="back-button" onClick={() => navigate(-1)}>
           Torna enrere
         </button>
         <h1>CREA UN NOU EQUIP</h1>
 
-        {error && <div className="error-message">{error}</div>}
+        {showErrorPopup && (
+          <div className="error-popup">
+            <p>{error}</p>
+            <button onClick={() => setShowErrorPopup(false)}>Tanca</button>
+          </div>
+        )}
 
         <div className="form-group">
           <label>Nom de l&apos;equip:</label>
@@ -149,35 +164,6 @@ const CrearEquipo = () => {
         {cursoSeleccionado && (
           <>
             <div className="form-group">
-              <label>Cercar estudiants:</label>
-              <input
-                type="text"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Escriu un nom"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Selecciona els membres del teu equip (mínim 1):</label>
-              <div className="checkbox-list">
-                {estudiantesFiltrados.map((estudiante) => (
-                  <label key={estudiante.id} className="checkbox-item">
-                    <input
-                      type="checkbox"
-                      value={estudiante.id}
-                      checked={estudiantesSeleccionados.includes(estudiante.id)}
-                      onChange={() =>
-                        toggleEstudianteSeleccionado(estudiante.id)
-                      }
-                    />
-                    {estudiante.nombre}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="form-group">
               <label>Selecciona al professor avaluador:</label>
               <select
                 value={profesorSeleccionado || ''}
@@ -193,11 +179,49 @@ const CrearEquipo = () => {
                 ))}
               </select>
             </div>
+            <div className="form-group">
+              <label>Selecciona els membres del teu equip (mínim 1):</label>
+              <input
+                type="text"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Cerca estudiants"
+              />
+            </div>
+
+            <div className="form-group">
+              <div className="checkbox-list-container">
+                <div className="checkbox-list">
+                  {estudiantesFiltrados.map((estudiante) => (
+                    <label
+                      key={estudiante.id}
+                      className={`equipo-checkbox-item ${
+                        estudiantesSeleccionados.includes(estudiante.id)
+                          ? 'selected'
+                          : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        value={estudiante.id}
+                        checked={estudiantesSeleccionados.includes(
+                          estudiante.id,
+                        )}
+                        onChange={() =>
+                          toggleEstudianteSeleccionado(estudiante.id)
+                        }
+                      />
+                      {estudiante.nombre}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
           </>
         )}
 
         <button
-          className="create-button"
+          className="crear-equipo-button"
           disabled={isCreateDisabled}
           onClick={() => setShowConfirmPopup(true)}
         >
@@ -205,42 +229,44 @@ const CrearEquipo = () => {
         </button>
 
         {showConfirmPopup && (
-          <div className="confirm-popup">
-            <div className="popup-content">
-              <h3>Confirmar creació</h3>
-              <p>
-                <strong>Nom de l&apos;equip:</strong> {nombreEquipo}
-              </p>
-              <p>
-                <strong>Curs:</strong> {nombreCursoSeleccionado}
-              </p>
-              <p>
-                <strong>Membres:</strong>{' '}
-                {estudiantesSeleccionados
-                  .map((id) =>
-                    id === idEstudiante
-                      ? 'Tu mateix'
-                      : estudiantesSinGrupo.find((est) => est.id === id)
-                          ?.nombre,
-                  )
-                  .join(', ')}
-              </p>
-              <p>
-                <strong>Professor avaluador:</strong>{' '}
-                {
-                  profesores.find((prof) => prof.id === profesorSeleccionado)
-                    ?.nombre
-                }
-              </p>
-              <button className="confirm-button" onClick={handleCreateClick}>
-                Confirmar
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => setShowConfirmPopup(false)}
-              >
-                Cancel·lar
-              </button>
+          <div className="overlay">
+            <div className="crear-equipo-confirm-popup">
+              <div className="crear-equipo-popup-content">
+                <h3>Confirmar creació</h3>
+                <p>
+                  <strong>Nom de l&apos;equip:</strong> {nombreEquipo}
+                </p>
+                <p>
+                  <strong>Curs:</strong> {nombreCursoSeleccionado}
+                </p>
+                <p>
+                  <strong>Membres:</strong>{' '}
+                  {estudiantesSeleccionados
+                    .map((id) =>
+                      id === idEstudiante
+                        ? 'Tu mateix'
+                        : estudiantesSinGrupo.find((est) => est.id === id)
+                            ?.nombre,
+                    )
+                    .join(', ')}
+                </p>
+                <p>
+                  <strong>Professor avaluador:</strong>{' '}
+                  {
+                    profesores.find((prof) => prof.id === profesorSeleccionado)
+                      ?.nombre
+                  }
+                </p>
+                <button className="confirm-button" onClick={handleCreateClick}>
+                  Confirmar
+                </button>
+                <button
+                  className="cancel-button"
+                  onClick={() => setShowConfirmPopup(false)}
+                >
+                  Cancel·lar
+                </button>
+              </div>
             </div>
           </div>
         )}

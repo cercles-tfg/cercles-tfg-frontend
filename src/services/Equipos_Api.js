@@ -196,7 +196,7 @@ export const salirEquipo = async (equipoId, estudianteId, token) => {
 //añadir miembros a un equipo
 export const añadirMiembros = async (equipoId, data, token) => {
   const response = await fetch(
-    `${API_BASE_URL}/equipos/${equipoId}/añadir_miembro`,
+    `${API_BASE_URL}/equipos/${equipoId}/add_member`,
     {
       method: 'POST',
       headers: {
@@ -230,29 +230,6 @@ export const borrarMiembros = async (equipoId, data, token) => {
     throw new Error('Error al borrar miembros del equipo.');
   }
 };
-
-/*/obtener url de instalacion del github app en organizacion
-export const obtenerUrlInstalacion = async (equipoId, token) => {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/github/instalacion?equipoId=${equipoId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`, // Asegúrate de pasar el token correctamente
-        },
-      },
-    );
-    const data = await response.json();
-    return data.url; // Devuelve la URL de instalación
-  } catch (error) {
-    console.error(
-      'Error al obtener la URL de instalación de GitHub App:',
-      error,
-    );
-    throw new Error('Error desconocido al obtener la URL de instalación.');
-  }
-};*/
 
 //validar org
 export const validarOrganizacion = async (

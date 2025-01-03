@@ -32,18 +32,17 @@ const PerfilPage = () => {
         setTaigaUsername(data.taigaUsername);
         setErrorMessage(null);
         if (data.gitUsername) {
-          fetchGitHubData(); // Cargar datos adicionales de GitHub si está conectado
+          fetchGitHubData();
         }
       })
-      .catch(() => setErrorMessage('Error al cargar los datos del usuario.'))
+      .catch(() => setErrorMessage('Error en carregar les dades.'))
       .finally(() => setLoading(false));
   }, []);
 
   const fetchGitHubData = () => {
     obtenerDatosGitHub()
       .then((data) => setGithubData(data))
-      .catch(() => setErrorMessage('Error al cargar los datos de GitHub.'));
-    console.log('datos git', githubData);
+      .catch(() => setErrorMessage('Error en carregar les dades.'));
   };
 
   const handleGitHubConnect = () => {
@@ -53,6 +52,13 @@ const PerfilPage = () => {
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&prompt=login`;
 
     window.location.href = githubAuthUrl;
+  };
+
+  // Guardar el code al conectar con GitHub para conectarse luego con Taiga
+  const handleGitHubCallback = (code) => {
+    if (code) {
+      localStorage.setItem('githubCode', code);
+    }
   };
 
   const handleGitHubDisconnect = () => {
@@ -70,11 +76,6 @@ const PerfilPage = () => {
         );
     }
   };
-  const handleTaigaGitHubError = () => {
-    setErrorMessage(
-      'Per connectar el teu compte de Taiga mitjançant Github, cal que et connectis a Github primer.',
-    );
-  };
 
   const handleTaigaConnect = () => {
     if (!username || !password) {
@@ -87,28 +88,29 @@ const PerfilPage = () => {
         alert('Compte de Taiga connectada correctament.');
         fetchUserData();
       })
-      .catch((err) => alert(`Error al conectar con Taiga: ${err.message}`));
+      .catch((err) => alert(`Error al cocnectar amb Taiga: ${err.message}`));
   };
 
-  const handleGitHubTaigaConnect = () => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const code = queryParams.get('code');
+  const handleGitHubTaigaConnect = async () => {
+    const code = localStorage.getItem('githubCode');
 
     if (!code) {
-      alert('Error: No se recibió el código de GitHub.');
+      alert('Error: No hi ha un compte de GitHub connectat.');
       return;
     }
 
-    conectarTaiga('github', { code })
-      .then(() => {
-        alert('Compte de Taiga connectada correctament.');
-        fetchUserData();
-      })
-      .catch((err) => alert(`Error al conectar con Taiga: ${err.message}`));
+    try {
+      await conectarTaiga('github', { code });
+      alert('Compte de Taiga connectada correctament.');
+      fetchUserData();
+      localStorage.setItem('githubCode', null);
+    } catch (err) {
+      alert(`Error al conectar amb Taiga: ${err.message}`);
+    }
   };
 
   const toggleSection = (section) => {
-    setExpandedSection((prev) => (prev === section ? null : section)); // Nueva lógica
+    setExpandedSection((prev) => (prev === section ? null : section));
   };
 
   useEffect(() => {
@@ -255,59 +257,84 @@ const PerfilPage = () => {
           {/* Taiga Connection */}
           <div className="taiga-connection-box">
             {taigaUsername ? (
-              <p>El compte de Taiga associat és: {taigaUsername}</p>
+              <div>
+                <h2>Compte de Taiga associat</h2>
+                <p>
+                  El compte de Taiga associat al teu perfil és: {taigaUsername}
+                </p>
+              </div>
             ) : (
               <div>
-                <label>
-                  <input
-                    type="radio"
-                    value="normal"
-                    checked={authType === 'normal'}
-                    onChange={() => setAuthType('normal')}
-                  />
-                  Autenticació normal
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="github"
-                    checked={authType === 'github'}
-                    onChange={() => setAuthType('github')}
-                  />
-                  Autenticació amb GitHub
-                </label>
-
-                {authType === 'normal' && (
-                  <>
+                <p>
+                  Per connectar el teu compte de <strong>Taiga</strong> amb{' '}
+                  <strong>CERCLES</strong>, selecciona una de les opcions
+                  següents:
+                </p>
+                <ul>
+                  <li>
+                    <strong>Autenticació normal:</strong> Proporciona el teu
+                    usuari i contrasenya de Taiga directament.
+                  </li>
+                  <li>
+                    <strong>Autenticació amb GitHub:</strong> Utilitza el teu
+                    compte de GitHub associat per connectar-te a Taiga, sempre
+                    que els comptes estiguin vinculats.
+                  </li>
+                </ul>
+                <div className="auth-options">
+                  <div className="auth-option">
                     <input
-                      type="text"
-                      placeholder="Usuario"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      type="radio"
+                      id="normal"
+                      value="normal"
+                      checked={authType === 'normal'}
+                      onChange={() => setAuthType('normal')}
                     />
+                    <label htmlFor="normal">Autenticació normal</label>
+                    {authType === 'normal' && (
+                      <div className="normal-auth-form">
+                        <input
+                          type="usuari"
+                          placeholder="Usuari"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <input
+                          type="password"
+                          placeholder="Contrasenya"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                          onClick={handleTaigaConnect}
+                          className="taiga-connect-button"
+                        >
+                          Connecta amb Taiga
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="auth-option">
                     <input
-                      type="password"
-                      placeholder="Contrasenya"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      type="radio"
+                      id="github"
+                      value="github"
+                      checked={authType === 'github'}
+                      onChange={() => setAuthType('github')}
                     />
-                    <button
-                      onClick={handleTaigaConnect}
-                      className="taiga-connect-button"
-                    >
-                      Connecta amb Taiga
-                    </button>
-                  </>
-                )}
-
-                {authType === 'github' && (
-                  <button
-                    onClick={handleGitHubTaigaConnect}
-                    className="taiga-connect-button"
-                  >
-                    Connecta amb GitHub
-                  </button>
-                )}
+                    <label htmlFor="github">Autenticació amb GitHub</label>
+                    {authType === 'github' && (
+                      <div className="github-auth-form">
+                        <button
+                          onClick={handleGitHubTaigaConnect}
+                          className="taiga-connect-button"
+                        >
+                          Connecta amb GitHub
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
