@@ -9,7 +9,7 @@
 .crear-equipo-content {
   padding: 20px;
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -24,6 +24,7 @@ h1 {
 }
 
 .form-group {
+  max-width: 1100px;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -47,6 +48,7 @@ select {
 
 .checkbox-list-container {
   max-height: 300px;
+  width: 1100px; /* Aumentar el ancho */
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -56,14 +58,14 @@ select {
 
 .checkbox-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+  gap: 10px; /* Espacio entre elementos */
 }
 
 .equipo-checkbox-item {
-  display: flex; /* Flexbox para alinear los elementos */
-  align-items: center; /* Alinear verticalmente */
-  justify-content: flex-start;
+  display: flex; /* Flexbox para alinear */
+  align-items: center; /* Centrado vertical */
+  justify-content: flex-start; /* Justificar a la izquierda */
   padding: 10px;
   border: 2px solid #ccc;
   border-radius: 5px;
@@ -72,18 +74,17 @@ select {
     background-color 0.3s ease,
     border-color 0.3s ease,
     transform 0.2s ease;
-  gap: 10px; /* Espacio entre el checkbox y el texto */
 }
 
-input[type='checkbox'] {
-  margin: 0; /* Eliminar margen adicional */
-  justify-content: flex-start;
+.equipo-checkbox-item input[type='checkbox'] {
+  margin: 0; /* Eliminar márgenes extra */
+  justify-content: flex-start; /* Alinear el checkbox a la izquierda */
 }
 
 .equipo-checkbox-item.selected {
   border-color: #4caf50;
   background-color: #e6ffe6;
-  transform: scale(1.02); /* Hacer que resalte un poco */
+  transform: scale(1.02); /* Hacer que destaque un poco */
 }
 
 .equipo-checkbox-item:hover {
@@ -146,8 +147,8 @@ input[type='checkbox'] {
 }
 
 .crear-equipo-content.dimmed {
-  pointer-events: none; /* Bloquear interacción con el fondo */
-  opacity: 0.5; /* Difuminar el fondo */
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .crear-equipo-confirm-popup {
@@ -162,12 +163,13 @@ input[type='checkbox'] {
   max-width: 500px;
   text-align: center;
   z-index: 1200;
-  pointer-events: auto; /* Permitir interacción */
-  opacity: 1; /* Asegurar que el popup no esté difuminado */
+  pointer-events: auto;
+  opacity: 1;
 }
 
-.crear-equipo-popup-content h3 {
+.crear-equipo-popup-content h4 {
   text-align: center;
+  margin-right: 20px;
   font-size: 30px;
   margin-bottom: 15px;
   color: #333;

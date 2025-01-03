@@ -232,7 +232,7 @@ const CrearEquipo = () => {
           <div className="overlay">
             <div className="crear-equipo-confirm-popup">
               <div className="crear-equipo-popup-content">
-                <h3>Confirmar creació</h3>
+                <h4>Confirmar creació</h4>
                 <p>
                   <strong>Nom de l&apos;equip:</strong> {nombreEquipo}
                 </p>

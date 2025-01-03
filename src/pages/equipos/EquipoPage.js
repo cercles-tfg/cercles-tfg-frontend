@@ -18,6 +18,8 @@ import {
 
 import './EquipoPage.css';
 import EquipoMetricsPage from './EquipoMetricsPage';
+import { format } from 'date-fns';
+import { ca } from 'date-fns/locale';
 
 const COLORS = [
   '#6C9975',
@@ -54,6 +56,12 @@ const EquipoPage = () => {
   const isProfesor = localStorage.getItem('rol') === 'Profesor';
   const [evaluacionActiva, setEvaluacionActiva] = useState(false);
   const [evaluacionRealizada, setEvaluacionRealizada] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredEstudiantesSinEquipo = estudiantesSinEquipo.filter(
+    (estudiante) =>
+      estudiante.nombre.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   useEffect(() => {
     const fetchEquipoDetalle = async () => {
@@ -80,17 +88,19 @@ const EquipoPage = () => {
 
   useEffect(() => {
     if (!equipo) return;
+
     const fetchEvaluacionStatus = async () => {
       try {
-        const activa = await isEvaluacionActiva(equipo.id, token);
+        const evaluacionData = await isEvaluacionActiva(equipo.id, token);
         const realizada = await isEvaluacionRealizada(
           equipo.id,
           idEstudiante,
           token,
         );
-        console.log('realizada ', realizada);
+        console.log('Evaluación activa:', evaluacionData);
+        console.log('Evaluación realizada:', realizada);
 
-        setEvaluacionActiva(activa);
+        setEvaluacionActiva(evaluacionData);
         setEvaluacionRealizada(realizada);
       } catch (error) {
         console.error('Error al comprobar el estado de la evaluación:', error);
@@ -327,7 +337,7 @@ const EquipoPage = () => {
                   </div>
                 )}
 
-                {/* Link a Taiga */}
+                {/* Link a Taiga 
                 {equipo.taigaProyecto ? (
                   <Link
                     to={`/equipo/${id}/taiga-metrics?project=${equipo.taigaProyecto}`}
@@ -343,7 +353,7 @@ const EquipoPage = () => {
                       Taiga, per tant no hi ha dades a veure.
                     </span>
                   </div>
-                )}
+                )}*/}
 
                 {/* Link a dades d'avaluacions */}
                 <Link
@@ -357,13 +367,30 @@ const EquipoPage = () => {
           ) : (
             <>
               {/* Link de evaluación para estudiantes */}
-              {evaluacionActiva && !evaluacionRealizada ? (
-                <Link
-                  to={`/equipo/${equipo.id}/evaluacion`}
-                  className="evaluacion-link"
-                >
-                  Avalua als teus companys
-                </Link>
+              {evaluacionActiva?.activa && !evaluacionRealizada ? (
+                <div className="evaluacion-container">
+                  <Link
+                    to={`/equipo/${equipo.id}/evaluacion`}
+                    className="evaluacion-link"
+                  >
+                    Avalua als teus companys
+                  </Link>
+                  <p className="evaluacion-info">
+                    Tens fins el{' '}
+                    <strong>
+                      {evaluacionActiva.fechaFin
+                        ? format(
+                            new Date(evaluacionActiva.fechaFin),
+                            "d 'de' MMMM 'de' yyyy",
+                            {
+                              locale: ca,
+                            },
+                          )
+                        : ''}
+                    </strong>{' '}
+                    per fer aquesta avaluació al teu equip.
+                  </p>
+                </div>
               ) : (
                 <span className="evaluacion-link-disabled">
                   No hi ha evaluacions actives
@@ -510,7 +537,7 @@ const EquipoPage = () => {
             </>
           )}
         </div>
-        {/* Organización Taiga */}
+        {/* Organización Taiga 
         <div className="equipo-section">
           <h2>Projecte de Taiga</h2>
           {isProfesor ? (
@@ -526,31 +553,12 @@ const EquipoPage = () => {
           ) : (
             <></>
           )}
-        </div>
+        </div>*/}
         <div className="equipo-section">
           <h2>Membres de l&apos;equip</h2>
           {isEditing ? (
             <>
               <div className="edit-members">
-                <h3>Estudiants sense equip</h3>
-                <div className="students-list">
-                  {estudiantesSinEquipo.map((estudiante) => (
-                    <div key={estudiante.id} className="student-item">
-                      <span>{estudiante.nombre}</span>
-                      <button
-                        className={`add-member-button ${
-                          miembrosSeleccionados.includes(estudiante.id)
-                            ? 'selected'
-                            : ''
-                        }`}
-                        onClick={() => handleAddMember(estudiante.id)}
-                      >
-                        Afegir
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <h3>Eliminar membres</h3>
                 <div className="students-list">
                   {equipo.estudiantes.map((miembro) => (
                     <div key={miembro.id} className="student-item">
@@ -563,11 +571,42 @@ const EquipoPage = () => {
                         }`}
                         onClick={() => handleRemoveMember(miembro.id)}
                       >
-                        🗑️ Eliminar
+                        🗑️
                       </button>
                     </div>
                   ))}
                 </div>
+
+                <h2>Estudiants sense equip</h2>
+
+                {/* Buscador */}
+                <input
+                  type="text"
+                  placeholder="Cerca un estudiant..."
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+
+                {/* Lista de estudiantes sin equipo */}
+                <div className="students-list no-team">
+                  {filteredEstudiantesSinEquipo.map((estudiante) => (
+                    <div key={estudiante.id} className="student-item">
+                      <span>{estudiante.nombre}</span>
+                      <button
+                        className={`add-member-button ${
+                          miembrosSeleccionados.includes(estudiante.id)
+                            ? 'selected'
+                            : ''
+                        }`}
+                        onClick={() => handleAddMember(estudiante.id)}
+                      >
+                        ➕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
                 <div className="edit-actions">
                   <button
                     className="confirm-button"

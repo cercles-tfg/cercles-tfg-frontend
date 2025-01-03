@@ -1,24 +1,26 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Sidebar from '../../components/common/Sidebar';
-import TaigaCallbackHandler from '../../components/auth/TaigaCallbackHandler';
+//import TaigaCallbackHandler from '../../components/auth/TaigaCallbackHandler';
+import githubLogo from '../../assets/images/github-logo-920x460-sue-v1.png';
+import userProfile from '../../assets/images/user-profile.png';
 import GitHubCallbackHandler from '../../components/auth/GitHubCallbackHandler';
 import {
   obtenerDatosGitHub,
   desconectarGitHub,
 } from '../../services/Github_Api';
-import { conectarTaiga } from '../../services/Taiga_Api';
+//import { conectarTaiga } from '../../services/Taiga_Api';
 import { obtenerDatosUsuario } from '../../services/Usuarios_Api';
 import './PerfilPage.css';
 
 const PerfilPage = () => {
   const [gitUsername, setGitUsername] = useState(null);
   const [githubData, setGithubData] = useState(null);
-  const [taigaUsername, setTaigaUsername] = useState(null);
+  //const [taigaUsername, setTaigaUsername] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nombre, setNombre] = useState(null);
-  const [authType, setAuthType] = useState('normal');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  //const [authType, setAuthType] = useState('normal');
+  //const [username, setUsername] = useState('');
+  //const [password, setPassword] = useState('');
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [expandedSection, setExpandedSection] = useState(null);
@@ -29,7 +31,7 @@ const PerfilPage = () => {
       .then((data) => {
         setNombre(data.nombre);
         setGitUsername(data.gitUsername);
-        setTaigaUsername(data.taigaUsername);
+        //setTaigaUsername(data.taigaUsername);
         setErrorMessage(null);
         if (data.gitUsername) {
           fetchGitHubData();
@@ -54,12 +56,12 @@ const PerfilPage = () => {
     window.location.href = githubAuthUrl;
   };
 
-  // Guardar el code al conectar con GitHub para conectarse luego con Taiga
+  /* Guardar el code al conectar con GitHub para conectarse luego con Taiga
   const handleGitHubCallback = (code) => {
     if (code) {
       localStorage.setItem('githubCode', code);
     }
-  };
+  };*/
 
   const handleGitHubDisconnect = () => {
     if (
@@ -77,6 +79,7 @@ const PerfilPage = () => {
     }
   };
 
+  /*
   const handleTaigaConnect = () => {
     if (!username || !password) {
       alert('Els camps de usuari i contrasenya són obligatoris.');
@@ -107,7 +110,7 @@ const PerfilPage = () => {
     } catch (err) {
       alert(`Error al conectar amb Taiga: ${err.message}`);
     }
-  };
+  };*/
 
   const toggleSection = (section) => {
     setExpandedSection((prev) => (prev === section ? null : section));
@@ -122,7 +125,7 @@ const PerfilPage = () => {
   return (
     <div className="perfil-page">
       <GitHubCallbackHandler onGitHubConnected={fetchUserData} />
-      <TaigaCallbackHandler
+      {/* <TaigaCallbackHandler
         authType={authType}
         username={username}
         password={password}
@@ -131,7 +134,8 @@ const PerfilPage = () => {
           fetchUserData();
         }}
         onError={(msg) => setErrorMessage(msg)}
-      />
+      />*/}
+
       <Sidebar />
       <div className="content">
         <h1>PERFIL</h1>
@@ -167,59 +171,47 @@ const PerfilPage = () => {
                     <p
                       className="expandable-item"
                       onClick={() => toggleSection('repositoriosPublicos')}
+                      aria-expanded={expandedSection === 'repositoriosPublicos'}
                     >
                       <strong>Repositoris públics:</strong>{' '}
                       {
                         githubData.repositorios.filter((repo) => !repo.private)
                           .length
                       }
+                      <span className="arrow" aria-hidden="true">
+                        ▶
+                      </span>
                     </p>
-                    {expandedSection === 'repositoriosPublicos' && (
-                      <ul className="expanded-list">
-                        {githubData.repositorios
-                          .filter((repo) => !repo.private)
-                          .map((repo) => (
-                            <li key={repo.id}>{repo.name}</li>
-                          ))}
-                      </ul>
-                    )}
 
                     <p
                       className="expandable-item"
                       onClick={() => toggleSection('repositoriosPrivados')}
+                      aria-expanded={expandedSection === 'repositoriosPrivados'}
                     >
                       <strong>Repositoris privats:</strong>{' '}
                       {
                         githubData.repositorios.filter((repo) => repo.private)
                           .length
                       }
+                      <span className="arrow" aria-hidden="true">
+                        ▶
+                      </span>
                     </p>
-                    {expandedSection === 'repositoriosPrivados' && (
-                      <ul className="expanded-list">
-                        {githubData.repositorios
-                          .filter((repo) => repo.private)
-                          .map((repo) => (
-                            <li key={repo.id}>{repo.name}</li>
-                          ))}
-                      </ul>
-                    )}
 
                     <p
                       className="expandable-item"
                       onClick={() => toggleSection('organizaciones')}
+                      aria-expanded={expandedSection === 'organizaciones'}
                     >
                       <strong>Organitzacions:</strong>{' '}
                       {githubData.organizaciones.length}
+                      <span className="arrow" aria-hidden="true">
+                        ▶
+                      </span>
                     </p>
-                    {expandedSection === 'organizaciones' && (
-                      <ul className="expanded-list">
-                        {githubData.organizaciones.map((org) => (
-                          <li key={org.id}>{org.login}</li>
-                        ))}
-                      </ul>
-                    )}
                   </div>
                 )}
+
                 <button
                   className="disconnect-button"
                   onClick={handleGitHubDisconnect}
@@ -253,8 +245,36 @@ const PerfilPage = () => {
               </div>
             )}
           </div>
+          {/* Caja secundaria: Detalles expandibles */}
+          {expandedSection && (
+            <div className="expanded-details-box">
+              <h2>
+                {expandedSection === 'repositoriosPublicos'
+                  ? 'Repositoris públics'
+                  : expandedSection === 'repositoriosPrivados'
+                    ? 'Repositoris privats'
+                    : 'Organitzacions'}
+              </h2>
+              <ul>
+                {expandedSection === 'repositoriosPublicos' &&
+                  githubData.repositorios
+                    .filter((repo) => !repo.private)
+                    .map((repo) => <li key={repo.id}>{repo.name}</li>)}
 
-          {/* Taiga Connection */}
+                {expandedSection === 'repositoriosPrivados' &&
+                  githubData.repositorios
+                    .filter((repo) => repo.private)
+                    .map((repo) => <li key={repo.id}>{repo.name}</li>)}
+
+                {expandedSection === 'organizaciones' &&
+                  githubData.organizaciones.map((org) => (
+                    <li key={org.id}>{org.login}</li>
+                  ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Taiga Connection 
           <div className="taiga-connection-box">
             {taigaUsername ? (
               <div>
@@ -338,6 +358,15 @@ const PerfilPage = () => {
               </div>
             )}
           </div>
+          */}
+        </div>
+        <div className="profile-images-container">
+          <img
+            src={userProfile}
+            alt="Home Welcome"
+            className="profile-images1"
+          />
+          <img src={githubLogo} alt="GitHub Logo" className="profile-images2" />
         </div>
       </div>
     </div>

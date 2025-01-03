@@ -9,7 +9,7 @@ const HomePage = () => {
   const [userData, setUserData] = useState({
     nombre: '',
     gitUsername: null,
-    taigaUsername: null,
+    //taigaUsername: null,
   });
 
   useEffect(() => {
@@ -75,13 +75,13 @@ const HomePage = () => {
                     la configuració.
                   </p>
                 )}
-                {userData.taigaUsername === null && (
+                {/*userData.taigaUsername === null && (
                   <p className="reminder-text">
                     ⚠️ Encara no has configurat el teu compte de{' '}
                     <strong>Taiga</strong>. Ves a la pàgina de Perfil per fer la
                     configuració.
                   </p>
-                )}
+                )*/}
               </div>
 
               <div className="button-container">

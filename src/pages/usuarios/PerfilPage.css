@@ -25,80 +25,101 @@
 }
 
 .content p {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #666;
   margin-bottom: 3rem;
 }
 
 .connections-container {
   display: flex;
-  justify-content: space-between;
-  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
 }
 
-.github-connection-box,
-.taiga-connection-box {
+.expanded-details-box {
   background: #f9f9f9;
   padding: 3rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 48%;
-  text-align: center;
+  flex: 0.4;
+  text-align: left;
   font-size: 1.1rem;
 }
 
-.github-connection-box h2,
-.taiga-connection-box h2 {
+.expanded-details-box h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #0058a3;
+}
+
+.expanded-details-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Máximo 3 columnas */
+  gap: 10px; /* Espaciado entre elementos */
+}
+
+.expanded-details-box li {
+  font-size: 1rem;
+  color: #333;
+  background: #eaf4ff; /* Fondo claro */
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.expanded-details-box li:hover {
+  transform: scale(1.05); /* Efecto hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.expandable-item {
+  cursor: pointer;
+  color: #0058a3;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  display: flex; /* Asegura que el contenido y la flecha estén alineados */
+  align-items: center;
+  padding-left: 190px;
+}
+.expandable-item .arrow {
+  margin-left: 10px;
+  font-size: 1.2rem;
+  color: #0058a3;
+  transition: transform 0.3s ease;
+}
+
+.expandable-item[aria-expanded='true'] .arrow {
+  transform: rotate(90deg);
+}
+
+.github-connection-box {
+  background: #f9f9f9;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 40%;
+  text-align: center;
+  font-size: 1.1rem;
+  transition: flex 0.3s ease-in-out;
+}
+
+.github-connection-box h2 {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   color: #0058a3;
   text-align: center;
 }
 
-.github-details .expandable-item {
-  cursor: pointer;
-  color: #0058a3;
-  font-weight: bold;
-  margin: 0.5rem 0;
-}
-
-.github-details .expandable-item:hover {
-  text-decoration: underline;
-}
-
-.expanded-list {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0 1rem;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 1rem;
-}
-
-.expanded-list li {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  color: #333;
-}
-
-.github-connect-button,
-.taiga-connect-button {
-  background-color: #0058a3;
-  color: white;
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  width: 100%;
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.github-connect-button:hover,
-.taiga-connect-button:hover {
+.github-connect-button:hover {
   background-color: #003e70;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -119,24 +140,83 @@
   background-color: #c9302c;
 }
 
-.github-info p,
-.taiga-info p {
+.github-info p {
   margin: 0.5rem 0;
   font-size: 1.2rem;
   color: #333;
+  padding-bottom: 10px;
 }
 
-.github-link,
-.taiga-link {
+.github-link {
   color: #0058a3;
   text-decoration: none;
   font-weight: bold;
 }
 
-.github-link:hover,
-.taiga-link:hover {
+.github-link:hover {
   text-decoration: underline;
 }
+
+.auth-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.auth-options {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.profile-images-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.profile-images1 {
+  max-width: 13%; /* Tamaño más pequeño para que se vean bien */
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para un efecto más visual */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-images2 {
+  max-width: 20%; /* Tamaño más pequeño para que se vean bien */
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para un efecto más visual */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/*TAIGA*/
+.taiga-connection-box {
+  background: #f9f9f9;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 48%;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.taiga-connection-box h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #0058a3;
+  text-align: center;
+}
+
 .normal-auth-form input[type='usuari'] {
   width: 14.84rem;
   padding: 0.74rem;
@@ -161,16 +241,37 @@
   outline: none;
 }
 
-.auth-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.taiga-connect-button {
+  background-color: #0058a3;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
   width: 100%;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-.auth-options {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 2rem;
+.taiga-connect-button:hover {
+  background-color: #003e70;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.taiga-link {
+  color: #0058a3;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.taiga-info p {
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.taiga-link:hover {
+  text-decoration: underline;
 }

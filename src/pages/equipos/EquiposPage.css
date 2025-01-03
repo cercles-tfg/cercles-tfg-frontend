@@ -55,10 +55,10 @@
 
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 20px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1400px;
   justify-content: center;
   margin-top: 20px;
 }
