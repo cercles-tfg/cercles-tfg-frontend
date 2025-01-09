@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link, Route, Routes } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import {
   getEquipoDetalle,
@@ -10,6 +10,7 @@ import {
   getEstudiantesCurso,
   validarOrganizacion,
   confirmarOrganizacion,
+  disconnectOrganizacion,
 } from '../../services/Equipos_Api';
 import {
   isEvaluacionActiva,
@@ -17,7 +18,6 @@ import {
 } from '../../services/Evaluaciones_Api';
 
 import './EquipoPage.css';
-import EquipoMetricsPage from './EquipoMetricsPage';
 import { format } from 'date-fns';
 import { ca } from 'date-fns/locale';
 
@@ -27,7 +27,17 @@ const COLORS = [
   '#785B75',
   '#5E807F',
   '#BA5A31',
-  '#355c7d',
+  '#355C7D',
+  '#F4A261',
+  '#E76F51',
+  '#2A9D8F',
+  '#264653',
+  '#A8DADH',
+  '#457B9D',
+  '#E9C46A',
+  '#F4A3B3',
+  '#D4A5A5',
+  '#B5838D',
 ];
 
 const EquipoPage = () => {
@@ -45,6 +55,7 @@ const EquipoPage = () => {
   const [miembrosSeleccionados, setMiembrosSeleccionados] = useState([]);
 
   const [showConfirmChangesPopup, setShowConfirmChangesPopup] = useState(false);
+  const [showDisconnectPopup, setShowDisconnectPopup] = useState(false);
   const [gitOrgUrl, setGitOrgUrl] = useState('');
   const [validationResults, setValidationResults] = useState(null);
   const [comprobandoValidacion, setComprobandoValidacion] = useState(false);
@@ -139,8 +150,27 @@ const EquipoPage = () => {
     }
   };
 
+  //desconectar org
+  const handleConfirmDisconnect = async () => {
+    try {
+      await disconnectOrganizacion(equipo.id, token);
+      setShowDisconnectPopup(false);
+      setEquipo((prev) => ({ ...prev, gitOrganizacion: null }));
+      alert('Organització de GitHub desconnectada correctament.');
+    } catch (error) {
+      console.error('Error al desconnectar la organització:', error);
+      alert('Error al desconnectar la organització.');
+    }
+  };
+
   const handleBackClick = () => {
-    navigate(-1);
+    if (localStorage.getItem('rol') === 'Profesor') {
+      console.log('si');
+      navigate(`/cursos/${equipo.cursoId}`);
+    } else {
+      console.log('no');
+      navigate('/equipos');
+    }
   };
 
   const handlePopupConfirm = async () => {
@@ -260,7 +290,7 @@ const EquipoPage = () => {
         <Sidebar />
         <div className="inactive-popup">
           <h2>Els curs al que pertany aquest equip ja no està disponible.</h2>
-          <button className="back-button" onClick={handleBackClick}>
+          <button className="equipos-back-button" onClick={handleBackClick}>
             Torna enrere
           </button>
         </div>
@@ -272,7 +302,7 @@ const EquipoPage = () => {
     <div className="equipo-page">
       <Sidebar />
       <div className="equipo-content">
-        <button className="back-button" onClick={handleBackClick}>
+        <button className="equipos-back-button" onClick={handleBackClick}>
           Torna enrere
         </button>
         <h1 className="equipo-title">{equipo.nombre}</h1>
@@ -315,26 +345,43 @@ const EquipoPage = () => {
           </div>
         </div>
         <div className="equipo-section">
-          <h2>Altres funcionalitats</h2>
           {isProfesor ? (
             <>
               <div className="metrics-links-container">
                 {/* Link a métricas de GitHub */}
                 {equipo.gitOrganizacion ? (
-                  <Link
-                    to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
-                    className="metrics-link"
-                  >
-                    📊 Veure mètriques de GitHub
-                  </Link>
+                  <>
+                    <Link
+                      to={`/equipo/${id}/datos_generales`}
+                      className="metrics-link"
+                    >
+                      📊 Dades generals de l&apos;equip
+                    </Link>
+                    <Link
+                      to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
+                      className="metrics-link"
+                    >
+                      📊 Veure mètriques de GitHub
+                    </Link>
+                  </>
                 ) : (
-                  <div className="metrics-link-disabled">
-                    📊 Veure mètriques de GitHub
-                    <span className="disabled-message">
-                      Aquest equip encara no ha configurat la seva organització
-                      de Github, per tant no hi ha dades a veure.
-                    </span>
-                  </div>
+                  <>
+                    <div className="metrics-link-disabled">
+                      📊 Dades generals de l&apos;equip
+                      <span className="disabled-message">
+                        Aquest equip encara no ha configurat la seva
+                        organització de Github, per tant no pots veure les dades
+                        generals de l&apos;equip.
+                      </span>
+                    </div>
+                    <div className="metrics-link-disabled">
+                      📊 Veure mètriques de GitHub
+                      <span className="disabled-message">
+                        Aquest equip encara no ha configurat la seva
+                        organització de Github, per tant no hi ha dades a veure.
+                      </span>
+                    </div>
+                  </>
                 )}
 
                 {/* Link a Taiga 
@@ -393,7 +440,7 @@ const EquipoPage = () => {
                 </div>
               ) : (
                 <span className="evaluacion-link-disabled">
-                  No hi ha evaluacions actives
+                  No hi ha avaluacions actives
                 </span>
               )}
             </>
@@ -441,6 +488,12 @@ const EquipoPage = () => {
                     >
                       {equipo.gitOrganizacion}
                     </a>
+                    <button
+                      className="disconnect-button"
+                      onClick={() => setShowDisconnectPopup(true)}
+                    >
+                      Desconnectar organització
+                    </button>
                   </p>
                 </>
               ) : (
@@ -464,6 +517,7 @@ const EquipoPage = () => {
                       <button
                         onClick={handleValidateGitOrg}
                         className="validate-git-org-button"
+                        disabled={!gitOrgUrl}
                       >
                         Validar
                       </button>
@@ -479,8 +533,8 @@ const EquipoPage = () => {
                         </p>
                         <p>
                           {validationResults?.professoratEsAdmin
-                            ? "✅ L'usuari professorat-amep té permissos d'owner en l'organització."
-                            : "❌ L'usuari professorat-amep no té permissos d'owner en l'organització."}
+                            ? "✅ L'usuari professorat-amep té permisos d'owner en l'organització."
+                            : "❌ L'usuari professorat-amep no té permisos d'owner en l'organització."}
                         </p>
                         <p>
                           {validationResults?.todosUsuariosGitConfigurados
@@ -489,13 +543,13 @@ const EquipoPage = () => {
                         </p>
                         <p>
                           {validationResults?.todosMiembrosEnOrganizacion
-                            ? '✅ Tots els membres pertanyen a la organització.'
-                            : '❌ No tots els membres pertanyen a la organització.'}
+                            ? "✅ Tots els membres pertanyen a l'organització."
+                            : "❌ No tots els membres pertanyen a l'organització."}
                         </p>
                         <p>
                           {validationResults?.profesorEnOrganizacion
-                            ? '✅ El professor pertany a la organització.'
-                            : '❌ El professor no pertany a la organització.'}
+                            ? "✅ El professor pertany a l'organització."
+                            : "❌ El professor no pertany a l'organització."}
                         </p>
                         {/* Botón para reintroducir la organización si hay problemas */}
                         {validationResults?.professoratEsMiembro &&
@@ -521,13 +575,20 @@ const EquipoPage = () => {
                             Confirmar organització
                           </button>
                         ) : (
-                          <button
-                            className="error-message-button"
-                            onClick={() => setComprobandoValidacion(false)}
-                          >
-                            Solucioneu els problemes abans de confirmar.
-                            Reintroduïr la organització de github
-                          </button>
+                          <>
+                            <button
+                              onClick={handleValidateGitOrg}
+                              className="validate-git-org-button"
+                            >
+                              Torna a validar l&apos;organització de GitHub
+                            </button>
+                            <button
+                              className="error-message-button"
+                              onClick={() => setComprobandoValidacion(false)}
+                            >
+                              Torna enrere
+                            </button>
+                          </>
                         )}
                       </div>
                     </>
@@ -579,7 +640,6 @@ const EquipoPage = () => {
 
                 <h2>Estudiants sense equip</h2>
 
-                {/* Buscador */}
                 <input
                   type="text"
                   placeholder="Cerca un estudiant..."
@@ -588,7 +648,6 @@ const EquipoPage = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
 
-                {/* Lista de estudiantes sin equipo */}
                 <div className="students-list no-team">
                   {filteredEstudiantesSinEquipo.map((estudiante) => (
                     <div key={estudiante.id} className="student-item">
@@ -622,6 +681,12 @@ const EquipoPage = () => {
             </>
           ) : (
             <div className="equipo-members">
+              <button
+                className="edit-members-equipo-button"
+                onClick={handleEditToggle}
+              >
+                Modificar membres
+              </button>
               {equipo.estudiantes.map((estudiante, index) => (
                 <div
                   key={estudiante.id}
@@ -634,24 +699,20 @@ const EquipoPage = () => {
                   </div>
                 </div>
               ))}
-              {!isProfesor && (
-                <button className="edit-button" onClick={handleEditToggle}>
-                  ✏️ Modificar membres
-                </button>
-              )}
             </div>
           )}
         </div>
+
         {showPopup && (
           <div className="confirm-popup">
-            <div className="popup-content">
-              <h3>
+            <div className="changes-popup-content">
+              <h>
                 Estas segur/a que vols{' '}
                 {popupAction === 'borrar'
                   ? 'borrar aquest equip'
                   : "sortir d'aquest equip"}
                 ?
-              </h3>
+              </h>
               <p className="popup-subtext">
                 {popupAction === 'borrar'
                   ? "Es perdrà tota la informació d'aquest equip."
@@ -668,17 +729,39 @@ const EquipoPage = () => {
         )}
         {showConfirmChangesPopup && (
           <div className="confirm-popup">
-            <div className="popup-content">
-              <h3>
-                Estàs segur/a de que vols fer aquestes modificacions als membres
-                de l&apos;equip?
-              </h3>
+            <div className="changes-popup-content">
+              <h>
+                Estàs segur/a que vols fer aquestes modificacions als membres de
+                l&apos;equip?
+              </h>
               <button className="confirm-button" onClick={handleConfirmChanges}>
                 Confirmar
               </button>
               <button
                 className="cancel-button"
                 onClick={() => setShowConfirmChangesPopup(false)}
+              >
+                Cancel·lar
+              </button>
+            </div>
+          </div>
+        )}
+        {showDisconnectPopup && (
+          <div className="confirm-popup">
+            <div className="changes-popup-content">
+              <h>
+                Estàs segur/a que vols desconnectar aquesta organització de
+                GitHub de l&apos;equip?
+              </h>
+              <button
+                className="confirm-button"
+                onClick={handleConfirmDisconnect}
+              >
+                Confirmar
+              </button>
+              <button
+                className="cancel-button"
+                onClick={() => setShowDisconnectPopup(false)}
               >
                 Cancel·lar
               </button>

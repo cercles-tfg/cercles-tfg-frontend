@@ -17,7 +17,7 @@
 }
 
 .logout-text {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .logout-modal-overlay {
@@ -44,7 +44,7 @@
 
 .logout-modal-text {
   color: #000;
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 20px;
 }
 
@@ -54,7 +54,7 @@
   justify-content: center;
 }
 
-.cancel-button {
+.logout-cancel-button {
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -62,6 +62,7 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-size: 18px;
 }
 
 .cancel-button:hover {
@@ -76,6 +77,7 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-size: 18px;
 }
 
 .logout-confirm-button:hover {

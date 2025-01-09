@@ -27,6 +27,7 @@ const CursosPage = () => {
       .catch((error) => {
         console.error('Error al obtener los cursos:', error);
       });
+    console.log('datos: ', cursosActivos);
   }, []);
 
   const compareCursos = (a, b) => {
@@ -62,7 +63,9 @@ const CursosPage = () => {
               <th>Nom de l&apos;assignatura</th>
               <th>Any d&apos;inici</th>
               <th>Quadrimestre</th>
-              <th>Número d&apos;estudiants</th>
+              <th>Nombre d&apos;estudiants</th>
+              <th>Nombre d&apos;equips</th>
+              <th>Nombre d&apos;estudiants sense equip</th>
             </tr>
           </thead>
           <tbody>
@@ -76,6 +79,8 @@ const CursosPage = () => {
                 <td>{curso.añoInicio}</td>
                 <td>{curso.cuatrimestre === 1 ? 'Tardor' : 'Primavera'}</td>
                 <td>{curso.numeroEstudiantes}</td>
+                <td>{curso.numeroEquipos}</td>
+                <td>{curso.numeroEstudiantesSinEquipo}</td>
               </tr>
             ))}
           </tbody>
@@ -84,7 +89,7 @@ const CursosPage = () => {
           className="toggle-inactive-courses"
           onClick={() => setShowInactiveCourses(!showInactiveCourses)}
         >
-          Veure els meus cursos inatius {showInactiveCourses ? '⬇' : '➡'}
+          Veure els meus cursos inactius {showInactiveCourses ? '⬇' : '➡'}
         </div>
         {showInactiveCourses && (
           <table className="cursos-table">
@@ -93,7 +98,9 @@ const CursosPage = () => {
                 <th>Nom de l&apos;assignatura</th>
                 <th>Any d&apos;inici</th>
                 <th>Quadrimestre</th>
-                <th>Número d&apos;estudiants</th>
+                <th>Nombre d&apos;estudiants</th>
+                <th>Nombre d&apos;equips</th>
+                <th>Nombre d&apos;estudiants sense equip</th>
               </tr>
             </thead>
             <tbody>
@@ -107,6 +114,8 @@ const CursosPage = () => {
                   <td>{curso.añoInicio}</td>
                   <td>{curso.cuatrimestre === 1 ? 'Tardor' : 'Primavera'}</td>
                   <td>{curso.numeroEstudiantes}</td>
+                  <td>{curso.numeroEquipos}</td>
+                  <td>{curso.numeroEstudiantesSinEquipo}</td>
                 </tr>
               ))}
             </tbody>

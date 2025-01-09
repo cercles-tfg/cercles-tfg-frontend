@@ -323,3 +323,26 @@ export const getMetrics = async (org, estudiantesIds, token) => {
 
   return await response.json();
 };
+
+//desconectar org de equipo
+export const disconnectOrganizacion = async (equipoId, token) => {
+  const response = await fetch(
+    `${API_BASE_URL}/github/disconnect-organizacion`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ equipoId }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Error al desconnectar la organització: ${response.statusText}`,
+    );
+  }
+
+  return await response.json();
+};

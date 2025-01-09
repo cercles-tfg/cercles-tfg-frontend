@@ -59,14 +59,14 @@
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Máximo 3 columnas */
-  gap: 10px; /* Espaciado entre elementos */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .expanded-details-box li {
   font-size: 1rem;
   color: #333;
-  background: #eaf4ff; /* Fondo claro */
+  background: #eaf4ff;
   padding: 5px 10px;
   border-radius: 5px;
   text-align: center;
@@ -77,7 +77,7 @@
 }
 
 .expanded-details-box li:hover {
-  transform: scale(1.05); /* Efecto hover */
+  transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -86,7 +86,7 @@
   color: #0058a3;
   font-weight: bold;
   margin: 0.5rem 0;
-  display: flex; /* Asegura que el contenido y la flecha estén alineados */
+  display: flex;
   align-items: center;
   padding-left: 190px;
 }
@@ -98,7 +98,7 @@
 }
 
 .expandable-item[aria-expanded='true'] .arrow {
-  transform: rotate(90deg);
+  color: #02e414;
 }
 
 .github-connection-box {
@@ -119,6 +119,10 @@
   text-align: center;
 }
 
+.github-connect-button {
+  font-size: 20px;
+}
+
 .github-connect-button:hover {
   background-color: #003e70;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -132,7 +136,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.2rem;
   width: 100%;
 }
 
@@ -142,7 +146,7 @@
 
 .github-info p {
   margin: 0.5rem 0;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: #333;
   padding-bottom: 10px;
 }
@@ -180,23 +184,15 @@
 }
 
 .profile-images1 {
-  max-width: 13%; /* Tamaño más pequeño para que se vean bien */
+  max-width: 13%;
   height: auto;
   border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para un efecto más visual */
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
 .profile-images2 {
-  max-width: 20%; /* Tamaño más pequeño para que se vean bien */
+  max-width: 20%;
   height: auto;
   border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para un efecto más visual */
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
 /*TAIGA*/

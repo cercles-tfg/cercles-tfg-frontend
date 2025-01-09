@@ -62,21 +62,21 @@
 }
 
 /* Back button styling */
-.back-button {
+.equipos-back-button {
   background-color: #4caf50;
   color: #fff;
   border: none;
   padding: 10px 15px;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
   margin-bottom: 20px;
   transition:
     background-color 0.3s ease,
     transform 0.2s;
 }
 
-.back-button:hover {
+.equipos-back-button:hover {
   background-color: #45a049;
   transform: scale(1.05);
 }
@@ -103,7 +103,7 @@
   color: #fff;
   border: none;
   padding: 10px 20px;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
@@ -136,13 +136,14 @@
 .metrics-links-container {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Espacio entre los enlaces */
+  gap: 15px;
 }
 
 .metrics-link {
   text-decoration: none;
-  color: #007bff; /* Cambia el color si lo prefieres */
+  color: #007bff;
   font-weight: bold;
+  font-size: 18px;
 }
 
 .metrics-link:hover {
@@ -154,10 +155,11 @@
   color: gray;
   cursor: not-allowed;
   text-decoration: none;
+  font-size: 18px;
 }
 
 .disabled-message {
-  font-size: 0.9rem;
+  font-size: 16px;
   color: gray;
   margin-left: 10px;
 }
@@ -174,7 +176,12 @@
   margin-bottom: 30px;
 }
 
+.equipo-info-content p {
+  font-size: 20px;
+}
+
 .github-org-link {
+  font-size: 18px;
   color: #0058a3;
   font-weight: bold;
   text-decoration: none;
@@ -183,6 +190,7 @@
 
 .github-org-link:hover {
   color: #003e70;
+  text-decoration: underline;
 }
 
 .git-org-input {
@@ -208,16 +216,23 @@
 .validate-git-org-button {
   background-color: #28a745;
   color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 18px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
 }
 
 .validate-git-org-button:hover {
   background-color: #218838;
+  transform: scale(1.05);
+}
+
+.confirm-git-org-button {
+  font-size: 18px;
 }
 
 .error-message-button {
@@ -225,9 +240,8 @@
   color: white;
   border: none;
   padding: 10px 20px;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 5px;
+  font-size: 18px;
+  border-radius: 8px;
   cursor: pointer;
   transition:
     background-color 0.3s ease,
@@ -268,8 +282,8 @@
 }
 
 .evaluacion-link-disabled {
-  font-size: 1.2rem;
-  color: #bbb;
+  font-size: 1.8rem;
+  color: #4e4e4e;
   text-align: center;
 }
 
@@ -282,10 +296,41 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.equipo-section p {
+  font-size: 20px;
+}
+
+.equipo-section h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.edit-members-equipo-button {
+  top: 0;
+  right: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.edit-members-equipo-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
 .equipo-members {
   display: flex;
   flex-wrap: wrap;
-  gap: 25px;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .member-circle {
@@ -293,14 +338,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   color: white;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  background-color: #6c757d; /* Default color */
+  background-color: #6c757d;
+  overflow: hidden;
 }
 
 .member-circle:hover {
@@ -309,18 +355,19 @@
 }
 
 .member-icon {
-  font-size: 32px;
+  font-size: 24px;
   margin-bottom: 8px;
 }
 
 .member-name {
-  font-size: 12px;
+  font-size: calc(10px + 0.4vw);
   font-weight: bold;
   color: #fff;
-}
-
-.edit-members {
-  margin-top: 20px;
+  text-align: center;
+  max-width: 90px;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .students-list {
@@ -355,6 +402,7 @@
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
+  color: #fff;
 }
 
 .student-item span {
@@ -418,32 +466,32 @@
 }
 
 /* Popup styling */
-.popup-content {
+.changes-popup-content {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   text-align: center;
-  display: flex; /* Usar flexbox para alinear correctamente */
-  flex-direction: column; /* Alinear elementos verticalmente */
-  align-items: center; /* Centrar los elementos horizontalmente */
-  justify-content: center; /* Centrar los elementos verticalmente */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.popup-content h3 {
-  margin-bottom: 20px;
+.changes-popup-content h {
+  margin-bottom: 10px;
+  margin-top: 10px;
   color: #000000;
-  font-size: 1.5rem; /* Tamaño del texto */
-  font-weight: bold; /* Negrita para destacar el encabezado */
+  font-size: 24px;
+  font-weight: bold;
   text-align: center;
-  padding-right: 450px;
 }
 
-.popup-content p {
+.changes-popup-content p {
   margin-bottom: 15px;
   color: #333;
-  font-size: 1.2rem; /* Tamaño del texto más pequeño */
+  font-size: 20px;
   text-align: center;
 }
 
@@ -455,9 +503,29 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center; /* Centrar verticalmente */
-  justify-content: center; /* Centrar horizontalmente */
+  align-items: center;
+  justify-content: center;
   z-index: 1000;
+}
+
+.disconnect-button {
+  top: 0;
+  right: 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.disconnect-button:hover {
+  background-color: #d32f2f;
+  transform: scale(1.05);
 }
 
 .popup-buttons {
@@ -473,7 +541,7 @@
   border-radius: 5px;
   cursor: pointer;
   margin: 10px 5px;
-  font-size: 14px;
+  font-size: 18px;
   transition: background-color 0.3s ease;
 }
 

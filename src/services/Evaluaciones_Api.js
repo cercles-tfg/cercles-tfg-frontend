@@ -11,6 +11,8 @@ export const getEvaluacionesDetalle = async (
       evaluacionIds: evaluacionIds.join(','),
     });
 
+    console.log('params ', params);
+
     const response = await fetch(
       `${API_BASE_URL}/equipo/${equipoId}?${params.toString()}`,
       {
@@ -173,4 +175,21 @@ export const getEvaluacionActivaId = async (equipoId, token) => {
     console.error('Error al obtener la evaluación activa:', error);
     throw error;
   }
+};
+
+// Get IDs de evaluaciones de un curso
+export const getIdsEvaluaciones = async (cursoId, token) => {
+  const response = await fetch(`${API_BASE_URL}/count/${cursoId}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Error al obtener los IDs de las evaluaciones');
+  }
+
+  const data = await response.json();
+  return data.idsEvaluaciones; // Devuelve la lista de IDs
 };

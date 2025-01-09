@@ -52,19 +52,18 @@ const HomePage = () => {
                 <span className="user-name">{userData.nombre}</span>
               </h1>
               {rol === 'Estudiante' && (
-                <p1>
+                <h2>
                   Aquesta és la pàgina principal després d&apos;iniciar sessió.
-                  Pots accedir al teu perfil per veure la teva informació o
-                  explorar els teus projectes.
-                </p1>
+                  Pots accedir al teu perfil per configurar el teu compte de
+                  Github o explorar els teus equips.
+                </h2>
               )}
               {rol === 'Profesor' && (
-                <p1>
+                <h2>
                   Aquesta és la pàgina principal després d&apos;iniciar sessió.
-                  Pots gestionar els cursos i els equips dels estudiants
-                  assignats, o accedir al teu perfil per revisar la teva
-                  informació.
-                </p1>
+                  Pots gestionar els teus cursos, els seus estudiants, o accedir
+                  al teu perfil per configurar el teu compte de Github.
+                </h2>
               )}
 
               <div className="config-reminders">
@@ -96,7 +95,7 @@ const HomePage = () => {
                     className="navigate-button"
                     onClick={handleNavigateToProjects}
                   >
-                    Veure Projectes
+                    Veure Equips
                   </button>
                 ) : (
                   <button

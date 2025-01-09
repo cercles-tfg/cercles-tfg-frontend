@@ -35,7 +35,10 @@ const Logout = ({ isSidebarOpen }) => {
               Estàs segur/a de que vols sortir de CERCLES?
             </p>
             <div className="logout-modal-buttons">
-              <button onClick={handleCancelLogout} className="cancel-button">
+              <button
+                onClick={handleCancelLogout}
+                className="logout-cancel-button"
+              >
                 Cancel·lar
               </button>
               <button

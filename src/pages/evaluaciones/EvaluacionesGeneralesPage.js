@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   getEvaluacionesDetalle,
   getEvaluacionesPorEquipo,
+  getIdsEvaluaciones,
 } from '../../services/Evaluaciones_Api';
 import { getEquipoDetalle } from '../../services/Equipos_Api';
 import Sidebar from '../../components/common/Sidebar';
@@ -11,6 +12,8 @@ import './EvaluacionesGeneralesPage.css';
 const EvaluacionesGeneralesPage = () => {
   const { equipoId } = useParams();
   const token = localStorage.getItem('jwtToken');
+  const [numeroEvaluaciones, setNumeroEvaluaciones] = useState(3); // Default por si acaso
+  const [evaluacionesIds, setEvaluacionesIds] = useState([]);
   const [detalles, setDetalles] = useState([]);
   const [medias, setMedias] = useState([]);
   const [equipo, setEquipo] = useState(null);
@@ -19,34 +22,37 @@ const EvaluacionesGeneralesPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEquipoDetalle = async () => {
+    const fetchDatos = async () => {
       try {
         const equipoData = await getEquipoDetalle(equipoId, token);
         setEquipo(equipoData);
-      } catch (error) {
-        setError('No se pudo cargar la información del equipo.');
-      }
-    };
 
-    const fetchEvaluaciones = async () => {
-      try {
+        const evaluacionesIds = await getIdsEvaluaciones(
+          equipoData.cursoId,
+          token,
+        );
+        setNumeroEvaluaciones(evaluacionesIds.length);
+        setEvaluacionesIds(evaluacionesIds);
+
         const detallesData = await getEvaluacionesDetalle(
           equipoId,
           token,
-          [1, 2, 3],
+          evaluacionesIds,
         );
+
         const mediasData = await getEvaluacionesPorEquipo(equipoId, token);
+        console.log('equipo ', detallesData);
         setDetalles(detallesData);
         setMedias(mediasData);
       } catch (error) {
-        setError('Error al cargar las evaluaciones.');
+        setError('Error al cargar los datos.');
+      } finally {
+        setLoading(false);
       }
     };
 
     setLoading(true);
-    Promise.all([fetchEquipoDetalle(), fetchEvaluaciones()])
-      .catch((error) => setError('Error al cargar los datos.'))
-      .finally(() => setLoading(false));
+    fetchDatos();
   }, [equipoId, token]);
 
   if (loading) return <p>Cargando...</p>;
@@ -54,29 +60,35 @@ const EvaluacionesGeneralesPage = () => {
 
   if (!equipo) return <p>No se pudo cargar la información del equipo.</p>;
 
-  // Crear un mapeo de IDs a nombres de estudiantes
-  const idToName = equipo.estudiantes.reduce((map, estudiante) => {
+  // Ordenar estudiantes alfabéticamente por nombre
+  const sortedEstudiantes = equipo.estudiantes
+    .slice() // Crear una copia del array para no modificar el original
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+  // Crear el mapeo de IDs a nombres
+  const idToName = sortedEstudiantes.reduce((map, estudiante) => {
     map[estudiante.id] = estudiante.nombre;
     return map;
   }, {});
 
-  const estudiantes = medias.map((media) => media.estudianteId);
+  // Obtener los IDs en el orden alfabético
+  const estudiantes = sortedEstudiantes.map((est) => est.id);
 
   const handleBackClick = () => {
-    navigate(-1);
+    navigate(`/equipos/${equipoId}`);
   };
 
   return (
     <div className="evaluaciones-page">
       <Sidebar />
-      <div className="content">
+      <div className="evaluacion-content">
         <button className="back-button" onClick={handleBackClick}>
           Torna enrere
         </button>
-        <h1>Dades d&apos;avaluacions</h1>
+        <h1>Detalls de les dades d&apos;avaluacions</h1>
 
-        {/* Tabla con medias generales */}
-        <h2>Mitjanes Generals</h2>
+        {/* Tabla de medias */}
+        <h2>Mitjanes generals</h2>
         {medias.length > 0 ? (
           <table className="tabla-medias-generales">
             <thead>
@@ -90,11 +102,14 @@ const EvaluacionesGeneralesPage = () => {
             <tbody>
               <tr>
                 <td>Mitjana entre companys</td>
-                {medias.map((media) => {
-                  const valor = media.mediaGeneralDeCompañeros;
+                {estudiantes.map((id) => {
+                  const media = medias.find(
+                    (media) => media.estudianteId === id,
+                  );
+                  const valor = media?.mediaGeneralDeCompañeros;
                   return (
                     <td
-                      key={`media-general-companeros-${media.estudianteId}`}
+                      key={`media-general-companeros-${id}`}
                       className={
                         valor === undefined
                           ? 'na-value'
@@ -112,11 +127,14 @@ const EvaluacionesGeneralesPage = () => {
               </tr>
               <tr>
                 <td>Autoavaluació</td>
-                {medias.map((media) => {
-                  const valor = media.mediaGeneralPropia;
+                {estudiantes.map((id) => {
+                  const media = medias.find(
+                    (media) => media.estudianteId === id,
+                  );
+                  const valor = media?.mediaGeneralPropia;
                   return (
                     <td
-                      key={`media-general-propia-${media.estudianteId}`}
+                      key={`media-general-propia-${id}`}
                       className={
                         valor === undefined
                           ? 'na-value'
@@ -150,34 +168,41 @@ const EvaluacionesGeneralesPage = () => {
           </div>
         </div>
 
-        {/* Tablas por evaluación */}
         <h2>Detalls per avaluació</h2>
-        {[1, 2, 3].map((evalId) => {
-          const evalDetalles = detalles
-            .map((detalle) => ({
+        {evaluacionesIds.map((realEvalId, index) => {
+          const evalDetalles = detalles.map((detalle) => {
+            const evaluacion = detalle.evaluaciones.find(
+              (evaluacion) => evaluacion.evaluacionId === realEvalId,
+            );
+
+            return {
               evaluadoId: detalle.evaluadoId,
-              detalles:
-                detalle.evaluaciones.find(
-                  (evaluacion) => evaluacion.evaluacionId === evalId,
-                )?.detalles || [],
-            }))
-            .filter((detalle) => detalle.detalles.length > 0);
+              detalles: evaluacion ? evaluacion.detalles : [],
+            };
+          });
+
+          console.log(
+            `Detalles procesados para evaluacion realEvalId ${realEvalId}:`,
+            evalDetalles,
+          );
 
           return (
-            <div key={`evaluacion-${evalId}`} className="evaluacion-tabla">
-              <h3>Avaluació {evalId}</h3>
+            <div key={`evaluacion-${realEvalId}`} className="evaluacion-tabla">
+              <h3>Avaluació {index + 1}</h3>
               <table>
                 <thead>
                   <tr>
-                    <th>Estudiant Evaluador / Evaluat</th>
+                    <th>Avaluador / Avaluat</th>
                     {estudiantes.map((id) => (
-                      <th key={`evaluado-${evalId}-${id}`}>{idToName[id]}</th>
+                      <th key={`evaluado-${realEvalId}-${id}`}>
+                        {idToName[id]}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {estudiantes.map((evaluadorId) => (
-                    <tr key={`evaluador-${evalId}-${evaluadorId}`}>
+                    <tr key={`evaluador-${realEvalId}-${evaluadorId}`}>
                       <td>{idToName[evaluadorId]}</td>
                       {estudiantes.map((evaluadoId) => {
                         const evaluacion = evalDetalles.find(
@@ -187,12 +212,11 @@ const EvaluacionesGeneralesPage = () => {
                           (detalle) => detalle.evaluadorId === evaluadorId,
                         )?.puntuacion;
 
-                        // Resaltar diagonal
                         const isDiagonal = evaluadorId === evaluadoId;
 
                         return (
                           <td
-                            key={`detalle-${evalId}-${evaluadorId}-${evaluadoId}`}
+                            key={`detalle-${realEvalId}-${evaluadorId}-${evaluadoId}`}
                             className={isDiagonal ? 'diagonal-highlight' : ''}
                           >
                             {puntuacion ? puntuacion.toFixed(2) : 'N/A'}
@@ -202,20 +226,22 @@ const EvaluacionesGeneralesPage = () => {
                     </tr>
                   ))}
 
-                  {/* Fila Mitjana */}
                   <tr>
-                    <td>Mitjana de l&apos;avaluació dels companys</td>
+                    <td>
+                      <strong>Mitjana de l&apos;avaluació dels companys</strong>
+                    </td>
                     {estudiantes.map((evaluadoId) => {
                       const mediaCompaneros = medias
                         .find(
                           (media) =>
                             media.estudianteId === evaluadoId &&
                             media.mediaPorEvaluacion.some(
-                              (evalMedia) => evalMedia.evaluacionId === evalId,
+                              (evalMedia) =>
+                                evalMedia.evaluacionId === realEvalId,
                             ),
                         )
                         ?.mediaPorEvaluacion.find(
-                          (evalMedia) => evalMedia.evaluacionId === evalId,
+                          (evalMedia) => evalMedia.evaluacionId === realEvalId,
                         )?.mediaDeCompañeros;
 
                       const cellClass = [
@@ -227,7 +253,7 @@ const EvaluacionesGeneralesPage = () => {
 
                       return (
                         <td
-                          key={`mitjana-${evalId}-${evaluadoId}`}
+                          key={`mitjana-${realEvalId}-${evaluadoId}`}
                           className={cellClass}
                         >
                           {mediaCompaneros ? mediaCompaneros.toFixed(2) : 'N/A'}

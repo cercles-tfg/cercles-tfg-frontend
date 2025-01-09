@@ -89,7 +89,7 @@ function App() {
         <Route
           path="/equipos/crear"
           element={
-            <PrivateRoute requiredRole="Estudiante">
+            <PrivateRoute>
               <CrearEquipo />
             </PrivateRoute>
           }

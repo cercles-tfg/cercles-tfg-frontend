@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import './CursoPage.css';
 import {
@@ -14,6 +14,7 @@ import {
 const CursoPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [curso, setCurso] = useState(null);
   const [error, setError] = useState('');
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
@@ -40,8 +41,52 @@ const CursoPage = () => {
     '#785B75',
     '#5E807F',
     '#BA5A31',
-    '#355c7d',
+    '#355C7D',
+    '#F4A261',
+    '#E76F51',
+    '#2A9D8F',
+    '#264653',
+    '#A8DADC',
+    '#457B9D',
+    '#E9C46A',
+    '#F4A3B3',
+    '#D4A5A5',
+    '#B5838D',
   ];
+  const [sortConfig, setSortConfig] = React.useState({
+    key: null,
+    direction: 'none',
+  });
+  const [sortedData, setSortedData] = React.useState([]);
+
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    } else if (sortConfig.key === key && sortConfig.direction === 'desc') {
+      direction = 'none';
+    }
+
+    setSortConfig({ key: direction === 'none' ? null : key, direction });
+
+    if (direction === 'none') {
+      setSortedData(curso.nombresEstudiantesSinGrupo.map((_, i) => i)); // Sin orden
+      return;
+    }
+
+    const sortedIndexes = [
+      ...Array(curso.nombresEstudiantesSinGrupo.length).keys(),
+    ].sort((a, b) => {
+      const valA = curso[key][a]?.toLowerCase() || '';
+      const valB = curso[key][b]?.toLowerCase() || '';
+
+      if (valA < valB) return direction === 'asc' ? -1 : 1;
+      if (valA > valB) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    setSortedData(sortedIndexes);
+  };
 
   useEffect(() => {
     obtenerDetallesCurso(id)
@@ -49,13 +94,14 @@ const CursoPage = () => {
         setCurso(data);
         setEditedCurso(data);
         setNombresProfesores(data.nombresProfesores || []);
+        setSortedData(data.nombresEstudiantesSinGrupo.map((_, i) => i));
         console.log('Data curso ', data);
       })
       .catch((error) => {
         setError(error.message);
         console.error('Error al obtener los detalles del curso:', error);
       });
-  }, [id]);
+  }, [id, location]);
 
   const handleBackClick = () => {
     navigate('/cursos');
@@ -149,7 +195,13 @@ const CursoPage = () => {
       añoInicio: editedCurso.añoInicio,
       cuatrimestre: editedCurso.cuatrimestre,
       estudiantesAñadir: newEstudiante.nombre
-        ? [{ nombre: newEstudiante.nombre, correo: newEstudiante.correo }]
+        ? [
+            {
+              nombre: newEstudiante.nombre,
+              correo: newEstudiante.correo,
+              grupo: newEstudiante.grupo,
+            },
+          ]
         : [],
       estudiantesBorrar: estudianteAEliminar ? [estudianteAEliminar] : [],
       profesoresAñadir: nombresProfesores.map((nombre) => {
@@ -164,12 +216,25 @@ const CursoPage = () => {
 
     modificarCurso(id, cursoData)
       .then(() => {
-        setCurso(editedCurso);
+        console.log('Curso modificado con éxito');
         setIsEditing(false);
         setNewEstudiante({ nombre: '', correo: '' });
         setShowSaveConfirmPopup(false);
         setEstudianteAEliminar(null);
-        console.log('Curso modificado con éxito');
+
+        // Vuelve a ejecutar obtenerDetallesCurso para actualizar los datos
+        obtenerDetallesCurso(id)
+          .then((data) => {
+            setCurso(data);
+            setEditedCurso(data);
+            setNombresProfesores(data.nombresProfesores || []);
+            setSortedData(data.nombresEstudiantesSinGrupo.map((_, i) => i));
+            console.log('Datos del curso actualizados:', data);
+          })
+          .catch((error) => {
+            setError(error.message);
+            console.error('Error al recargar los detalles del curso:', error);
+          });
       })
       .catch((error) => {
         setError(error.message);
@@ -205,20 +270,16 @@ const CursoPage = () => {
     setShowDeleteStudentPopup(true);
   };
 
-  const handleConfirmDeleteStudent = () => {
-    handleSaveChanges();
-    setShowDeleteConfirmPopup(false);
-  };
-
-  const handleCancelDeleteStudent = () => {
-    setShowDeleteConfirmPopup(false);
-  };
-
   const toggleEquipoExpand = (index) => {
     setExpandedEquipos((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const validarCorreo = (correo) => {
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regexCorreo.test(correo);
   };
 
   const handleConfirmDeleteCourse = () => {
@@ -239,7 +300,7 @@ const CursoPage = () => {
     <div className="curso-page">
       <Sidebar />
       <div className="curso-content">
-        <button className="back-button" onClick={handleBackClick}>
+        <button className="cursos-back-button" onClick={handleBackClick}>
           Tornar als cursos
         </button>
         {error && <div className="error-message">{error}</div>}
@@ -248,23 +309,32 @@ const CursoPage = () => {
             <div className="edit-controls">
               {isEditing ? (
                 <>
-                  <button className="save-button" onClick={handleSaveChanges}>
+                  <button
+                    className="save-changes-button"
+                    onClick={handleSaveChanges}
+                  >
                     Guardar canvis
                   </button>
-                  <button className="cancel-button" onClick={handleEditToggle}>
+                  <button
+                    className="cancel-canvis-button"
+                    onClick={handleEditToggle}
+                  >
                     Cancel·lar
                   </button>
                 </>
               ) : (
                 <>
-                  <button className="edit-button" onClick={handleEditToggle}>
-                    ✏️ Modificar curs
+                  <button
+                    className="modify-curs-button"
+                    onClick={handleEditToggle}
+                  >
+                    Modificar curs
                   </button>
                   <button
-                    className="delete-button"
+                    className="delete-curs-button"
                     onClick={() => setShowDeleteConfirmPopup(true)}
                   >
-                    🗑️ Esborrar Curs
+                    Esborrar curs
                   </button>
                 </>
               )}
@@ -332,7 +402,10 @@ const CursoPage = () => {
                     {(curso.nombresEstudiantesSinGrupo?.length || 0) +
                       (curso.equipos?.reduce(
                         (total, equipo) =>
-                          total + (equipo.miembros?.length || 0),
+                          total +
+                          (equipo.miembros
+                            ? Object.keys(equipo.miembros).length
+                            : 0),
                         0,
                       ) || 0)}
                   </p>
@@ -341,7 +414,7 @@ const CursoPage = () => {
                     {curso.equipos?.length || 0}
                   </p>
                   <p>
-                    <strong>Nombre total d&apos;estudiants sense grup:</strong>{' '}
+                    <strong>Nombre total d&apos;estudiants sense equip:</strong>{' '}
                     {curso.nombresEstudiantesSinGrupo?.length || 0}
                   </p>
                 </div>
@@ -351,9 +424,12 @@ const CursoPage = () => {
                       type="checkbox"
                       checked={curso.activo}
                       onChange={handleToggleEstado}
+                      disabled={isEditing}
                     />
                     <span
-                      className={`slider ${curso.activo ? 'activo' : 'inactivo'}`}
+                      className={`slider ${curso.activo ? 'activo' : 'inactivo'} ${
+                        isEditing ? 'disabled' : ''
+                      }`}
                     >
                       {curso.activo ? 'ACTIU' : 'INACTIU'}
                     </span>
@@ -398,6 +474,14 @@ const CursoPage = () => {
               </div>
               <div className="curso-section">
                 <h2>Equips</h2>
+                <button
+                  className={`crear-equipo-curso-button ${isEditing ? 'disabled' : ''}`}
+                  onClick={() => navigate(`/equipos/crear?cursoId=${curso.id}`)}
+                  disabled={isEditing}
+                >
+                  Crear Equip
+                </button>
+
                 <div className="filter-buttons">
                   <button
                     className={!mostrarMisEquipos ? 'active-filter' : ''}
@@ -439,7 +523,15 @@ const CursoPage = () => {
                               alignItems: 'center',
                             }}
                           >
-                            <span>{equipo.nombreEquipo}</span>
+                            <div className="equipo-header-content">
+                              <span>{equipo.nombreEquipo}</span>
+                              {equipo.validado && (
+                                <div className="equipo-validado">
+                                  <i className="fas fa-check-circle"></i>{' '}
+                                  Validat
+                                </div>
+                              )}
+                            </div>
                             <button
                               className="toggle-button"
                               onClick={(e) => {
@@ -452,15 +544,22 @@ const CursoPage = () => {
                           </div>
                           {expandedEquipos[index] && (
                             <div className="equipo-card-body">
-                              {equipo.miembros && equipo.miembros.length > 0 ? (
-                                equipo.miembros.map((miembro, miembroIndex) => (
-                                  <div
-                                    key={miembroIndex}
-                                    className="equipo-member"
-                                  >
-                                    <p>{miembro || 'Desconegut'}</p>
-                                  </div>
-                                ))
+                              {equipo.miembros &&
+                              Object.keys(equipo.miembros).length > 0 ? (
+                                Object.entries(equipo.miembros)
+                                  .sort(([nombreA], [nombreB]) =>
+                                    nombreA.localeCompare(nombreB),
+                                  )
+                                  .map(([nombre, grupo], miembroIndex) => (
+                                    <div
+                                      key={miembroIndex}
+                                      className="equipo-member"
+                                    >
+                                      <p>
+                                        {nombre} ({grupo || 'Sense Grup'})
+                                      </p>
+                                    </div>
+                                  ))
                               ) : (
                                 <p>No hi ha membres en aquest equip.</p>
                               )}
@@ -478,17 +577,51 @@ const CursoPage = () => {
                 <table className="curso-table">
                   <thead>
                     <tr>
-                      <th>Nom i Cognoms</th>
-                      <th>Adreça electrònica</th>
+                      <th
+                        onClick={() => handleSort('nombresEstudiantesSinGrupo')}
+                      >
+                        Nom i Cognoms{' '}
+                        <span
+                          className={`sort-icon ${
+                            sortConfig.key === 'nombresEstudiantesSinGrupo'
+                              ? sortConfig.direction
+                              : 'none'
+                          }`}
+                        />
+                      </th>
+                      <th
+                        onClick={() => handleSort('gruposEstudiantesSinGrupo')}
+                      >
+                        Grup{' '}
+                        <span
+                          className={`sort-icon ${
+                            sortConfig.key === 'gruposEstudiantesSinGrupo'
+                              ? sortConfig.direction
+                              : 'none'
+                          }`}
+                        />
+                      </th>
+                      <th
+                        onClick={() => handleSort('correosEstudiantesSinGrupo')}
+                      >
+                        Adreça electrònica{' '}
+                        <span
+                          className={`sort-icon ${
+                            sortConfig.key === 'correosEstudiantesSinGrupo'
+                              ? sortConfig.direction
+                              : 'none'
+                          }`}
+                        />
+                      </th>
                       {isEditing && <th>Accions</th>}
                     </tr>
                   </thead>
                   <tbody>
-                    {curso.nombresEstudiantesSinGrupo &&
-                    curso.nombresEstudiantesSinGrupo.length > 0 ? (
-                      curso.nombresEstudiantesSinGrupo.map((nombre, index) => (
+                    {sortedData && sortedData.length > 0 ? (
+                      sortedData.map((index) => (
                         <tr key={index}>
-                          <td>{nombre}</td>
+                          <td>{curso.nombresEstudiantesSinGrupo[index]}</td>
+                          <td>{curso.gruposEstudiantesSinGrupo[index]}</td>
                           <td>{curso.correosEstudiantesSinGrupo[index]}</td>
                           {isEditing && (
                             <td>
@@ -496,12 +629,14 @@ const CursoPage = () => {
                                 className="delete-button"
                                 onClick={() =>
                                   handleDeleteStudent({
-                                    nombre,
-                                    correo: curso.correosEstudiantes[index],
+                                    nombre:
+                                      curso.nombresEstudiantesSinGrupo[index],
+                                    correo:
+                                      curso.correosEstudiantesSinGrupo[index],
                                   })
                                 }
                               >
-                                🗑️ Eliminar
+                                Eliminar
                               </button>
                             </td>
                           )}
@@ -509,7 +644,7 @@ const CursoPage = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={isEditing ? '3' : '2'}>
+                        <td colSpan={isEditing ? '4' : '3'}>
                           No hi ha cap estudiant sense equip.
                         </td>
                       </tr>
@@ -528,6 +663,15 @@ const CursoPage = () => {
                         </td>
                         <td>
                           <input
+                            type="text"
+                            name="grupo"
+                            value={newEstudiante.grupo}
+                            onChange={handleInputChange}
+                            placeholder="Grup"
+                          />
+                        </td>
+                        <td>
+                          <input
                             type="email"
                             name="correo"
                             value={newEstudiante.correo}
@@ -538,7 +682,14 @@ const CursoPage = () => {
                         <td>
                           <button
                             className="add-button"
-                            onClick={() => setShowAddConfirmPopup(true)}
+                            onClick={() => {
+                              if (validarCorreo(newEstudiante.correo)) {
+                                setShowAddConfirmPopup(true);
+                                setError('');
+                              } else {
+                                setError('El correu proporcionat no és vàlid.');
+                              }
+                            }}
                           >
                             Afegir
                           </button>
@@ -584,10 +735,10 @@ const CursoPage = () => {
             <div className="popup-content">
               <p>
                 Estàs segur/a de que vols eliminar el curs{' '}
-                {curso.nombreAsignatura}?
+                <strong>{curso.nombreAsignatura}</strong>?
               </p>
               <p>
-                <strong>Aquesta acció no es pot desfer.</strong>
+                <strong>AQUESTA ACCIÓ NO ES POT DESFER</strong>
               </p>
               <div className="popup-buttons">
                 <button
@@ -635,13 +786,21 @@ const CursoPage = () => {
             </div>
           </div>
         )}
+        {error && (
+          <div className="error-message">
+            <p>{error}</p>
+          </div>
+        )}
+
         {showAddConfirmPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
               <p>
                 Estàs segur/a de que vols afegir al Curs{' '}
-                {curso.nombreAsignatura} a l&apos;estudiant{' '}
-                {newEstudiante.nombre} amb Correu {newEstudiante.correo}?
+                <strong>{curso.nombreAsignatura}</strong> a l&apos;estudiant{' '}
+                <strong>{newEstudiante.nombre}</strong> amb correu{' '}
+                <strong>{newEstudiante.correo}</strong> i grup{' '}
+                <strong>{newEstudiante.grupo}</strong>?
               </p>
               <div className="popup-buttons">
                 <button
@@ -659,7 +818,7 @@ const CursoPage = () => {
                     setShowAddConfirmPopup(false);
                   }}
                 >
-                  Sí
+                  Si
                 </button>
               </div>
             </div>
@@ -668,7 +827,7 @@ const CursoPage = () => {
         {showSaveConfirmPopup && (
           <div className="confirm-popup">
             <div className="popup-content">
-              <p>Estàs segur de que vols realitzar aquests canvis?</p>
+              <p>Estàs segur/a de que vols realitzar aquests canvis?</p>
               <div className="popup-buttons">
                 <button
                   type="button"
@@ -682,7 +841,7 @@ const CursoPage = () => {
                   className="confirm-button"
                   onClick={handleConfirmSaveChanges}
                 >
-                  Sí
+                  Si
                 </button>
               </div>
             </div>
@@ -693,8 +852,8 @@ const CursoPage = () => {
             <div className="popup-content">
               <p>
                 Estàs segur/a de que vols eliminar del curs{' '}
-                {curso.nombreAsignatura} l&apos;estudiant{' '}
-                {estudianteAEliminar?.nombre}?
+                <strong>{curso.nombreAsignatura}</strong> l&apos;estudiant{' '}
+                <strong>{estudianteAEliminar?.nombre}</strong>?
               </p>
               <div className="popup-buttons">
                 <button
@@ -707,9 +866,12 @@ const CursoPage = () => {
                 <button
                   type="button"
                   className="confirm-button"
-                  onClick={handleConfirmDeleteStudent}
+                  onClick={() => {
+                    handleSaveChanges();
+                    setShowDeleteStudentPopup(false);
+                  }}
                 >
-                  Sí
+                  Si
                 </button>
               </div>
             </div>

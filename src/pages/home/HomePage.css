@@ -52,12 +52,14 @@
 .welcome-text h1 {
   color: #0058a3;
   font-size: 2.8rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
 }
 
-.welcome-text p1 {
-  font-size: 1.3rem;
-  margin-bottom: 1.5rem;
+.welcome-text h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 3rem;
 }
 
 .user-name {
@@ -67,7 +69,7 @@
 
 .welcome-text p {
   font-size: 1.4rem;
-  color: #333;
+  color: #777777;
   margin-bottom: 2rem;
 }
 

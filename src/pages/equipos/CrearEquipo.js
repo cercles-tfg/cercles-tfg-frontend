@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import {
   getCursosDeEstudiante,
@@ -7,6 +7,7 @@ import {
   crearEquipo,
   getEstudiantesCurso,
 } from '../../services/Equipos_Api';
+import { obtenerCursos } from '../../services/Cursos_Api';
 import './CrearEquipo.css';
 
 const CrearEquipo = () => {
@@ -26,21 +27,42 @@ const CrearEquipo = () => {
 
   const idEstudiante = parseInt(localStorage.getItem('id'));
   const token = localStorage.getItem('jwtToken');
+  const rol = localStorage.getItem('rol');
+
+  const location = useLocation();
+  const cursoIdFromParams = new URLSearchParams(location.search).get('cursoId');
 
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const cursosData = await getCursosDeEstudiante(idEstudiante, token);
+        let cursosData = [];
+        if (rol === 'Profesor') {
+          cursosData = await obtenerCursos();
+        } else {
+          cursosData = await getCursosDeEstudiante(idEstudiante, token);
+        }
+
         const cursosActivos = cursosData.filter((curso) => curso.activo);
         setCursos(cursosActivos || []);
+
+        if (cursoIdFromParams) {
+          const curso = cursosActivos.find(
+            (c) => c.id === parseInt(cursoIdFromParams),
+          );
+          setNombreCursoSeleccionado(
+            curso?.nombreAsignatura || 'Nom no disponible',
+          );
+        }
       } catch (error) {
-        setError('Error al cargar los cursos disponibles.');
+        setError('Error al carregar els cursos disponibles.');
         setShowErrorPopup(true);
       }
     };
 
+    setCursoSeleccionado(parseInt(cursoIdFromParams));
+    handleCursoChange(cursoIdFromParams);
     fetchCursos();
-  }, [idEstudiante, token]);
+  }, [idEstudiante, token, cursoIdFromParams]);
 
   const handleCursoChange = async (cursoId) => {
     if (!cursoId) {
@@ -89,9 +111,16 @@ const CrearEquipo = () => {
 
   const handleCreateClick = async () => {
     try {
-      const uniqueEstudiantes = [
-        ...new Set([...estudiantesSeleccionados, parseInt(idEstudiante)]),
-      ];
+      const uniqueEstudiantes =
+        rol === 'Estudiante'
+          ? [...new Set([...estudiantesSeleccionados, parseInt(idEstudiante)])]
+          : [
+              ...new Set(
+                estudiantesSeleccionados.filter(
+                  (id) => id !== parseInt(idEstudiante),
+                ),
+              ),
+            ];
 
       const equipoData = {
         nombre: nombreEquipo,
@@ -100,8 +129,13 @@ const CrearEquipo = () => {
         evaluadorId: profesorSeleccionado,
       };
 
-      await crearEquipo(equipoData, token);
-      navigate('/equipos');
+      crearEquipo(equipoData, token).then(() => {
+        if (rol === 'Estudiante') {
+          navigate('/equipos');
+        } else {
+          window.location.href = `/cursos/${cursoSeleccionado}`;
+        }
+      });
     } catch (error) {
       setError(error.response?.data?.message || 'Error al crear el equipo.');
       setShowErrorPopup(true);
@@ -148,17 +182,22 @@ const CrearEquipo = () => {
 
         <div className="form-group">
           <label>Selecciona un curs on crear l&apos;equip:</label>
-          <select
-            value={cursoSeleccionado || ''}
-            onChange={(e) => handleCursoChange(e.target.value)}
-          >
-            <option value="">Selecciona curs</option>
-            {cursos.map((curso) => (
-              <option key={curso.id} value={curso.id}>
-                {curso.nombreAsignatura}
-              </option>
-            ))}
-          </select>
+          {cursoIdFromParams ? (
+            <div className="curso-seleccionado">{nombreCursoSeleccionado}</div>
+          ) : (
+            <select
+              value={cursoSeleccionado || ''}
+              onChange={(e) => handleCursoChange(e.target.value)}
+              disabled={!!cursoIdFromParams}
+            >
+              <option value="">Selecciona curs</option>
+              {cursos.map((curso) => (
+                <option key={curso.id} value={curso.id}>
+                  {curso.nombreAsignatura}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {cursoSeleccionado && (
@@ -241,15 +280,18 @@ const CrearEquipo = () => {
                 </p>
                 <p>
                   <strong>Membres:</strong>{' '}
-                  {estudiantesSeleccionados
-                    .map((id) =>
-                      id === idEstudiante
-                        ? 'Tu mateix'
-                        : estudiantesSinGrupo.find((est) => est.id === id)
+                  {[
+                    ...(rol === 'Estudiante' ? ['Jo'] : []),
+                    ...estudiantesSeleccionados
+                      .map(
+                        (id) =>
+                          estudiantesSinGrupo.find((est) => est.id === id)
                             ?.nombre,
-                    )
-                    .join(', ')}
+                      )
+                      .filter(Boolean),
+                  ].join(', ')}
                 </p>
+
                 <p>
                   <strong>Professor avaluador:</strong>{' '}
                   {

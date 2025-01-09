@@ -1,4 +1,3 @@
-/* General styling to prevent horizontal overflow */
 body,
 html {
   overflow-x: hidden;
@@ -15,7 +14,7 @@ html {
 .curso-content {
   padding: 20px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1300px;
   box-sizing: border-box;
   background-color: #ffffff;
   border-radius: 8px;
@@ -24,26 +23,25 @@ html {
 }
 
 /* Back button styling */
-.back-button {
+.cursos-back-button {
   background-color: #4caf50;
   color: #fff;
   border: none;
   padding: 10px 15px;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
   transition:
     background-color 0.3s ease,
     transform 0.2s;
-  margin-bottom: 20px; /* Adds space between button and content */
+  margin-bottom: 20px;
 }
 
-.back-button:hover {
+.cursos-back-button:hover {
   background-color: #45a049;
-  transform: scale(1.05); /* Adds a slight zoom effect on hover */
+  transform: scale(1.05);
 }
 
-/* Styling for course title and details */
 .curso-title {
   text-align: center;
   margin-bottom: 20px;
@@ -85,6 +83,20 @@ html {
   height: 0;
 }
 
+.switch input:disabled + .slider {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.slider.disabled {
+  color: #666;
+  cursor: not-allowed;
+}
+
+.switch input:disabled {
+  cursor: not-allowed;
+}
+
 .slider {
   position: absolute;
   cursor: pointer;
@@ -92,7 +104,7 @@ html {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #f44336; /* Default red for inactive */
+  background-color: #f44336;
   transition: 0.4s;
   display: flex;
   align-items: center;
@@ -104,7 +116,7 @@ html {
 }
 
 .slider.activo {
-  background-color: #4caf50; /* Green for active */
+  background-color: #4caf50;
 }
 
 .slider:before {
@@ -120,7 +132,7 @@ html {
 }
 
 input:checked + .slider {
-  background-color: #4caf50; /* Green when active */
+  background-color: #4caf50;
 }
 
 input:checked + .slider:before {
@@ -160,7 +172,7 @@ input:checked + .slider:before {
 .confirm-button {
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   margin-right: 10px;
   transition: background-color 0.3s ease;
@@ -186,33 +198,71 @@ input:checked + .slider:before {
 }
 
 /* Styling for edit button */
-.edit-button {
-  background: none;
+.edit-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.save-changes-button {
+  background-color: #007bff;
+  color: white;
   border: none;
-  font-size: 20px;
+  padding: 10px 15px;
+  font-size: 18px;
   cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.save-changes-button:hover {
+  background-color: #0056b3;
+}
+
+.cancel-canvis-button {
+  background-color: #ffc107;
   color: #333;
-  transition: transform 0.2s;
-  margin-left: auto;
+  border: none;
+  padding: 10px 15px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
 }
 
-.edit-button:hover {
-  transform: scale(1.2);
+.cancel-canvis-button:hover {
+  background-color: #ffb300;
 }
 
-.delete-button {
+.modify-curs-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.modify-curs-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-curs-button {
   background-color: #f44336;
   color: white;
   border: none;
   padding: 10px 15px;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
-  border-radius: 4px;
-  margin-left: 10px;
+  border-radius: 8px;
   transition: background-color 0.3s ease;
 }
 
-.delete-button:hover {
+.delete-curs-button:hover {
   background-color: #d32f2f;
 }
 
@@ -233,7 +283,7 @@ input:checked + .slider:before {
   padding: 5px 10px;
   font-size: 14px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
   transition: background-color 0.3s ease;
 }
 
@@ -256,7 +306,7 @@ p strong {
   background-color: #ffe6e6;
   border: 1px solid #ffcccc;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 8px;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -297,12 +347,30 @@ p strong {
 .equipo-card-header {
   background-color: #4caf50;
   color: white;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
   text-align: center;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   width: 100%;
+}
+.equipo-header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.equipo-validado {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  color: #000000;
+  gap: 5px;
+}
+
+.equipo-validado i {
+  font-size: 16px;
 }
 
 .equipo-card-body {
@@ -312,7 +380,7 @@ p strong {
 
 .equipo-member {
   background-color: #f9f9f9;
-  border-radius: 5px;
+  border-radius: 8px;
   padding: 10px;
   margin-bottom: 10px;
   text-align: center;
@@ -325,16 +393,87 @@ p strong {
 
 .equipo-member p {
   margin: 5px 0;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 /* Students and Professors section */
+
+.professor-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.professor-item:hover {
+  background-color: #e6f7ff;
+  transform: scale(1.02);
+}
+
+.professor-item label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.professor-item input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
 .curso-section {
   margin-top: 20px;
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.crear-equipo-curso-button {
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.crear-equipo-curso-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.crear-equipo-curso-button:active {
+  background-color: #004085;
+  transform: scale(0.98);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.crear-equipo-curso-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.crear-equipo-curso-button:disabled {
+  pointer-events: none;
 }
 
 .curso-section-header {
@@ -359,12 +498,42 @@ h2 {
 .curso-table td {
   padding: 12px;
   text-align: left;
+  font-size: 18px;
   border-bottom: 1px solid #ddd;
 }
 
 .curso-table th {
   background-color: #f8f8f8;
   color: #333;
+  position: relative;
+  cursor: pointer;
+}
+
+.curso-table th .sort-icon {
+  margin-left: 10px;
+  font-size: 12px;
+  color: #888;
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+}
+
+.curso-table th .sort-icon.asc::after {
+  content: '▲';
+  font-size: 12px;
+  color: #333;
+}
+
+.curso-table th .sort-icon.desc::after {
+  content: '▼';
+  font-size: 12px;
+  color: #333;
+}
+
+.curso-table th .sort-icon.none::after {
+  content: '▲▼';
+  font-size: 12px;
+  color: #ccc;
 }
 
 .curso-list {
@@ -375,7 +544,7 @@ h2 {
 .curso-list-item {
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .curso-list-item:last-child {
@@ -393,7 +562,7 @@ h2 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 18px;
   background-color: #e0e0e0;
   transition: background-color 0.3s ease;
 }
@@ -421,6 +590,30 @@ h2 {
 
 .toggle-button:hover {
   transform: scale(1.2);
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+  animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
 }
 
 /* Responsive design for smaller screens */

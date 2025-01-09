@@ -31,6 +31,13 @@ h1 {
   gap: 15px;
 }
 
+.curso-seleccionado {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  padding: 10px 0;
+}
+
 label {
   font-weight: bold;
   font-size: 20px;

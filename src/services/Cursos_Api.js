@@ -26,6 +26,7 @@ export const obtenerCursos = async () => {
     throw error;
   }
 };
+
 // Crear un nuevo curso
 export const crearCurso = async (cursoData) => {
   const token = obtenerToken();

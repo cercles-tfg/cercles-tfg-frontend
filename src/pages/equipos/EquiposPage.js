@@ -110,16 +110,15 @@ const EquiposPage = () => {
             {equiposInactivos.map((equipo, index) => (
               <div
                 key={equipo.id}
-                className="card"
+                className="inactive-card"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                onClick={() => handleCardClick(equipo.id)}
               >
                 <div className="icon-container">
                   <i className={`fas ${ICONS[index % ICONS.length]}`} />
                 </div>
                 <h2>{equipo.nombre}</h2>
                 <p>
-                  <strong>Curso:</strong> {equipo.cursoNombre}
+                  <strong>Curs:</strong> {equipo.cursoNombre}
                 </p>
               </div>
             ))}

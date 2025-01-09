@@ -173,7 +173,7 @@ const PerfilPage = () => {
                       onClick={() => toggleSection('repositoriosPublicos')}
                       aria-expanded={expandedSection === 'repositoriosPublicos'}
                     >
-                      <strong>Repositoris públics:</strong>{' '}
+                      <strong>Repositoris públics: </strong>{' '}
                       {
                         githubData.repositorios.filter((repo) => !repo.private)
                           .length
@@ -188,7 +188,7 @@ const PerfilPage = () => {
                       onClick={() => toggleSection('repositoriosPrivados')}
                       aria-expanded={expandedSection === 'repositoriosPrivados'}
                     >
-                      <strong>Repositoris privats:</strong>{' '}
+                      <strong>Repositoris privats: </strong>{' '}
                       {
                         githubData.repositorios.filter((repo) => repo.private)
                           .length
@@ -203,7 +203,7 @@ const PerfilPage = () => {
                       onClick={() => toggleSection('organizaciones')}
                       aria-expanded={expandedSection === 'organizaciones'}
                     >
-                      <strong>Organitzacions:</strong>{' '}
+                      <strong>Organitzacions: </strong>{' '}
                       {githubData.organizaciones.length}
                       <span className="arrow" aria-hidden="true">
                         ▶
@@ -246,7 +246,7 @@ const PerfilPage = () => {
             )}
           </div>
           {/* Caja secundaria: Detalles expandibles */}
-          {expandedSection && (
+          {expandedSection && githubData && (
             <div className="expanded-details-box">
               <h2>
                 {expandedSection === 'repositoriosPublicos'

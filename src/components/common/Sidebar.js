@@ -34,7 +34,7 @@ const Sidebar = () => {
         {rol === 'Estudiante' && (
           <a href="/equipos">
             <FaProjectDiagram />
-            <span className="link-text">Projectes</span>
+            <span className="link-text">Equips</span>
           </a>
         )}
         {rol === 'Profesor' && (
