@@ -12,7 +12,7 @@ import './EvaluacionesGeneralesPage.css';
 const EvaluacionesGeneralesPage = () => {
   const { equipoId } = useParams();
   const token = localStorage.getItem('jwtToken');
-  const [numeroEvaluaciones, setNumeroEvaluaciones] = useState(3); // Default por si acaso
+  const [numeroEvaluaciones, setNumeroEvaluaciones] = useState(3);
   const [evaluacionesIds, setEvaluacionesIds] = useState([]);
   const [detalles, setDetalles] = useState([]);
   const [medias, setMedias] = useState([]);
@@ -192,7 +192,7 @@ const EvaluacionesGeneralesPage = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>Avaluador / Avaluat</th>
+                    <th>▾ Avaluador / Avaluat ▸</th>
                     {estudiantes.map((id) => (
                       <th key={`evaluado-${realEvalId}-${id}`}>
                         {idToName[id]}

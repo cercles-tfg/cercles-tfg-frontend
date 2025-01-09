@@ -12,6 +12,7 @@ import EquiposPage from './pages/equipos/EquiposPage';
 import EquipoPage from './pages/equipos/EquipoPage';
 import CrearEquipo from './pages/equipos/CrearEquipo';
 import EquipoMetricsPage from './pages/equipos/EquipoMetricsPage';
+import DatosGeneralesEquipoPage from './pages/equipos/DatosGeneralesEquipoPage';
 import EvaluacionPage from './pages/evaluaciones/EvaluacionPage';
 import EvaluacionesGeneralesPage from './pages/evaluaciones/EvaluacionesGeneralesPage';
 import NotFoundPage from './pages/common/NotFoundPage';
@@ -99,6 +100,14 @@ function App() {
           element={
             <PrivateRoute requiredRole="Profesor">
               <EquipoMetricsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/equipo/:equipoId/datos_generales"
+          element={
+            <PrivateRoute requiredRole="Profesor">
+              <DatosGeneralesEquipoPage />
             </PrivateRoute>
           }
         />

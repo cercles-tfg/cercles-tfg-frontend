@@ -133,9 +133,10 @@ const EquipoMetricsPage = () => {
           Mètriques de GitHub de l&apos;equip {equipo.nombre} pel curs{' '}
           {equipo.nombreAsignatura}
         </h1>
-        <h3>Nom de l&apos;organització {org}</h3>
+        <h1>Nom de l&apos;organització {org}</h1>
 
         {/* Primera Tabla */}
+        <h3>Mètriques de les contribucions dels usuaris</h3>
         <table>
           <thead>
             <tr>
@@ -265,22 +266,18 @@ const EquipoMetricsPage = () => {
 
         {/* Sección Expandible */}
         <div>
-          <h3 onClick={() => setIsExpanded(!isExpanded)}>
+          <h2
+            onClick={() => setIsExpanded((prevState) => !prevState)}
+            className="expandable-header"
+          >
             Veure detalls de les històries d&apos;usuari i les tasques{' '}
             {isExpanded ? '▲' : '▼'}
-          </h3>
+          </h2>
+
           {isExpanded && (
             <>
-              {/* Leyenda */}
-              <div className="legend-container">
-                <div className="legend-item">
-                  <span className="legend-square green"></span> Història
-                  d&apos;usuari
-                </div>
-                <div className="legend-item">
-                  <span className="legend-square blue"></span> Tasca
-                </div>
-              </div>
+              {/* Tabla de historias de usuario */}
+              <h3>Històries d&apos;usuari</h3>
               <table>
                 <thead>
                   <tr>
@@ -292,38 +289,72 @@ const EquipoMetricsPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {globalIssueDetails.map((detail, index) => {
-                    const isUserStory =
-                      detail.includes('user story') ||
-                      detail.includes('historia de usuario') ||
-                      detail.includes("història d'usuari");
-                    const isTask =
-                      detail.includes('task') ||
-                      detail.includes('tarea') ||
-                      detail.includes('tasca');
-                    const style = isUserStory
-                      ? { backgroundColor: '#ccffcc' }
-                      : isTask
-                        ? { backgroundColor: '#cce5ff' }
-                        : {};
+                  {globalIssueDetails
+                    .filter(
+                      (detail) =>
+                        detail.includes('user story') ||
+                        detail.includes('historia de usuario') ||
+                        detail.includes("història d'usuari"),
+                    )
+                    .map((detail, index) => {
+                      const shortDetail = detail.split(',')[0];
+                      const noAssignat = detail.includes('Assignees: []');
 
-                    const shortDetail = detail.split(',')[0];
-                    const noAssignat = detail.includes('Assignees: []');
+                      return (
+                        <tr key={`user-story-${index}`}>
+                          <td>{shortDetail}</td>
+                          {metrics.map((m) => (
+                            <td key={`user-story-detail-${m.username}`}>
+                              {detail.includes(`Assignees: [${m.username}]`)
+                                ? '✔️'
+                                : ''}
+                            </td>
+                          ))}
+                          <td>{noAssignat ? '✔️' : ''}</td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
 
-                    return (
-                      <tr key={index} style={style}>
-                        <td>{shortDetail}</td>
-                        {metrics.map((m) => (
-                          <td key={`detail-${m.username}`}>
-                            {detail.includes(`Assignees: [${m.username}]`)
-                              ? '✔️'
-                              : ''}
-                          </td>
-                        ))}
-                        <td>{noAssignat ? '✔️' : ''}</td>
-                      </tr>
-                    );
-                  })}
+              {/* Tabla de tareas */}
+              <h3>Tasques</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Detalls</th>
+                    {metrics.map((m) => (
+                      <th key={m.username}>{m.nombre}</th>
+                    ))}
+                    <th>No assignat</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {globalIssueDetails
+                    .filter(
+                      (detail) =>
+                        detail.includes('task') ||
+                        detail.includes('tarea') ||
+                        detail.includes('tasca'),
+                    )
+                    .map((detail, index) => {
+                      const shortDetail = detail.split(',')[0];
+                      const noAssignat = detail.includes('Assignees: []');
+
+                      return (
+                        <tr key={`task-${index}`}>
+                          <td>{shortDetail}</td>
+                          {metrics.map((m) => (
+                            <td key={`task-detail-${m.username}`}>
+                              {detail.includes(`Assignees: [${m.username}]`)
+                                ? '✔️'
+                                : ''}
+                            </td>
+                          ))}
+                          <td>{noAssignat ? '✔️' : ''}</td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </>
@@ -331,7 +362,9 @@ const EquipoMetricsPage = () => {
         </div>
 
         {/* Gráficos */}
+        <h3>GRÀFICS</h3>
         <div className="charts-section">
+          {/* Primera fila de gráficos */}
           <div className="chart-row">
             <div className="chart-container">
               <h2>Distribució de commits</h2>
@@ -413,41 +446,88 @@ const EquipoMetricsPage = () => {
               />
             </div>
           </div>
-          <div className="chart-container-large">
-            <h2>Històries d&apos;usuari i tasques tancades</h2>
-            <Bar
-              data={{
-                labels: metrics.map((m) => m.nombre),
-                datasets: [
-                  {
-                    label: 'HU tancades',
-                    data: metrics.map((m) => m.userStoriesClosed),
-                    backgroundColor: '#A7D2CB',
-                  },
-                  {
-                    label: 'Tasques tancades',
-                    data: metrics.map((m) => m.tasksClosed),
-                    backgroundColor: '#F2D388',
-                  },
-                ],
-              }}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: {
-                    labels: {
-                      font: {
-                        size: 16,
+
+          {/* Segunda fila de gráficos */}
+          <div className="chart-row">
+            <div className="chart-container-large">
+              <h2>Històries d&apos;usuari i tasques tancades</h2>
+              <Bar
+                data={{
+                  labels: metrics.map((m) => m.nombre),
+                  datasets: [
+                    {
+                      label: 'HU tancades',
+                      data: metrics.map((m) => m.userStoriesClosed),
+                      backgroundColor: '#A7D2CB',
+                    },
+                    {
+                      label: 'Tasques tancades',
+                      data: metrics.map((m) => m.tasksClosed),
+                      backgroundColor: '#F2D388',
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      labels: {
+                        font: {
+                          size: 16,
+                        },
                       },
                     },
                   },
-                },
-                scales: {
-                  x: { ticks: { font: { size: 14 } } },
-                  y: { ticks: { font: { size: 14 } } },
-                },
-              }}
-            />
+                  scales: {
+                    x: { ticks: { font: { size: 14 } } },
+                    y: { ticks: { font: { size: 14 } } },
+                  },
+                }}
+              />
+            </div>
+            <div className="chart-container">
+              <h2>Distribució d&apos;històries d&apos;usuari totals</h2>
+              <Pie
+                data={{
+                  labels: metrics.map((m) => m.nombre),
+                  datasets: [
+                    {
+                      data: metrics.map((m) => m.userStories),
+                      backgroundColor: [
+                        '#6C9975',
+                        '#BB6365',
+                        '#785B75',
+                        '#5E807F',
+                        '#BA5A31',
+                        '#355C7D',
+                        '#F4A261',
+                        '#E76F51',
+                        '#2A9D8F',
+                        '#264653',
+                        '#A8DADC',
+                        '#457B9D',
+                        '#E9C46A',
+                        '#F4A3B3',
+                        '#D4A5A5',
+                        '#B5838D',
+                      ],
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      labels: {
+                        font: {
+                          size: 16,
+                        },
+                      },
+                    },
+                  },
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

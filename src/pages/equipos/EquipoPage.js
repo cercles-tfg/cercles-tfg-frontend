@@ -352,22 +352,23 @@ const EquipoPage = () => {
                 {equipo.gitOrganizacion ? (
                   <>
                     <Link
-                      to={`/equipo/${id}/datos_generales`}
+                      to={`/equipo/${id}/datos_generales?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
                       className="metrics-link"
                     >
-                      📊 Dades generals de l&apos;equip
+                      📊 DADES GENERALS DE L&apos;EQUIP
                     </Link>
+
                     <Link
                       to={`/equipo/${id}/metrics?org=${equipo.gitOrganizacion}&estudiantesIds=${estIds.join(',')}`}
                       className="metrics-link"
                     >
-                      📊 Veure mètriques de GitHub
+                      📊 Veure detalls de les mètriques de GitHub
                     </Link>
                   </>
                 ) : (
                   <>
                     <div className="metrics-link-disabled">
-                      📊 Dades generals de l&apos;equip
+                      📊 DADES GENERALS DE L&apos;EQUIP
                       <span className="disabled-message">
                         Aquest equip encara no ha configurat la seva
                         organització de Github, per tant no pots veure les dades
@@ -375,7 +376,7 @@ const EquipoPage = () => {
                       </span>
                     </div>
                     <div className="metrics-link-disabled">
-                      📊 Veure mètriques de GitHub
+                      📊 Veure detalls de les mètriques de GitHub
                       <span className="disabled-message">
                         Aquest equip encara no ha configurat la seva
                         organització de Github, per tant no hi ha dades a veure.
@@ -407,7 +408,7 @@ const EquipoPage = () => {
                   to={`/equipo/${id}/evaluaciones_generales`}
                   className="metrics-link"
                 >
-                  📊 Veure dades d&apos;avaluacions
+                  📊 Veure detalls de les dades d&apos;avaluacions
                 </Link>
               </div>
             </>

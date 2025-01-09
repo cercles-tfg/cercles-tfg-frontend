@@ -19,6 +19,27 @@ h1 {
   color: #333;
 }
 
+.expandable-header {
+  cursor: pointer;
+  text-align: center;
+  font-size: 1.8rem; /* Tamaño de fuente más grande */
+  font-weight: bold;
+  color: #007bff; /* Azul destacado */
+  margin: 20px 0;
+  transition:
+    color 0.3s ease,
+    transform 0.2s ease;
+}
+
+.expandable-header:hover {
+  color: #0056b3; /* Azul más oscuro al pasar el ratón */
+  transform: scale(1.05); /* Efecto de zoom al pasar el ratón */
+}
+
+.expandable-header:active {
+  transform: scale(0.95); /* Efecto de clic */
+}
+
 h3 {
   text-align: center;
   padding-top: 20px;
@@ -26,7 +47,6 @@ h3 {
   margin-bottom: 20px;
   font-size: 1.5rem;
   color: #555;
-  cursor: pointer;
   transition: color 0.2s ease;
 }
 
@@ -49,8 +69,7 @@ td {
 }
 
 th {
-  background-color: #f4f4f4;
-  color: #333;
+  color: #6c9975;
   font-weight: bold;
 }
 
@@ -105,10 +124,10 @@ th.mitjana-column {
 
 .chart-row {
   display: flex;
-  justify-content: center;
-  gap: 0px;
-  margin-left: 100px;
+  justify-content: space-evenly;
   width: 100%;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .chart-container {
@@ -118,19 +137,13 @@ th.mitjana-column {
 }
 
 .chart-container-large {
-  width: 60%;
+  flex: 1;
+  max-width: 45%;
   height: 400px;
-  margin: 0 auto;
 }
 
 .chart-container h2 {
-  text-align: center;
   margin-bottom: 10px;
-}
-
-.chart-row h2 {
-  text-align: center;
-  width: 80%;
 }
 
 /*loading*/
