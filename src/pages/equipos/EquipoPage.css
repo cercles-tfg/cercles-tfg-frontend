@@ -549,9 +549,25 @@
   background-color: #4caf50;
   color: white;
 }
+.creating-error-message {
+  color: #721c24;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
 
 .confirm-button:hover {
   background-color: #45a049;
+}
+.confirm-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+.confirm-button:disabled:hover {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }
 
 .cancel-button {

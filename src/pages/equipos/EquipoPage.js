@@ -15,6 +15,7 @@ import {
 import {
   isEvaluacionActiva,
   isEvaluacionRealizada,
+  getEvaluacionActivaId,
 } from '../../services/Evaluaciones_Api';
 
 import './EquipoPage.css';
@@ -56,6 +57,7 @@ const EquipoPage = () => {
 
   const [showConfirmChangesPopup, setShowConfirmChangesPopup] = useState(false);
   const [showDisconnectPopup, setShowDisconnectPopup] = useState(false);
+
   const [gitOrgUrl, setGitOrgUrl] = useState('');
   const [validationResults, setValidationResults] = useState(null);
   const [comprobandoValidacion, setComprobandoValidacion] = useState(false);
@@ -102,17 +104,21 @@ const EquipoPage = () => {
 
     const fetchEvaluacionStatus = async () => {
       try {
-        const evaluacionData = await isEvaluacionActiva(equipo.id, token);
-        const realizada = await isEvaluacionRealizada(
-          equipo.id,
-          idEstudiante,
-          token,
-        );
-        console.log('Evaluación activa:', evaluacionData);
-        console.log('Evaluación realizada:', realizada);
+        if (!isProfesor) {
+          const evaluacionData = await isEvaluacionActiva(equipo.id, token);
+          console.log('Evaluación activa:', evaluacionData);
+          const evaluacionId = await getEvaluacionActivaId(equipo.id, token);
+          const realizada = await isEvaluacionRealizada(
+            idEstudiante,
+            evaluacionId,
+            token,
+          );
+          console.log('Evaluación activa:', evaluacionData);
+          console.log('Evaluación realizada:', realizada);
 
-        setEvaluacionActiva(evaluacionData);
-        setEvaluacionRealizada(realizada);
+          setEvaluacionActiva(evaluacionData);
+          setEvaluacionRealizada(realizada);
+        }
       } catch (error) {
         console.error('Error al comprobar el estado de la evaluación:', error);
       }
@@ -129,6 +135,8 @@ const EquipoPage = () => {
         equipo.evaluadorId,
         equipo.estudiantes.map((miembro) => miembro.id),
         gitOrgUrl,
+        equipo.githubAsignatura,
+        equipo.tokenGithub,
         token,
       );
       setValidationResults(resultados);
@@ -180,7 +188,8 @@ const EquipoPage = () => {
       } else if (popupAction === 'salir') {
         await salirEquipo(id, idEstudiante, token);
       }
-      navigate('/equipos');
+      if (!isProfesor) navigate('/equipos');
+      else navigate(`/cursos/${equipo.cursoId}`);
     } catch (error) {
       setError('Error al realizar la acción.');
     } finally {
@@ -258,10 +267,12 @@ const EquipoPage = () => {
           token,
         );
       }
+
       setMiembrosAEliminar([]);
       setMiembrosAAgregar([]);
       setMiembrosSeleccionados([]);
       setIsEditing(false);
+
       const equipoData = await getEquipoDetalle(id, token);
       setEquipo(equipoData);
     } catch (error) {
@@ -306,17 +317,18 @@ const EquipoPage = () => {
           Torna enrere
         </button>
         <h1 className="equipo-title">{equipo.nombre}</h1>
-        {!isProfesor ? (
-          <div className="action-buttons">
-            <button
-              className="delete-button"
-              onClick={() => {
-                setPopupAction('borrar');
-                setShowPopup(true);
-              }}
-            >
-              Esborrar equip
-            </button>
+
+        <div className="action-buttons">
+          <button
+            className="delete-button"
+            onClick={() => {
+              setPopupAction('borrar');
+              setShowPopup(true);
+            }}
+          >
+            Esborrar equip
+          </button>
+          {!isProfesor && (
             <button
               className="leave-button"
               onClick={() => {
@@ -326,8 +338,9 @@ const EquipoPage = () => {
             >
               Sortir d&apos;aquest equip
             </button>
-          </div>
-        ) : null}
+          )}
+        </div>
+
         <div className="equipo-info">
           <div className="equipo-info-content">
             <p>
@@ -505,8 +518,8 @@ const EquipoPage = () => {
                       <p>
                         Introdueix la URL de l&apos;organització de GitHub del
                         teu equip. Assegura&apos;t de que el perfil de
-                        <strong> professorat-amep</strong> n&apos;és membre i
-                        que té permisos d&apos;<strong>Owner</strong>.
+                        <strong> {equipo.githubAsignatura}</strong> n&apos;és
+                        membre i que té permisos d&apos;<strong>Owner</strong>.
                       </p>
                       <input
                         type="text"
@@ -735,7 +748,23 @@ const EquipoPage = () => {
                 Estàs segur/a que vols fer aquestes modificacions als membres de
                 l&apos;equip?
               </h>
-              <button className="confirm-button" onClick={handleConfirmChanges}>
+              {/* Mensaje de error */}
+              {miembrosAEliminar.length === equipo.estudiantes.length &&
+                miembrosAAgregar.length === 0 && (
+                  <p className="creating-error-message">
+                    No pots eliminar a tots els membres de l&apos;equip i no
+                    afegir-ne a cap. En tot cas, esborra l&apos;equip.
+                  </p>
+                )}
+
+              <button
+                className="confirm-button"
+                onClick={handleConfirmChanges}
+                disabled={
+                  miembrosAEliminar.length === equipo.estudiantes.length &&
+                  miembrosAAgregar.length === 0
+                } // Deshabilita si la condición es verdadera
+              >
                 Confirmar
               </button>
               <button
@@ -747,6 +776,7 @@ const EquipoPage = () => {
             </div>
           </div>
         )}
+
         {showDisconnectPopup && (
           <div className="confirm-popup">
             <div className="changes-popup-content">

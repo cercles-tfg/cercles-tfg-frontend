@@ -87,11 +87,14 @@ const VerificarCurso = () => {
         grupo: estudiante.grupo,
       })),
       periodosEvaluacion: state.periodosEvaluacion,
+      githubAsignatura: state.githubAsignatura,
+      tokenGithubAsignatura: state.tokenGithub,
     };
 
     crearCurso(newCursoData)
-      .then(() => {
-        navigate('/cursos', { state: { cursoCreado: true } });
+      .then((response) => {
+        const cursoId = response.cursoId;
+        navigate(`/cursos/${cursoId}`);
       })
       .catch((error) => {
         setErrorMessage(error.message);
@@ -143,6 +146,22 @@ const VerificarCurso = () => {
           <p>
             <strong>Professors:</strong>{' '}
             {profesores.map((prof) => prof.nombre).join(', ')}
+          </p>
+          <p>
+            <strong>Compte de GitHub de l&apos;assignatura: </strong>{' '}
+            {state.githubAsignatura}
+          </p>
+          <p>
+            <strong>Token de GitHub establert: </strong>{' '}
+            {state.tokenGithub ? (
+              <span className="token-status">
+                <span className="tick-icon">✔️</span> Establert
+              </span>
+            ) : (
+              <span className="token-status">
+                <span className="cross-icon">❌</span> No establert
+              </span>
+            )}
           </p>
         </div>
         <h2>Períodes d&apos;avaluació</h2>

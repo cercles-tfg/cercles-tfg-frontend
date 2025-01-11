@@ -45,7 +45,7 @@ export const crearCurso = async (cursoData) => {
       throw new Error(`Error al crear el curso: ${errorText}`);
     }
 
-    const data = await response.text(); // Cambiado a .text() si la respuesta no es JSON
+    const data = await response.json(); // Cambiado a .text() si la respuesta no es JSON
     return data;
   } catch (error) {
     console.error('Error al crear el curso:', error);

@@ -40,13 +40,15 @@ const DatosGeneralesEquipoPage = () => {
 
   useEffect(() => {
     const fetchMetrics = async () => {
-      if (!organizacion || estudiantesIds.length === 0) return;
+      if (!organizacion || estudiantesIds.length === 0 || equipo === null)
+        return;
 
       try {
         setLoadingMetrics(true);
         const metricsData = await getMetrics(
           organizacion,
           estudiantesIds,
+          equipo.id,
           token,
         );
         setMetrics(metricsData.userMetrics);

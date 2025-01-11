@@ -27,6 +27,8 @@ const CrearCurso = () => {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const idProfesorLoggeado = parseInt(localStorage.getItem('id'));
+  const [githubAsignatura, setGithubAsignatura] = useState('');
+  const [tokenGithub, setTokenGithub] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,13 +61,15 @@ const CrearCurso = () => {
         cuatrimestre,
         selectedProfesores,
         periodosEvaluacion,
+        numPeriodosEvaluacion,
+        githubAsignatura,
       } = location.state;
 
       setNombreAsignatura(nombreAsignatura || '');
       setAñoInicio(añoInicio || currentYear);
       setCuatrimestre(cuatrimestre || '1');
       setSelectedProfesores(selectedProfesores || []);
-      setNumPeriodosEvaluacion(periodosEvaluacion?.length || 3);
+      setNumPeriodosEvaluacion(numPeriodosEvaluacion);
       setPeriodosEvaluacion(
         periodosEvaluacion ||
           Array(3).fill({
@@ -73,6 +77,7 @@ const CrearCurso = () => {
             fechaFin: '',
           }),
       );
+      setGithubAsignatura(githubAsignatura);
     }
   }, [location.state, idProfesorLoggeado, currentYear]);
 
@@ -164,6 +169,8 @@ const CrearCurso = () => {
           }),
           estudiantes: data,
           periodosEvaluacion,
+          githubAsignatura,
+          tokenGithub,
         },
       });
     } catch (error) {
@@ -289,6 +296,30 @@ const CrearCurso = () => {
               required
             />
           </div>
+
+          <div className="form-group-curso">
+            <label htmlFor="nombreAsignatura">
+              Nom del compte de GitHub de l&apos;assignatura
+            </label>
+            <input
+              type="text"
+              id="githubAsignatura"
+              value={githubAsignatura}
+              onChange={(e) => setGithubAsignatura(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group-curso">
+            <label htmlFor="nombreAsignatura">Definir Token de GitHub</label>
+            <input
+              type="password"
+              placeholder="Introduir token de GitHub"
+              value={tokenGithub}
+              onChange={(e) => setTokenGithub(e.target.value)}
+            />
+          </div>
+
           <div className="form-group-curso">
             <label>
               Indica quants períodes d&apos;avaluació tindrà aquest curs:

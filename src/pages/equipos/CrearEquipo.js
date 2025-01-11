@@ -129,18 +129,31 @@ const CrearEquipo = () => {
         evaluadorId: profesorSeleccionado,
       };
 
-      crearEquipo(equipoData, token).then(() => {
-        if (rol === 'Estudiante') {
-          navigate('/equipos');
-        } else {
-          window.location.href = `/cursos/${cursoSeleccionado}`;
-        }
-      });
+      await crearEquipo(equipoData, token);
+
+      // Redirigir después de la creación exitosa
+      if (rol === 'Estudiante') {
+        navigate('/equipos');
+      } else {
+        window.location.href = `/cursos/${cursoSeleccionado}`;
+      }
     } catch (error) {
-      setError(error.response?.data?.message || 'Error al crear el equipo.');
+      console.log('hola?');
+      setError(error.message || 'Error desconocido al crear el equipo.');
       setShowErrorPopup(true);
     }
   };
+
+  useEffect(() => {
+    if (showErrorPopup) {
+      const timer = setTimeout(() => {
+        setShowErrorPopup(false);
+        setShowConfirmPopup(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showErrorPopup]);
 
   const isCreateDisabled =
     !nombreEquipo ||
@@ -162,13 +175,6 @@ const CrearEquipo = () => {
           Torna enrere
         </button>
         <h1>CREA UN NOU EQUIP</h1>
-
-        {showErrorPopup && (
-          <div className="error-popup">
-            <p>{error}</p>
-            <button onClick={() => setShowErrorPopup(false)}>Tanca</button>
-          </div>
-        )}
 
         <div className="form-group">
           <label>Nom de l&apos;equip:</label>
@@ -309,6 +315,13 @@ const CrearEquipo = () => {
                   Cancel·lar
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+        {showErrorPopup && (
+          <div className="error-popup">
+            <div className="error-popup-content">
+              <p className="error-message">{error}</p>
             </div>
           </div>
         )}

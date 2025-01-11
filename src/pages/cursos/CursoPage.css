@@ -196,7 +196,24 @@ input:checked + .slider:before {
 .confirm-button:hover {
   background-color: #388e3c;
 }
+.creating-error-message {
+  color: #721c24;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+}
 
+.confirm-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+.confirm-button:disabled:hover {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
 /* Styling for edit button */
 .edit-controls {
   display: flex;
@@ -430,6 +447,24 @@ p strong {
   height: 20px;
   cursor: pointer;
   accent-color: #007bff;
+}
+
+/* Estilos para el item deshabilitado */
+.professor-item.disabled {
+  background-color: #f9f9f9;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.professor-item.disabled input[type='checkbox'] {
+  cursor: not-allowed;
+  accent-color: #ccc; /* Cambiar el color del checkbox cuando está deshabilitado */
+}
+
+.self-indicator {
+  font-size: 0.9rem;
+  color: #999;
+  margin-left: 0.5rem;
 }
 
 .curso-section {

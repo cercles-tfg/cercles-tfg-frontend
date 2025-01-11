@@ -73,11 +73,16 @@ const EquipoMetricsPage = () => {
   }, [org, estudiantesIds]);
 
   useEffect(() => {
-    if (!localOrg || !localEstudiantesIds?.length) return;
+    if (!localOrg || !localEstudiantesIds?.length || equipo === null) return;
     const fetchMetrics = async () => {
       try {
         setLoadingMetrics(true);
-        const data = await getMetrics(localOrg, localEstudiantesIds, token);
+        const data = await getMetrics(
+          localOrg,
+          localEstudiantesIds,
+          equipo.id,
+          token,
+        );
         setMetrics(data.userMetrics);
         setGlobalIssueDetails(data.globalIssueDetails);
       } catch (error) {
@@ -89,7 +94,7 @@ const EquipoMetricsPage = () => {
     };
 
     fetchMetrics();
-  }, [localOrg, localEstudiantesIds, token]);
+  }, [localOrg, localEstudiantesIds, equipo, token]);
 
   useEffect(() => {
     let interval;
@@ -105,9 +110,6 @@ const EquipoMetricsPage = () => {
   if (loadingEquipo || loadingMetrics) {
     return (
       <div className="loading-container">
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${progress}%` }}></div>
-        </div>
         <img src={loadingGif} alt="Cargando..." className="loading-gif" />
         <p className="loading-text">
           Carregant les dades... Si us plau, espereu! ⏳

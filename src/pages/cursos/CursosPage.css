@@ -1,6 +1,11 @@
 body,
 html {
-  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Evita scroll horizontal */
+  overflow-y: auto; /* Habilita scroll vertical */
 }
 
 .cursos-page {
@@ -8,7 +13,9 @@ html {
   flex-direction: column;
   align-items: center;
   background-color: #f5f5f5;
-  min-height: 100vh;
+  min-height: 100vh; /* Ocupa al menos toda la ventana */
+  height: auto; /* Permite que crezca según el contenido */
+  padding: 20px; /* Espaciado alrededor */
 }
 
 .cursos-page .content {
@@ -16,11 +23,63 @@ html {
   width: 100%;
   max-width: 1400px;
   box-sizing: border-box;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  overflow: auto; /* Permite scroll dentro del contenedor si es necesario */
 }
 
-.cursos-page h1 {
-  text-align: center;
-  margin-bottom: 20px;
+.cursos-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cursos-table th,
+.cursos-table td {
+  padding: 12px;
+  text-align: left;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  word-wrap: break-word;
+  white-space: nowrap; /* Evita saltos innecesarios */
+}
+
+.cursos-table th {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.clicable-row {
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    font-weight 0.3s ease;
+}
+
+.clicable-row:hover {
+  background-color: #e6f7ff;
+  font-weight: bold;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-inactive-courses {
+  padding: 10px;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+  color: #0056a4;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toggle-inactive-courses:hover {
+  text-decoration: underline;
 }
 
 .create-course-button {
@@ -43,53 +102,7 @@ html {
   transform: scale(1.02);
 }
 
-.cursos-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0 auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.cursos-table th,
-.cursos-table td {
-  padding: 12px;
-  text-align: left;
-  font-size: 18px;
-  border: 1px solid #ddd;
-  word-wrap: break-word;
-}
-
-.cursos-table th {
-  background-color: #f8f9fa;
-  color: #333;
-}
-
-.clicable-row {
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.clicable-row:hover {
-  background-color: #f1f1f1;
-}
-
-.toggle-inactive-courses {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  color: #0056a4;
-  font-size: 20px;
-  cursor: pointer;
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.toggle-inactive-courses:hover {
-  text-decoration: underline;
-}
-
-/* Estilo responsivo para pantallas pequeñas */
+/* Responsividad */
 @media (max-width: 768px) {
   .cursos-page .content {
     padding: 10px;
@@ -99,10 +112,5 @@ html {
   .cursos-table td {
     padding: 8px;
     font-size: 14px;
-  }
-
-  .create-course-button {
-    font-size: 13px;
-    padding: 6px 12px;
   }
 }

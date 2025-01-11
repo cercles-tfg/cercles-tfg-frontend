@@ -194,6 +194,8 @@ const CursoPage = () => {
       nombreAsignatura: editedCurso.nombreAsignatura,
       añoInicio: editedCurso.añoInicio,
       cuatrimestre: editedCurso.cuatrimestre,
+      githubAsignatura: editedCurso.githubAsignatura,
+      tokenGithubAsignatura: editedCurso.tokenGithub,
       estudiantesAñadir: newEstudiante.nombre
         ? [
             {
@@ -229,16 +231,15 @@ const CursoPage = () => {
             setEditedCurso(data);
             setNombresProfesores(data.nombresProfesores || []);
             setSortedData(data.nombresEstudiantesSinGrupo.map((_, i) => i));
-            console.log('Datos del curso actualizados:', data);
+            console.log('Dades del curs actualitzades:', data);
           })
           .catch((error) => {
             setError(error.message);
-            console.error('Error al recargar los detalles del curso:', error);
+            console.error('Error en recarregar les dades del curs:', error);
           });
       })
-      .catch((error) => {
-        setError(error.message);
-        console.error('Error al modificar el curso:', error);
+      .catch(() => {
+        setError('Error en modificar el curs');
       });
   };
 
@@ -398,6 +399,60 @@ const CursoPage = () => {
                     )}
                   </p>
                   <p>
+                    <strong>Compte de GitHub de l&apos;assignatura:</strong>{' '}
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editedCurso.githubAsignatura}
+                        onChange={(e) =>
+                          setEditedCurso({
+                            ...editedCurso,
+                            githubAsignatura: e.target.value,
+                          })
+                        }
+                      />
+                    ) : curso.githubAsignatura ? (
+                      <a
+                        href={`https://github.com/${curso.githubAsignatura}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="github-link"
+                      >
+                        {curso.githubAsignatura}
+                      </a>
+                    ) : (
+                      <span className="token-status">
+                        <span className="cross-icon">❌</span> No establert
+                      </span>
+                    )}
+                  </p>
+
+                  <p>
+                    <strong>
+                      Token del compte de GitHub de l&apos;assignatura:
+                    </strong>{' '}
+                    {isEditing ? (
+                      <input
+                        type="password"
+                        value={editedCurso.tokenGithub}
+                        onChange={(e) =>
+                          setEditedCurso({
+                            ...editedCurso,
+                            tokenGithub: e.target.value,
+                          })
+                        }
+                      />
+                    ) : curso.tokenGithub ? (
+                      <span className="token-status">
+                        <span className="tick-icon">✔️</span> Establert
+                      </span>
+                    ) : (
+                      <span className="token-status">
+                        <span className="cross-icon">❌</span> No establert
+                      </span>
+                    )}
+                  </p>
+                  <p>
                     <strong>Nombre total d&apos;estudiants:</strong>{' '}
                     {(curso.nombresEstudiantesSinGrupo?.length || 0) +
                       (curso.equipos?.reduce(
@@ -443,20 +498,33 @@ const CursoPage = () => {
                 <h2>Professors</h2>
                 {isEditing ? (
                   <div className="profesores-list">
-                    {profesoresDisponibles.map((profesor, index) => (
-                      <div key={index} className="professor-item">
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={nombresProfesores.includes(
-                              profesor.nombre,
+                    {profesoresDisponibles.map((profesor, index) => {
+                      const isCurrentUser =
+                        profesor.id === parseInt(localStorage.getItem('id'));
+                      return (
+                        <div
+                          key={index}
+                          className={`professor-item ${isCurrentUser ? 'disabled' : ''}`}
+                        >
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={nombresProfesores.includes(
+                                profesor.nombre,
+                              )}
+                              onChange={() =>
+                                handleProfessorSelection(profesor)
+                              }
+                              disabled={isCurrentUser}
+                            />
+                            {profesor.nombre}
+                            {isCurrentUser && (
+                              <span className="self-indicator">(JO)</span>
                             )}
-                            onChange={() => handleProfessorSelection(profesor)}
-                          />
-                          {profesor.nombre}
-                        </label>
-                      </div>
-                    ))}
+                          </label>
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <ul className="curso-list">
@@ -828,6 +896,12 @@ const CursoPage = () => {
           <div className="confirm-popup">
             <div className="popup-content">
               <p>Estàs segur/a de que vols realitzar aquests canvis?</p>
+              {nombresProfesores.length === 0 && (
+                <p className="creating-error-message">
+                  No pots eliminar a tots els professors d&apos;aquest curs i no
+                  afegir-ne a cap.
+                </p>
+              )}
               <div className="popup-buttons">
                 <button
                   type="button"
@@ -840,6 +914,7 @@ const CursoPage = () => {
                   type="button"
                   className="confirm-button"
                   onClick={handleConfirmSaveChanges}
+                  disabled={nombresProfesores.length === 0}
                 >
                   Si
                 </button>

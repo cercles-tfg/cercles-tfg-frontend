@@ -236,6 +236,8 @@ export const validarOrganizacion = async (
   profesorId,
   miembrosIds,
   organizacionUrl,
+  githubAsignatura,
+  tokenGithub,
   token,
 ) => {
   try {
@@ -251,6 +253,8 @@ export const validarOrganizacion = async (
           profesorId,
           miembrosIds,
           organizacionUrl,
+          githubAsignatura,
+          tokenGithub,
         }),
       },
     );
@@ -302,13 +306,13 @@ export const confirmarOrganizacion = async (
 };
 
 // Obtener métricas del equipo
-export const getMetrics = async (org, estudiantesIds, token) => {
-  if (!org || !estudiantesIds?.length) {
+export const getMetrics = async (org, estudiantesIds, idEquipo, token) => {
+  if (!org || !estudiantesIds?.length || !idEquipo) {
     throw new Error('Faltan parámetros necesarios.');
   }
 
   const queryParams = `estudiantesIds=${estudiantesIds.join(',')}`;
-  const url = `${API_BASE_URL}/github/metrics/${org}?${queryParams}`;
+  const url = `${API_BASE_URL}/github/equipo/${idEquipo}/metrics/${org}?${queryParams}`;
 
   const response = await fetch(url, {
     headers: {

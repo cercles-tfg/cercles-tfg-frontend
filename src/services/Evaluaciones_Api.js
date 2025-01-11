@@ -89,11 +89,14 @@ export const isEvaluacionActiva = async (equipoId, token) => {
 };
 
 // Comprobar si la evaluación ya fue realizada
-export const isEvaluacionRealizada = async (equipoId, estudianteId, token) => {
-  console.log('realizada ', equipoId, estudianteId);
+export const isEvaluacionRealizada = async (
+  estudianteId,
+  evaluacionId,
+  token,
+) => {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/equipo/${equipoId}/evaluacion-realizada/${estudianteId}`,
+      `${API_BASE_URL}/equipo/evaluacion-realizada/${evaluacionId}/${estudianteId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -157,7 +160,7 @@ export const crearEvaluacionDetalle = async (
 export const getEvaluacionActivaId = async (equipoId, token) => {
   try {
     const response = await fetch(
-      `http://localhost:8080/api/evaluaciones/equipo/${equipoId}/evaluacion-activa-id`,
+      `${API_BASE_URL}/equipo/${equipoId}/evaluacion-activa-id`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

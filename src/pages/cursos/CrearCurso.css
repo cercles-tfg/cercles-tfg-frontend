@@ -104,6 +104,8 @@ input[type='date'] {
   border-radius: 8px;
   max-width: 500px;
   width: 90%;
+  max-height: 80%; /* Limita la altura máxima del popup */
+  overflow-y: auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: left;
 }

@@ -73,7 +73,8 @@ const EvaluacionPage = () => {
       setError('Tots els estudiants han de tenir una puntuació assignada.');
       return;
     }
-
+    console.log('suma tot ', sumaTotal);
+    console.log('max p ', maxPuntos);
     // Validar que la suma total sea igual al máximo permitido
     if (sumaTotal !== maxPuntos) {
       setError(
@@ -130,7 +131,7 @@ const EvaluacionPage = () => {
           de membres de l&apos;equip * 10
         </h2>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="evaluacion-error-message">{error}</div>}
 
         <ul>
           {equipo.estudiantes.map((estudiante) => (
