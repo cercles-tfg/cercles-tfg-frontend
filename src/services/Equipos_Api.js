@@ -306,26 +306,36 @@ export const confirmarOrganizacion = async (
 };
 
 // Obtener métricas del equipo
+// Obtener métricas del equipo
 export const getMetrics = async (org, estudiantesIds, idEquipo, token) => {
   if (!org || !estudiantesIds?.length || !idEquipo) {
     throw new Error('Faltan parámetros necesarios.');
   }
 
-  const queryParams = `estudiantesIds=${estudiantesIds.join(',')}`;
+  const queryParams = `estudiantesIds=${estudiantesIds.join('&estudiantesIds=')}`;
   const url = `${API_BASE_URL}/github/equipo/${idEquipo}/metrics/${org}?${queryParams}`;
+  console.log('url ', url);
 
-  const response = await fetch(url, {
+  return await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json', // Corregido
+      'Content-Type': 'application/json',
     },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error al obtener las métricas: ${response.statusText}`);
-  }
-
-  return await response.json();
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      return response.json(); // Retorna explícitamente el JSON
+    })
+    .then((data) => {
+      console.log('Datos obtenidos:', data);
+      return data; // Asegúrate de retornar los datos aquí
+    })
+    .catch((error) => {
+      console.error('Error en la solicitud:', error);
+      throw error; // Re-lanza el error para que se pueda manejar en el `useEffect`
+    });
 };
 
 //desconectar org de equipo

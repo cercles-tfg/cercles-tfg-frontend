@@ -3,12 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
 import './CursosPage.css';
 import { obtenerCursos } from '../../services/Cursos_Api.js';
+import { crearProfesor } from '../../services/Usuarios_Api.js';
 
 const CursosPage = () => {
   const navigate = useNavigate();
   const [cursosActivos, setCursosActivos] = useState([]);
   const [cursosInactivos, setCursosInactivos] = useState([]);
   const [showInactiveCourses, setShowInactiveCourses] = useState(false);
+  const [showProfessorPopup, setShowProfessorPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [professorData, setProfessorData] = useState({
+    nombre: '',
+    correo: '',
+  });
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     // Obtener la lista de cursos del backend
@@ -45,17 +53,49 @@ const CursosPage = () => {
     navigate('/cursos/crear');
   };
 
+  const handleAddProfessor = async () => {
+    const jwtToken = localStorage.getItem('jwtToken');
+    if (!jwtToken) {
+      alert('Token no encontrado. Inicia sesión de nuevo.');
+      return;
+    }
+
+    try {
+      await crearProfesor(professorData, jwtToken);
+      setShowProfessorPopup(false);
+      setSuccessMessage(
+        `El professor "${professorData.nombre}" amb correu "${professorData.correo}" s'ha afegit correctament a la BD.`,
+      );
+      setProfessorData({
+        nombre: '',
+        correo: '',
+      });
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error('Error al afegir el professor:', error);
+      alert(`Error al afegir el professor: ${error.message}`);
+    }
+  };
+
   return (
     <div className="cursos-page">
       <Sidebar />
       <div className="content">
         <h1>Els meus cursos</h1>
-        <button
-          className="create-course-button"
-          onClick={handleCreateNewCourse}
-        >
-          Crear un nou curs
-        </button>
+        <div className="buttons-container">
+          <button
+            className="create-course-button"
+            onClick={handleCreateNewCourse}
+          >
+            Crear un nou curs
+          </button>
+          <button
+            className="add-professor-button"
+            onClick={() => setShowProfessorPopup(true)}
+          >
+            Afegir professor
+          </button>
+        </div>
         <h2>Els meus cursos actius</h2>
         <table className="cursos-table">
           <thead>
@@ -120,6 +160,64 @@ const CursosPage = () => {
               ))}
             </tbody>
           </table>
+        )}
+        {showProfessorPopup && (
+          <div className="popup-overlay">
+            <div className="popup">
+              <h2>Afegir professor a la BD</h2>
+              <div className="form-group">
+                <label>Nom i cognoms:</label>
+                <input
+                  type="text"
+                  value={professorData.nombre}
+                  onChange={(e) =>
+                    setProfessorData({
+                      ...professorData,
+                      nombre: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label>Correu electrònic:</label>
+                <input
+                  type="email"
+                  value={professorData.correo}
+                  onChange={(e) =>
+                    setProfessorData({
+                      ...professorData,
+                      correo: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="buttons-container">
+                <button className="popup-button" onClick={handleAddProfessor}>
+                  Afegir
+                </button>
+                <button
+                  className="popup-button cancel"
+                  onClick={() => setShowProfessorPopup(false)}
+                >
+                  Cancel·lar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showSuccessPopup && (
+          <div className="popup-overlay">
+            <div className="popup">
+              <h2>Professor afegit correctament</h2>
+              <p>{successMessage}</p>
+              <button
+                className="popup-button"
+                onClick={() => setShowSuccessPopup(false)}
+              >
+                Tanca
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

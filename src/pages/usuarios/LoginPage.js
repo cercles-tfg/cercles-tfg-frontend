@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
+  const [fadeOut, setFadeOut] = useState(false);
 
   const handleLoginSuccess = (credentialResponse) => {
     const googleToken = credentialResponse.credential;
@@ -43,6 +44,14 @@ const LoginPage = () => {
       });
   };
 
+  const handleErrorMessageClose = () => {
+    setFadeOut(true);
+    setTimeout(() => {
+      setErrorMessage('');
+      setFadeOut(false);
+    }, 300); // Tiempo de transición sincronizado con el CSS
+  };
+
   const handleLoginFailure = (error) => {
     console.error('Login failed', error);
     setErrorMessage("S'ha produït un error durant l'inici de sessió.");
@@ -54,8 +63,11 @@ const LoginPage = () => {
         <div className="login-box">
           <h1>CERCLES</h1>
           <p>
-            Creació d&apos;Equips i seguiment del Rendiment i CoL·laboracio en
-            projectes d&apos;Enginyeria del Software
+            <strong>C</strong>reació d&apos;<strong>E</strong>quips i seguiment
+            del <strong>R</strong>endiment i <strong>C</strong>o
+            <strong>L</strong>·laboracio en projectes d&apos;<strong>E</strong>
+            nginyeria del
+            <strong> S</strong>oftware
           </p>
           <p>Inicia sessió amb el teu compte de la UPC per continuar</p>
 

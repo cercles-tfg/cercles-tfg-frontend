@@ -90,7 +90,7 @@ const EquipoPage = () => {
         setEstIds(estudiantesIds);
         setGitOrganizacion(equipoData.gitOrganizacion);
       } catch (error) {
-        setError("No se pudo carregar la informació de l'equip.");
+        setError("No s'ha pogut carregar la informació de l'equip.");
       } finally {
         setLoading(false);
       }
@@ -541,15 +541,37 @@ const EquipoPage = () => {
                       {/* Checklist de validación */}
                       <div className="validation-results">
                         <p>
-                          {validationResults?.professoratEsMiembro
-                            ? "✅ L'usuari professorat-amep és membre de l'organització."
-                            : "❌ L'usuari professorat-amep no és membre de l'organització."}
+                          {validationResults?.professoratEsMiembro ? (
+                            <>
+                              ✅ L&apos;usuari{' '}
+                              <strong>{equipo.githubAsignatura}</strong> és
+                              membre de l&apos;organització.
+                            </>
+                          ) : (
+                            <>
+                              ❌ L&apos;usuari{' '}
+                              <strong>{equipo.githubAsignatura}</strong> no és
+                              membre de l&apos;organització.
+                            </>
+                          )}
                         </p>
+
                         <p>
-                          {validationResults?.professoratEsAdmin
-                            ? "✅ L'usuari professorat-amep té permisos d'owner en l'organització."
-                            : "❌ L'usuari professorat-amep no té permisos d'owner en l'organització."}
+                          {validationResults?.professoratEsAdmin ? (
+                            <>
+                              ✅ L&apos;usuari{' '}
+                              <strong>{equipo.githubAsignatura}</strong> té
+                              permisos d&apos;owner en l&apos;organització.
+                            </>
+                          ) : (
+                            <>
+                              ❌ L&apos;usuari{' '}
+                              <strong>{equipo.githubAsignatura}</strong> no té
+                              permisos d&apos;owner en l&apos;organització.
+                            </>
+                          )}
                         </p>
+
                         <p>
                           {validationResults?.todosUsuariosGitConfigurados
                             ? '✅ Tots els membres tenen un compte de GitHub associat.'

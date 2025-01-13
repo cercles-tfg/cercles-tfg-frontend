@@ -74,17 +74,26 @@ const EquipoMetricsPage = () => {
 
   useEffect(() => {
     if (!localOrg || !localEstudiantesIds?.length || equipo === null) return;
+
     const fetchMetrics = async () => {
       try {
         setLoadingMetrics(true);
+
         const data = await getMetrics(
           localOrg,
           localEstudiantesIds,
           equipo.id,
           token,
         );
-        setMetrics(data.userMetrics);
-        setGlobalIssueDetails(data.globalIssueDetails);
+
+        if (data && data.userMetrics && data.globalIssueDetails) {
+          console.log('Datos obtenidos en fetchMetrics:', data);
+          setMetrics(data.userMetrics);
+          setGlobalIssueDetails(data.globalIssueDetails);
+        } else {
+          console.error('La respuesta no tiene las claves esperadas:', data);
+          setError('Error: La respuesta del servidor no es válida.');
+        }
       } catch (error) {
         console.error('Error en fetchMetrics:', error.message);
         setError('Error al obtener las métricas.');
@@ -491,28 +500,34 @@ const EquipoMetricsPage = () => {
               <h2>Distribució d&apos;històries d&apos;usuari totals</h2>
               <Pie
                 data={{
-                  labels: metrics.map((m) => m.nombre),
+                  labels: metrics.every((m) => m.userStories === 0)
+                    ? ['No hi ha cap HU']
+                    : metrics.map((m) => m.nombre),
                   datasets: [
                     {
-                      data: metrics.map((m) => m.userStories),
-                      backgroundColor: [
-                        '#6C9975',
-                        '#BB6365',
-                        '#785B75',
-                        '#5E807F',
-                        '#BA5A31',
-                        '#355C7D',
-                        '#F4A261',
-                        '#E76F51',
-                        '#2A9D8F',
-                        '#264653',
-                        '#A8DADC',
-                        '#457B9D',
-                        '#E9C46A',
-                        '#F4A3B3',
-                        '#D4A5A5',
-                        '#B5838D',
-                      ],
+                      data: metrics.every((m) => m.userStories === 0)
+                        ? [1] // Valor fijo para el caso de "No hi ha cap HU"
+                        : metrics.map((m) => m.userStories),
+                      backgroundColor: metrics.every((m) => m.userStories === 0)
+                        ? ['#C0C0C0'] // Color gris para "No hi ha cap HU"
+                        : [
+                            '#6C9975',
+                            '#BB6365',
+                            '#785B75',
+                            '#5E807F',
+                            '#BA5A31',
+                            '#355C7D',
+                            '#F4A261',
+                            '#E76F51',
+                            '#2A9D8F',
+                            '#264653',
+                            '#A8DADC',
+                            '#457B9D',
+                            '#E9C46A',
+                            '#F4A3B3',
+                            '#D4A5A5',
+                            '#B5838D',
+                          ],
                     },
                   ],
                 }}
