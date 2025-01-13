@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getEquipoDetalle, getMetrics } from '../../services/Equipos_Api';
 import { getEvaluacionesPorEquipo } from '../../services/Evaluaciones_Api';
@@ -10,23 +10,33 @@ const DatosGeneralesEquipoPage = () => {
   const { equipoId } = useParams();
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  const organizacion = queryParams.get('org'); // Organización de GitHub
-  const estudiantesIds = queryParams.get('estudiantesIds')?.split(',') || [];
+  const org = queryParams.get('org');
+  const estudiantesIdsString = queryParams.get('estudiantesIds');
+  const estudiantesIds = estudiantesIdsString
+    ? estudiantesIdsString.split(',').map(Number)
+    : [];
   const token = localStorage.getItem('jwtToken');
+
   const [medias, setMedias] = useState([]);
   const [metrics, setMetrics] = useState([]);
   const [equipo, setEquipo] = useState(null);
   const [loadingEquipo, setLoadingEquipo] = useState(true);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
   const [error, setError] = useState(null);
+  const [localOrg, setLocalOrg] = useState(null);
+  const [localEstudiantesIds, setLocalEstudiantesIds] = useState([]);
+
   const navigate = useNavigate();
 
+  // Cargar datos del equipo y evaluaciones
   useEffect(() => {
     const fetchEquipoDetalle = async () => {
       try {
         setLoadingEquipo(true);
         const equipoData = await getEquipoDetalle(equipoId, token);
+        const mediasData = await getEvaluacionesPorEquipo(equipoId, token);
         setEquipo(equipoData);
+        setMedias(mediasData);
       } catch (error) {
         console.error('Error en fetchEquipoDetalle:', error.message);
         setError("No es pot carregar la informació de l'equip.");
@@ -38,39 +48,50 @@ const DatosGeneralesEquipoPage = () => {
     fetchEquipoDetalle();
   }, [equipoId, token]);
 
+  // Actualizar org y estudiantes localmente solo si cambian
   useEffect(() => {
-    const fetchMetrics = async () => {
-      if (!organizacion || estudiantesIds.length === 0 || equipo === null)
-        return;
+    if (
+      org !== localOrg ||
+      JSON.stringify(estudiantesIds) !== JSON.stringify(localEstudiantesIds)
+    ) {
+      setLocalOrg(org);
+      setLocalEstudiantesIds(estudiantesIds);
+    }
+  }, [org, estudiantesIds]);
 
+  // Cargar métricas de GitHub
+  useEffect(() => {
+    if (!localOrg || !localEstudiantesIds?.length || !equipo) return;
+
+    const fetchMetrics = async () => {
       try {
         setLoadingMetrics(true);
         const metricsData = await getMetrics(
-          organizacion,
-          estudiantesIds,
+          localOrg,
+          localEstudiantesIds,
           equipo.id,
           token,
         );
-        setMetrics(metricsData.userMetrics);
+        if (metricsData && metricsData.userMetrics) {
+          console.log('Datos obtenidos en fetchMetrics:', metricsData);
+          setMetrics(metricsData.userMetrics);
+        } else {
+          console.error(
+            'La respuesta no tiene las claves esperadas:',
+            metricsData,
+          );
+          setError('Error: La respuesta del servidor no es vàlida.');
+        }
       } catch (error) {
         console.error('Error en fetchMetrics:', error.message);
-        if (
-          error.response?.status === 403 &&
-          error.response?.data?.message?.includes('API rate limit exceeded')
-        ) {
-          setError(
-            "Has arribat al límit de sol·licituds de l'API de GitHub. Si us plau, torna a intentar-ho més tard!",
-          );
-        } else {
-          setError('Error al carregar les mètriques.');
-        }
+        setError('Error al carregar les mètriques.');
       } finally {
         setLoadingMetrics(false);
       }
     };
 
     fetchMetrics();
-  }, [organizacion, estudiantesIds, token]);
+  }, [localOrg, localEstudiantesIds, equipo, token]);
 
   if (loadingEquipo || loadingMetrics) {
     return (
@@ -117,7 +138,7 @@ const DatosGeneralesEquipoPage = () => {
         <h1>📊 Dades generals de l&apos;equip</h1>
 
         {/* Tabla de medias */}
-        <h2>Mitjanes generals</h2>
+        <h2>Dades generals de les avaluacions</h2>
         {medias.length > 0 ? (
           <table className="tabla-medias-generales">
             <thead>
@@ -236,13 +257,25 @@ const DatosGeneralesEquipoPage = () => {
                 </td>
               </tr>
               <tr>
-                <td>#PRs</td>
+                <td>#PRs creats</td>
                 {metrics.map((m) => (
                   <td key={`prs-${m.username}`}>{m.pullRequestsCreated}</td>
                 ))}
                 <td className="mitjana-column">
                   {(
                     metrics.reduce((sum, m) => sum + m.pullRequestsCreated, 0) /
+                    metrics.length
+                  ).toFixed(2)}
+                </td>
+              </tr>
+              <tr>
+                <td>#PRs fusionats</td>
+                {metrics.map((m) => (
+                  <td key={`prs-${m.username}`}>{m.pullRequestsMerged}</td>
+                ))}
+                <td className="mitjana-column">
+                  {(
+                    metrics.reduce((sum, m) => sum + m.pullRequestsMerged, 0) /
                     metrics.length
                   ).toFixed(2)}
                 </td>

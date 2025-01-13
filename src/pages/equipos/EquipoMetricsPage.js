@@ -196,13 +196,25 @@ const EquipoMetricsPage = () => {
               </td>
             </tr>
             <tr>
-              <td>#PRs</td>
+              <td>#PRs creats</td>
               {metrics.map((m) => (
                 <td key={`prs-${m.username}`}>{m.pullRequestsCreated}</td>
               ))}
               <td className="mitjana-column">
                 {(
                   metrics.reduce((sum, m) => sum + m.pullRequestsCreated, 0) /
+                  metrics.length
+                ).toFixed(2)}
+              </td>
+            </tr>
+            <tr>
+              <td>#PRs fusionats</td>
+              {metrics.map((m) => (
+                <td key={`prs-${m.username}`}>{m.pullRequestsMerged}</td>
+              ))}
+              <td className="mitjana-column">
+                {(
+                  metrics.reduce((sum, m) => sum + m.pullRequestsMerged, 0) /
                   metrics.length
                 ).toFixed(2)}
               </td>

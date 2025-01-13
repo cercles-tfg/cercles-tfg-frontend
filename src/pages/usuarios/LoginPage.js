@@ -44,14 +44,6 @@ const LoginPage = () => {
       });
   };
 
-  const handleErrorMessageClose = () => {
-    setFadeOut(true);
-    setTimeout(() => {
-      setErrorMessage('');
-      setFadeOut(false);
-    }, 300); // Tiempo de transición sincronizado con el CSS
-  };
-
   const handleLoginFailure = (error) => {
     console.error('Login failed', error);
     setErrorMessage("S'ha produït un error durant l'inici de sessió.");
