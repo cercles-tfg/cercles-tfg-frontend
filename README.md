@@ -62,6 +62,6 @@ Inicia Apache Tomcat y verifica que la aplicación esté funcionando accediendo 
 
 ## **Licencia**
 
-Este proyecto se distribuye bajo la licencia Apache License 2.0. Consulta el archivo LICENSE para más detalles.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.
 
 ---
