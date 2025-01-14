@@ -1,0 +1,170 @@
+.equipos-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.content {
+  padding: 40px;
+  width: 100%;
+  max-width: 1400px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.header-container h1 {
+  margin-bottom: 15px;
+  font-size: 2rem;
+  color: #333;
+}
+
+.create-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s;
+  margin-top: 10px;
+}
+
+.create-button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1400px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.inactive-card {
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  cursor: not-allowed;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-container {
+  height: 80px;
+  width: 80px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 30px;
+  color: white;
+}
+
+.card h2 {
+  margin: 20px 0;
+  font-size: 40px;
+  color: white;
+}
+
+.card p {
+  font-size: 25px;
+  margin: 5px 0;
+  color: white;
+}
+
+.inactive-card h2 {
+  margin: 20px 0;
+  font-size: 40px;
+  color: white;
+}
+
+.inactive-card p {
+  font-size: 25px;
+  margin: 5px 0;
+  color: white;
+}
+
+.toggle-inactive-teams {
+  color: #0056a4;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toggle-inactive-teams:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+  }
+
+  .card p {
+    font-size: 0.9rem;
+  }
+}

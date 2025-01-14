@@ -1,0 +1,239 @@
+.create-course-form {
+  width: 100%;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 50px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.form-group-curso {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input[type='text'],
+input[type='file'],
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.profesor-selection-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profesor-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.profesor-card.selected {
+  background-color: #d4eafd;
+  border-color: #007bff;
+}
+
+.profesor-card:hover {
+  background-color: #f1f1f1;
+}
+
+.evaluacion-fechas {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.evaluacion-fechas label {
+  font-weight: bold;
+  white-space: nowrap; /* Evitar que el texto se divida en dos líneas */
+  margin-right: 10px; /* Espacio entre el texto y el primer input */
+}
+
+input[type='date'] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.no-periodos {
+  color: #555;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.error-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80%; /* Limita la altura máxima del popup */
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.popup-content h2 {
+  margin-top: 0;
+  color: #d9534f;
+}
+
+.popup-content ul {
+  margin: 15px 0;
+  padding-left: 20px;
+  list-style: disc;
+  text-align: left;
+}
+
+.popup-content li {
+  color: #333;
+}
+
+.file-label {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-icon {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 50%;
+  margin-left: 5px;
+  cursor: pointer;
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 110%;
+  background: white;
+  padding: 50px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  z-index: 3000;
+  font-size: 14px;
+  color: #333;
+}
+
+.tooltip p {
+  margin: 5px 0;
+}
+
+.tooltip-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tooltip-table th,
+.tooltip-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.tooltip-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.close-popup-button {
+  display: inline-block;
+  background-color: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-popup-button:hover {
+  background-color: #c9302c;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cancel-button,
+.create-button {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 26px;
+  font-weight: bold;
+  border: none;
+  text-align: center;
+}
+
+.cancel-button {
+  background-color: #ff4d4d;
+  color: #fff;
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+.create-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.create-button:hover {
+  background-color: #218838;
+}
